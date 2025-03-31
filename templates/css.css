@@ -1,0 +1,350 @@
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    background-color: rgba(29, 48, 66, 0.72);
+    color: ghostwhite;
+  }
+
+.tablecontainer{
+    border: 1px solid #13131326;
+    margin-top: 5vh;
+    position: relative;
+    background-color: #859099;
+    border-radius: 9px;
+}
+
+.CryptoInfo{
+    justify-content: center;
+    display: flex;
+    width: 100%;
+    margin-top: 3vh;
+    padding: 51px;
+    border: 1px solid #0000000f;
+    background-color: rgba(217, 248, 255, 0.15);
+    position: relative;
+    border-radius: 4px;
+    max-width: 1200px; 
+}
+
+.cryptoName{
+font-size: 24px;
+  font-family: sans-serif;
+}
+
+.monospaceFont{
+    font-family: monospace;
+}
+
+.AccAdmin{
+    font-size: 17px;
+}
+
+.navbarspacer{
+    margin-top: 10vh;
+}
+
+
+.CryptoInfoContainer{
+    justify-content: center;
+    display: flex;
+}
+
+.indexAccInput{
+    display: grid;
+}
+
+@media (min-width: 1337px) {
+    .tablecontainer {
+        margin: 20px;
+        max-width: 1200px; 
+        margin: 20px auto; 
+    }
+}
+
+.tableEvents {
+    width: 100%;
+    background-color: #4f5b6a4f;
+    border-radius: 8px;
+    border: 0.01rem solid #0000000a !important;
+}
+
+.tableEventsLeft {
+    text-align: left;
+}
+
+.tableEventsCenter {
+    text-align: center;
+}
+
+.tableEventsRight {
+    text-align: Right;
+}
+
+.searchbarIndex{
+    justify-content: right;
+    display: flex;
+    max-width: 1200px; 
+}
+.searchbar{
+  width: 440px;
+  background-color: #80a3b526;
+  border: aqua;
+  border-radius: 4px;
+  color: azure;
+}
+
+.intervalsetsearhbar{
+    width: 128px;
+    background-color: #304e5e80;;
+    border: rgb(0, 0, 0);
+    border-radius: 4px;
+}
+
+.intervalsetsearhbarDiv{
+
+    max-width: 148px;
+}
+
+
+
+.amountsCoin{
+    justify-content: center;
+  display: flex;
+}
+  
+
+.intervalsetMaxWidth{
+    max-width: 475px;
+    display: block ruby;
+}
+
+.RowCheckBox{
+    max-width: 629px;
+    justify-content: center;
+    display: flex;
+}
+
+.searchbarspan{
+  margin-right: 10px;
+}
+
+.tableheadCoinSymbol{
+    max-width: 42px;
+}
+
+.buttonsearch{
+  background-color: #739fa63b;
+  color: aliceblue;
+  border: turquoise;
+  margin-left: 15px;
+  border-radius: 4px;
+}
+
+.displayRowSearchInterval{
+    display: block ruby;
+}
+
+.searchFrom{
+    max-width: 136px;
+    min-width: 136px;
+}
+
+.searchTo{
+    max-width: 1px;
+}
+
+.filterselection{
+    margin-top: 10px;
+    
+}
+
+.CheckboxContainer {
+    display: block;
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+    
+/* Hide the browser's default checkbox */
+.CheckboxContainer input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+  
+  /* Create a custom checkbox */
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 14px;
+    width: 14px;
+    border-radius: 15px;
+    background-color: #13243180;
+  }
+  
+  /* On mouse-over, add a grey background color */
+  .CheckboxContainer:hover input ~ .checkmark {
+
+  }
+  
+  /* When the checkbox is checked, add a blue background */
+  .CheckboxContainer input:checked ~ .checkmark {
+    background-color: #b0cfff;
+    height: 14px;
+    width: 14px;
+  border-radius: 15px;
+  }
+  
+  /* Create the checkmark/indicator (hidden when not checked) */
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+  
+  /* Show the checkmark when checked */
+  .CheckboxContainer input:checked ~ .checkmark:after {
+    display: none;
+  }
+  
+  /* Style the checkmark/indicator */
+  .CheckboxContainer .checkmark:after {
+    left: 9px;
+    top: 5px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+  }
+
+
+
+
+
+
+  .sidebar {
+    margin: 0;
+    padding: 0;
+    width: 200px;
+    background-color: #6e7a84;
+    position: fixed;
+    height: 100%;
+    overflow: auto;
+  }
+  
+  /* Sidebar links */
+  .sidebar a {
+    display: block;
+    color: rgb(255, 255, 255);
+    padding: 16px;
+    text-decoration: none;
+  }
+  
+  /* Active/current link */
+  .sidebar a.active {
+    background-color: #3f4855;
+    color: white;
+  }
+  
+  /* Links on mouse-over */
+  .sidebar a:hover:not(.active) {
+    background-color: #3f485554;
+    color: white;
+  }
+  
+  /* Page content. The value of the margin-left property should match the value of the sidebar's width property */
+  div.content {
+    margin-left: 200px;
+    padding: 1px 16px;
+    height: 1000px;
+  }
+  
+  /* On screens that are less than 700px wide, make the sidebar into a topbar */
+  @media screen and (max-width: 700px) {
+    .sidebar {
+      width: 100%;
+      height: auto;
+      position: relative;
+    }
+    .sidebar a {float: left;}
+    div.content {margin-left: 0;}
+  }
+  
+  /* On screens that are less than 400px, display the bar vertically, instead of horizontally */
+  @media screen and (max-width: 400px) {
+    .sidebar a {
+      text-align: center;
+      float: none;
+    }
+  }
+
+  .AddressWrapper {
+    display: grid;
+    padding-top: 15px;
+  }
+
+  .AddNetwork{
+    padding-bottom: 42px;
+    justify-content: center;
+    display: grid;
+  }
+
+  .buttonSetSetting{
+    background-color: #739fa63b;
+    max-width: 28px;
+    color: aliceblue;
+    border: turquoise;
+    margin-left: 15px;
+    border-radius: 4px;
+  }
+
+  .TittleSetting{
+    border-bottom: 1px solid;
+  }
+
+  .SMSettings{
+    display: none;
+    justify-content: center;
+  }
+
+  .SMSettingGrouop{
+    padding: 22px;
+    background-color: #221d1d36;
+    margin-top: 15px;
+  }
+
+  .NetworkSettingGrouop{
+    padding: 22px;
+    background-color: #221d1d36;
+    margin-top: 15px;
+  }
+
+  .settingInput{
+
+    width: 440px;
+    outline: none;
+    background-color: #929eac57;
+    border: aqua;
+    border-radius: 4px;
+    color: azure;
+
+}
+
+
+
+  .bg-light {
+    background-color: #75929d66 !important;
+  }

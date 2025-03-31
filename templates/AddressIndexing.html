@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Demo APP SS</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="/css/css.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <script  src="/js/reqapi.js"></script>
+</head>
+
+<body>
+  <div class="container">
+      <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <a class="navbar-brand" href="#">S.S: Front Rest API Web</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="#">Index log<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/AddressIndexing">Address indexing</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/settigns">Settings</a>
+            </li>
+          </ul>
+          <span class="navbar-text">
+            web app en desarrollo
+          </span>
+        </div>
+      </nav>
+  </div>
+
+  <div class ="navbarspacer">
+
+  </div>
+
+  <div class="col-xs-2 searchbarIndex">
+      <label for="ex1" class="searchbarspan">Index Account </label>
+      <input type="text" class="searchbar" id="IndexAddress">
+      <button class="buttonsearch" onclick="IndexAddress()">Search</button>
+  </div>
+
+  <div class="CryptoInfoContainer">
+
+    <div class="CryptoInfo">
+      <div class="row">
+
+        <div class="col ">
+          <span id="Address" class="cryptoName">{{Address}}</span>
+        </div>
+
+        <div class="col">
+          <span id="AccAdmin" class="AccAdmin">balance  </span><span class="monospaceFont">{{balance}}</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="tablecontainer">
+
+    <div class="row w-100">
+
+      <div class="col">
+        <p>{{symbol}} Events</p>
+      </div>
+
+      <div class="col">
+        <div class="row  filterselection">
+          <div class="col">
+            <p>filter</p>
+          </div>
+          <div class="col">
+            <label class="checkbox-inline"><input type="checkbox" value="" id="filterTransactions">Transactions</label>
+          </div>
+          <div class="col">
+            <label class="checkbox-inline"><input type="checkbox" value="" id="filterBalances">Balances</label>
+          </div>
+          <div class="col">
+            <label class="checkbox-inline"><input type="checkbox" value="" id="filterApproval">Approval</label> 
+          </div>
+          <div class="col">
+            <label class="checkbox-inline"><input type="checkbox" value="" id="filterSupply">Supply</label> 
+          </div>
+          <div class="col">
+            <label class="checkbox-inline"><input type="checkbox" value="" id="filterFreezeAddress">FreezeAddress</label> 
+          </div>
+          <div class="col">
+            <label class="checkbox-inline"><input type="checkbox" value="" id="filterPause">Pause</label> 
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  <div class="tableEvents">
+    <table id="tableEvents" class="tableEvents">
+      <tbody id="table-body">
+      </tbody>
+    </table>
+  </div>
+
+  </div>
+
+  <script>
+    const intervalId = setInterval(IndexEventsAddressMain, 2000)
+  </script>
+
+</body>

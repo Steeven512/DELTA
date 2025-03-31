@@ -1,0 +1,52 @@
+ --smart contract settings
+ --manage transactions
+ --add multichain for index panel
+ --add support for bridgin chains
+ --write readme repo
+
+03/24/25
+
+Paxos smart contrac's review
+structuring of ideas
+
+03/25/25
+
+skeletonization of the app base
+DB designing
+
+03/26/25
+
+writing events and statements to the database
+fixed directories
+
+03/27/25
+
+enchangements in py script eth indexer
+restructuring the app's directories
+reading events in the database
+Added smart contract events and functions
+event interface on the front end
+
+03/28/25
+
+display of event-specific data on the front end
+stylization of the front
+custom indexing filters
+account balances indexing
+
+03/29/25
+
+events of specific accout at its index
+fix event order list
+styliced
+
+03/30/25
+
+db multichain support
+multichain indexing 
+Admin Settings Panel Layout
+
+
+
+
+
