@@ -85,6 +85,10 @@ font-size: 24px;
     justify-content: right;
     display: flex;
     max-width: 1200px; 
+<<<<<<< HEAD
+=======
+    outline: none;
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
 }
 .searchbar{
   width: 440px;
@@ -92,6 +96,7 @@ font-size: 24px;
   border: aqua;
   border-radius: 4px;
   color: azure;
+<<<<<<< HEAD
 }
 
 .intervalsetsearhbar{
@@ -99,18 +104,53 @@ font-size: 24px;
     background-color: #304e5e80;;
     border: rgb(0, 0, 0);
     border-radius: 4px;
+=======
+  outline: none;
+}
+
+.WrapperIntervalSets{
+  justify-items: right;
+  display: grid;
+  max-width: 423px;
+}
+
+.intervalsetsearhbar{
+    width: 96px;
+    background-color: #304e5e80;;
+    border: rgb(0, 0, 0);
+    border-radius: 4px;
+    color: ghostwhite;
+    outline: none;
+
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
 }
 
 .intervalsetsearhbarDiv{
 
+<<<<<<< HEAD
     max-width: 148px;
+=======
+    max-width: 89px;
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
 }
 
 
 
+<<<<<<< HEAD
 .amountsCoin{
     justify-content: center;
   display: flex;
+=======
+.amountsCoindiv{
+  justify-content: center;
+  display: flex;
+
+}
+
+.amountsCoin{
+  font-size: 20px;
+  color: #aac2d7;
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
 }
   
 
@@ -145,6 +185,16 @@ font-size: 24px;
     display: block ruby;
 }
 
+<<<<<<< HEAD
+=======
+.ToMargin{
+  margin-left: 18px;
+}
+.FromMargin{
+  margin-left: 15px;
+}
+
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
 .searchFrom{
     max-width: 136px;
     min-width: 136px;
@@ -159,6 +209,22 @@ font-size: 24px;
     
 }
 
+<<<<<<< HEAD
+=======
+.chartsdiv{
+  padding: 12px;
+  border-radius: 15px;
+  width: 100%;
+  background-color: #48484826;
+}
+
+.chartIndividualCont{
+  background-color: #a9dfff1f;
+  border-radius: 5px;
+  margin: 15px;
+}
+
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
 .CheckboxContainer {
     display: block;
     position: relative;
@@ -324,12 +390,23 @@ font-size: 24px;
     padding: 22px;
     background-color: #221d1d36;
     margin-top: 15px;
+<<<<<<< HEAD
   }
 
   .NetworkSettingGrouop{
     padding: 22px;
     background-color: #221d1d36;
     margin-top: 15px;
+=======
+    border-radius: 2px;
+  }
+
+  .NetworkSettingGroup{
+    padding: 22px;
+    background-color: #221d1d36;
+    margin-top: 15px;
+    border-radius: 2px
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
   }
 
   .settingInput{
@@ -346,5 +423,34 @@ font-size: 24px;
 
 
   .bg-light {
+<<<<<<< HEAD
     background-color: #75929d66 !important;
+=======
+    background-color: #657985 !important;
+  }
+
+
+  .center-container{
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+  } 
+
+  .SelectorStyliced{
+    background-color: #00000003;
+    border-radius: 4px;
+    border: none;
+    color: ghostwhite;
+  }
+
+  .left-col {
+
+
+  }
+
+  .right-col {
+   
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
   }

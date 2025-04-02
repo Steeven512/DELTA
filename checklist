@@ -1,3 +1,4 @@
+<<<<<<< HEAD
  --smart contract settings
  --manage transactions
  --add multichain for index panel
@@ -50,3 +51,78 @@ Admin Settings Panel Layout
 
 
 
+=======
+
+
+check smart contract logic
+debug smart contract admin management
+
+user tranasaction
+index acc section
+write readme
+
+if still remain time make bridge
+
+
+03/24/25
+
+Paxos smart contrac's review
+structuring of ideas
+
+03/25/25
+
+skeletonization of the app base
+DB designing
+
+03/26/25
+
+writing events and statements to the database
+fixed directories
+
+03/27/25
+
+enchangements in py script eth indexer
+restructuring the app's directories
+reading events in the database
+Added smart contract events and functions
+event interface on the front end
+
+03/28/25
+
+display of event-specific data on the front end
+stylization of the front
+custom indexing filters
+account balances indexing
+
+03/29/25
+
+events of specific accout at its index
+fix event order list
+styliced
+
+03/30/25
+
+db multichain support
+multichain indexing 
+Admin Settings Panel Layout
+
+03/31/25
+
+stylicing settings  panel
+fixing js
+fixing options settings
+add sm admin section
+add sm interaction script
+habilitation of ptions sm
+
+04/01/25
+
+debuggins sm functions
+def of functions call variable py script W3
+storage info of smart contract
+retrieving data to show in front end
+stiliced front end
+indexing from intervals of number of blocks
+
+
+>>>>>>> ac220ad (update progress, The checklist file describes the work)

@@ -9,7 +9,7 @@ contract regulatedStableCoin is Owner{
     string public symbol;
     string public name;
     uint256 public decimals;
-    uint256 internal totalSupply;
+    uint256 public totalSupply;
     bool public paused;
 
     mapping(address => mapping(address => uint256)) allowed;
@@ -72,7 +72,7 @@ contract regulatedStableCoin is Owner{
         return allowed[_owner][_spender];
     }
 
-    function approve(address _spender, uint256 _value) public returns (bool) {
+    function approve(address _spender, uint256 _value) public whenNotPaused returns (bool) {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
@@ -86,14 +86,14 @@ contract regulatedStableCoin is Owner{
         return true;
     }
 
-    function transfer(address _to, uint256 _value) public returns (bool) {
+    function transfer(address _to, uint256 _value) public whenNotPaused returns (bool) {
         require(_transfer(msg.sender, _to, _value), "transfer fail");
         emit accountBalanceUpdate(msg.sender, balanceOf(msg.sender));
         emit accountBalanceUpdate( _to, balanceOf(_to));
         return true;
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool){
+    function transferFrom(address _from, address _to, uint256 _value) public whenNotPaused returns (bool){
         require(allowed[_from][msg.sender] >= _value, "Insufficient allowance");
         allowed[_from][msg.sender] = allowed[_from][msg.sender] - _value;
         _transfer(_from, _to, _value);

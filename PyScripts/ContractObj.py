@@ -11,12 +11,20 @@ with open(compiled_contract_path) as file:
 
 Contract = W3.eth.contract(address=contract_address, abi = contract_abi)
 
+<<<<<<< HEAD
 def contract(sm_address):
+=======
+def contract(sm_address, web3Obj):
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
 
     contract_address = sm_address
 
     with open(compiled_contract_path) as file:
         contract_json = json.load(file)  
 
+<<<<<<< HEAD
     return W3.eth.contract(address=contract_address, abi = contract_abi)
+=======
+    return web3Obj.eth.contract(address=contract_address, abi = contract_abi)
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
 

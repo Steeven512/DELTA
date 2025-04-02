@@ -11,7 +11,11 @@
 
 <body>
   <div class="container">
+<<<<<<< HEAD
       <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+=======
+      <nav class="navbar navbar-expand-lg navbar-dark bg-light fixed-top">
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
         <a class="navbar-brand" href="#">S.S: Front Rest API Web</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -19,13 +23,21 @@
         <div class="collapse navbar-collapse" id="navbarText">
           <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
+<<<<<<< HEAD
               <a class="nav-link" href="#">Index log<span class="sr-only">(current)</span></a>
+=======
+              <a class="nav-link" href="/CryptoAdmin">Index log<span class="sr-only">(current)</span></a>
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/AddressIndexing">Address indexing</a>
             </li>
             <li class="nav-item">
+<<<<<<< HEAD
               <a class="nav-link" href="/settigns">Settings</a>
+=======
+              <a class="nav-link" href="/setting">Settings</a>
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
             </li>
           </ul>
           <span class="navbar-text">
@@ -39,6 +51,7 @@
 
   </div>
 
+<<<<<<< HEAD
   <div class="col-xs-2 searchbarIndex">
       <label for="ex1" class="searchbarspan">Index Account </label>
       <input type="text" class="searchbar" id="IndexAddress">
@@ -47,15 +60,58 @@
 
   <div class="CryptoInfoContainer">
 
+=======
+  <div>
+
+    <div class="center-container">
+
+      <div class="left-col">
+        <label for="networks">Choose a Network:</label>
+        <select name="Networks" id="Networks" class="SelectorStyliced"></select>
+      </div>
+    
+      <div class="col-xs-2 searchbarIndex">
+        <label for="ex1" class="searchbarspan">Index Account </label>
+        <input type="text" class="searchbar" id="IndexAddress">
+        <button class="buttonsearch" onclick="IndexAddress(this)">Search</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="CryptoInfoContainer">
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
     <div class="CryptoInfo">
       <div class="row">
 
         <div class="col ">
+<<<<<<< HEAD
           <span id="Address" class="cryptoName">{{Address}}</span>
         </div>
 
         <div class="col">
           <span id="AccAdmin" class="AccAdmin">balance  </span><span class="monospaceFont">{{balance}}</span>
+=======
+          <span id="name" class="cryptoName">{{NameCoin}}</span>
+          <br>
+          <span id="symbol" class="cryptoName">{{NameCoin}}</span>
+          <br>
+          <span  id="" class="">Network: </span><span  id="networkName" class="">Ethereum</span>
+          <br>
+          <span  id="" class="">id: </span><span  id="networkid" class="">777</span>
+        </div>
+
+        <div class="col ">
+          <span id="" class="AccAdmin ">Address:</span>
+          <br>
+          <span id="Address" class="monospaceFont amountsCoin">{{Address}}</span>
+        </div>
+
+        <div class="col">
+          <span id="AccAdmin" class="AccAdmin">balance  </span> 
+          <br>
+          <span class="monospaceFont amountsCoin" id="balance">{{balance}}</span>
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
         </div>
 
       </div>
@@ -64,6 +120,7 @@
 
   <div class="tablecontainer">
 
+<<<<<<< HEAD
     <div class="row w-100">
 
       <div class="col">
@@ -92,11 +149,79 @@
           </div>
           <div class="col">
             <label class="checkbox-inline"><input type="checkbox" value="" id="filterPause">Pause</label> 
+=======
+    <div class="row w-100" style="align-items: center;justify-content: center;" >
+
+      <div class="col filterselection tableheadCoinSymbol">
+        <p>{{symbol}} Events</p>
+      </div>
+
+      <div class="col RowCheckBox">
+        <div class="row filterselection ">
+          <div class="col">
+            <label class="CheckboxContainer">Transactions
+              <input type="checkbox" checked="checked" id="filterTransactions">
+              <span class="checkmark"></span>
+            </label>
+          </div>
+          <div class="col">
+            <label class="CheckboxContainer">Balances
+              <input type="checkbox" checked="checked" id="filterBalances">
+              <span class="checkmark"></span>
+            </label>
+          </div>
+          <div class="col">
+            <label class="CheckboxContainer">Approval
+              <input type="checkbox" checked="checked" id="filterApproval">
+            <span class="checkmark"></span>
+          </div>
+          <div class="col">
+            <label class="CheckboxContainer">Supply
+              <input type="checkbox" checked="checked" id="filterSupply">
+              <span class="checkmark"></span>
+          </div>
+          <div class="col">
+            <label class="CheckboxContainer">FreezeAddress
+              <input type="checkbox" checked="checked" id="filterFreezeAddress">
+              <span class="checkmark"></span> 
+          </div>
+          <div class="col">
+            <label class="CheckboxContainer">Pause
+              <input type="checkbox" checked="checked" id="filterPause">
+              <span class="checkmark"></span> 
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
           </div>
 
         </div>
       </div>
 
+<<<<<<< HEAD
+=======
+      <div class="col filterselection intervalsetMaxWidth">
+
+        <div class="row ">
+          <div class="col searchFrom">
+            <p>index From Block N</p>
+          </div>
+          <div class="col intervalsetsearhbarDiv">
+            <input type="text" class="intervalsetsearhbar" id="fromBl">
+          </div>
+          <div class="col">
+            <div class="row displayRowSearchInterval">
+              <div class="col searchTo">
+                <p>To</p>
+              </div>
+              <div class="col intervalsetsearhbarDiv">
+                <input type="text" class="intervalsetsearhbar" id="toBl">
+              </div>
+
+            </div>
+          </div>
+          
+        </div>
+      </div>
+
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
     </div>
 
   <div class="tableEvents">
@@ -106,7 +231,11 @@
     </table>
   </div>
 
+<<<<<<< HEAD
   </div>
+=======
+</div>
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
 
   <script>
     const intervalId = setInterval(IndexEventsAddressMain, 2000)

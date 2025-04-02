@@ -25,7 +25,7 @@ def eventsIndexer(RPC_Networkd_Address, SM_address, fromBlock, toBlock):
         'fromBlock': fromBlock,
         'toBlock': toBlock,
         'topics': [
-            [accountBalanceUpdate_topic, transfer_topic, approval_topic]
+            [accountBalanceUpdate_topic, transfer_topic, approval_topic, pause_topic, unpause_topic, frozenAddressWiped_topic, freezeAddress_topic, unfreezeAddress_topic, supplyDecreased_topic, supplyIncreased_topic]
         ]
     })
 
@@ -37,7 +37,11 @@ def eventsIndexer(RPC_Networkd_Address, SM_address, fromBlock, toBlock):
 
         return result
 
+<<<<<<< HEAD
     Contract = contract(SM_address)
+=======
+    Contract = contract(SM_address, W3)
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
 
     for log in logs:
 
@@ -203,7 +207,11 @@ def eventsIndexer(RPC_Networkd_Address, SM_address, fromBlock, toBlock):
                     "blockNumber" : blockNumber,
                     "transactionIndex" : transactionIndex,
                     "logIndex" : logIndex,
+<<<<<<< HEAD
                     "From" : From,
+=======
+                    "from" : From,
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
                     "value" : value}
 
             result.append(json.dumps(data))
@@ -215,14 +223,22 @@ def eventsIndexer(RPC_Networkd_Address, SM_address, fromBlock, toBlock):
             blockNumber = event['blockNumber']
             transactionIndex = event['transactionIndex']
             logIndex = event['logIndex']
+<<<<<<< HEAD
             to = event['args']['from']
+=======
+            to = event['args']['to']
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
             value = event['args']['value']
 
             data = {"event": "SupplyIncreased", 
                     "blockNumber" : blockNumber,
                     "transactionIndex" : transactionIndex,
                     "logIndex" : logIndex,
+<<<<<<< HEAD
                     "From" : to,
+=======
+                    "to" : to,
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
                     "value" : value}
 
             result.append(json.dumps(data))

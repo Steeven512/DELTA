@@ -30,6 +30,56 @@ struct network{
 
 inline std::unordered_map<string, struct network>Networks;
 
+<<<<<<< HEAD
+=======
+json ReadNetworkFileSet(std::string FilePath){
+
+    std::ifstream jsonFileEvent(FilePath);
+    if (jsonFileEvent.is_open()) {
+        json EventData;
+        jsonFileEvent >> EventData;
+        jsonFileEvent.close();
+        return EventData;
+    } else {
+        std::cerr << "Error reading network setting file  " << FilePath << std::endl;
+        return 1; 
+    }
+
+}
+
+void loadnetworks(){
+
+    for ( const auto& File : fs::directory_iterator("sets/networks/") ) {
+
+        json networkset = ReadNetworkFileSet(File.path().string());
+
+        Networks[File.path().filename().string()].networkName = networkset["networkName"];
+        Networks[File.path().filename().string()].rpc_address = networkset["rpc_address"];
+        Networks[File.path().filename().string()].sm_address = networkset["sm_address"];
+        Networks[File.path().filename().string()].networkid = networkset["networkid"];
+
+    }
+
+    return;
+
+}
+
+bool isNetworkExist(std::string Network){
+
+    loadnetworks();
+
+    for(auto &network: Networks){
+
+        if(network.first == Network){
+            return true;
+        }
+    }
+
+    return false;
+    
+}
+
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
 std::string readlatestBlockNumberIndexed(std::string Network){
 
     std::ifstream fileData("DB/"+Network+"/latestEthBlockNumber", std::ios::binary | std::ios::ate);
@@ -221,16 +271,26 @@ bool SaveEventAddress(std::string Network, json &ethEvent){
     std::string addressA;
     std::string addressB;
 
+<<<<<<< HEAD
     GetAddressOfEvent(ethEvent, addressA, addressB);
 
     std::cout<<std::endl<<"fl1h "<< addressA.substr(2 , addressA.length()-2).length()<<std::endl;
+=======
+    if(!GetAddressOfEvent(ethEvent, addressA, addressB)){
+        return false;
+    }
+
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
 
     if(addressA.substr(2 , addressA.length()-2).length() != 40 ){
         return false;
     }
 
+<<<<<<< HEAD
     std::cout<<std::endl<<"fl2 h"<<std::endl;
 
+=======
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
     Path = pathOfAddressEvent(Network, ethEvent, addressA);
 
     std::ofstream File(Path+"/"+event);
@@ -249,7 +309,10 @@ bool SaveEventAddress(std::string Network, json &ethEvent){
         return true;
     }
 
+<<<<<<< HEAD
     std::cout<<std::endl<<"fl3 "<<std::endl;
+=======
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
     if(addressB.substr(2 , addressB.length()-2).length() != 40 ){
         return false;
     }
@@ -441,11 +504,18 @@ vector<uint64_t> getDirOfTransactionsEvents(const std::string &Path, uint64_t &B
 
     std::sort(BlocksNumberIndex.begin(), BlocksNumberIndex.end(), std::greater<uint64_t>());
 
+<<<<<<< HEAD
     std::cout << "Directorios ordenados:" << std::endl;
     for (uint64_t dirNumber : BlocksNumberIndex) {
         std::cout << dirNumber << std::endl;
     }
 
+=======
+    /*(uint64_t dirNumber : BlocksNumberIndex) {
+        std::cout << dirNumber << std::endl;
+    }
+    */
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
     return BlocksNumberIndex;
 
 }
@@ -472,6 +542,7 @@ vector<uint64_t> getDirOfBlTransactions(const std::string &Path, const uint64_t 
 
     std::sort(BlocksNumberIndex.begin(), BlocksNumberIndex.end(), std::greater<uint64_t>());
 
+<<<<<<< HEAD
     std::cout << "Directorios ordenados:" << std::endl;
     for (uint64_t dirNumber : BlocksNumberIndex) {
         std::cout << dirNumber << std::endl;
@@ -479,6 +550,15 @@ vector<uint64_t> getDirOfBlTransactions(const std::string &Path, const uint64_t 
 
     return BlocksNumberIndex;
 
+=======
+    /*std::cout << "Directories order:" << std::endl;
+    for (uint64_t dirNumber : BlocksNumberIndex) {
+        std::cout << dirNumber << std::endl;
+    }
+    */
+    return BlocksNumberIndex;
+  
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
 }
 
 vector<uint64_t> getDirOfBlocksInRange(const std::string &Path, const uint64_t &from, const uint64_t &to){
@@ -505,10 +585,18 @@ vector<uint64_t> getDirOfBlocksInRange(const std::string &Path, const uint64_t &
 
     std::sort(BlocksNumberIndex.begin(), BlocksNumberIndex.end(), std::greater<uint64_t>());
 
+<<<<<<< HEAD
     std::cout << "Directorios ordenados:" << std::endl;
     for (uint64_t dirNumber : BlocksNumberIndex) {
         std::cout << dirNumber << std::endl;
     }
+=======
+    /*std::cout << "Directories order:" << std::endl;
+    for (uint64_t dirNumber : BlocksNumberIndex) {
+        std::cout << dirNumber << std::endl;
+    }
+    */
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
 
     return BlocksNumberIndex;
 
@@ -574,6 +662,7 @@ uint64_t AddressBalance(std::string &Network, string address){
 
 }
 
+<<<<<<< HEAD
 json ReadNetworkFileSet(std::string FilePath){
 
     std::ifstream jsonFileEvent(FilePath);
@@ -589,6 +678,8 @@ json ReadNetworkFileSet(std::string FilePath){
 
 }
 
+=======
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
 bool mkDir(std::string Path){
 
     if ( access(Path.c_str() , 0) != 0) {
@@ -637,6 +728,7 @@ bool saveNetwork(json &networtSet){
 
 }
 
+<<<<<<< HEAD
 void loadnetworks(){
 
     for ( const auto& File : fs::directory_iterator("sets/networks/") ) {
@@ -654,6 +746,8 @@ void loadnetworks(){
 
 }
 
+=======
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
 vector<json> loadnetworksJson(){
 
     vector<json>networks;
@@ -682,4 +776,36 @@ vector<string> savedNetworks(){
     
 }
 
+<<<<<<< HEAD
+=======
+bool storeSmartContracInfoDB(std::string network, json tokenInfo){
+
+    std::ofstream archivo("DB/"+network+"/tokenInfo");
+    if (archivo.is_open()) {
+        archivo << tokenInfo.dump(4); 
+        archivo.close();
+    } else {
+        std::cerr << "Error storing event file." << std::endl;
+        return false; 
+    }
+    return true;
+}
+
+json ReadSmartContracInfoDB(std::string network){
+
+    std::ifstream jsonFileEvent("DB/"+network+"/tokenInfo");
+
+    if (jsonFileEvent.is_open()) {
+        json EventData;
+        jsonFileEvent >> EventData;
+        jsonFileEvent.close();
+        return EventData;
+    } else {
+        std::cerr << "Error reading network setting file  " << "DB/"+network+"/tokenInfo" << std::endl;
+        return 1; 
+    }
+
+}
+
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
 #endif

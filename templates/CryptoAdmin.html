@@ -7,11 +7,12 @@
   <link rel="stylesheet" type="text/css" href="css/css.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
   <script  src="js/reqapi.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 </head>
 
 <body>
   <div class="container">
-      <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-light fixed-top">
         <a class="navbar-brand" href="#">S.S: Front Rest API Web</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -36,7 +37,119 @@
   </div>
 
     <div class ="navbarspacer">
+<<<<<<< HEAD
 
+=======
+
+    </div>
+
+    <div>
+
+
+        <div class="center-container">
+
+          <div class="left-col">
+            <label for="networks">Choose a Network:</label>
+            <select name="Networks" id="Networks" class="SelectorStyliced"></select>
+          </div>
+        
+          <div class="col-xs-2 searchbarIndex">
+            <label for="ex1" class="searchbarspan">Index Account </label>
+            <input type="text" class="searchbar" id="IndexAddress">
+            <button class="buttonsearch" onclick="IndexAddress(this)">Search</button>
+          </div>
+
+        </div>
+      </div>
+
+
+  <div class="CryptoInfoContainer">
+
+    <div class="CryptoInfo">
+      <div class="row">
+
+        <div class="col ">
+          <span id="name" class="cryptoName">{{NameCoin}}</span>
+          <br>
+          <span id="symbol" class="cryptoName">{{NameCoin}}</span>
+          <br>
+          <span  id="" class="">Network: </span><span  id="networkName" class="">Ethereum</span>
+          <br>
+          <span  id="" class="">id: </span><span  id="networkid" class="">777</span>
+        </div>
+
+        <div class="col">
+          <div class="WrapperGrid">
+            <div>
+            <span id="AccAdmin" class="AccAdmin">Admin Address  </span><span id="admin" class="monospaceFont amountsCoin">{{AccAdmin}}</span>
+          </div>
+          <br>
+          <div>
+            <span id="AccAdmin" class="AccAdmin">Smart Contract Address  </span><span id = "sm_address" class="monospaceFont amountsCoin">{{AccAdmin}}</span>
+          </div>
+          </div>
+
+        </div>
+
+        <div class="col amountsCoindiv">
+
+          <div class="WrapperGrid">
+
+            <div class="row">
+              <span id="AccAdmin" class="AccAdmin">Total Supply </span> 
+            </div>
+            <div class="row">
+              <span class="amountsCoin" id="totalSupply"> {{TotalSupply}} </span>
+            </div>
+
+            <div class="row">
+              <span id="AccAdmin" class="AccAdmin">in reserve </span> 
+            </div>
+            <div class="row">
+              <span class="amountsCoin" id="inReserve"> {{TotalSupply}} </span>
+            </div>
+
+            <div class="row">
+              <span id="AccAdmin" class="AccAdmin">in circulation </span> 
+            </div>
+            <div class="row">
+              <span class="amountsCoin" id="inCirculation"> {{TotalSupply}} </span>
+            </div>
+
+
+
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="CryptoInfoContainer">
+
+  <div class="CryptoInfo">
+    <h2>Charts</h2>
+    <div class="row chartsdiv">
+
+
+      <div class="col chartIndividualCont">
+        <span>Transactions Volume</span>
+        <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+      </div>
+
+
+      <div class="col chartIndividualCont">
+        <span>Burned</span>
+        <canvas id="myChart2" style="width:100%;max-width:600px"></canvas>
+      </div>
+
+
+      <div class="col chartIndividualCont">
+        <span>Minted</span>
+        <canvas id="myChart3" style="width:100%;max-width:600px"></canvas>
+      </div>
+
+
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
     </div>
 
   <div class="col-xs-2 searchbarIndex">
@@ -44,7 +157,9 @@
     <input type="text" class="searchbar" id="IndexAddress">
     <button class="buttonsearch" onclick="IndexAddress(this)">Search</button>
   </div>
+</div>
 
+<<<<<<< HEAD
   <div class="CryptoInfoContainer">
 
     <div class="CryptoInfo">
@@ -105,6 +220,12 @@
  
 
   <div class="tablecontainer">
+=======
+
+ 
+
+<div class="tablecontainer">
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
 
     <div class="row w-100" style="align-items: center;justify-content: center;" >
 
@@ -150,17 +271,31 @@
         </div>
       </div>
 
+<<<<<<< HEAD
       <div class="col filterselection intervalsetMaxWidth">
 
         <div class="row ">
           <div class="col searchFrom">
+=======
+      <div class="col filterselection  intervalsetMaxWidth">
+
+        <div class="row ">
+          <div class="col FromMargin searchFrom">
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
             <p>index From Block N</p>
           </div>
           <div class="col intervalsetsearhbarDiv">
             <input type="text" class="intervalsetsearhbar" id="fromBl">
           </div>
+<<<<<<< HEAD
           <div class="col">
             <div class="row displayRowSearchInterval">
+=======
+          <div class="col ToMargin">
+
+            <div class="row displayRowSearchInterval">
+
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
               <div class="col searchTo">
                 <p>To</p>
               </div>
@@ -168,7 +303,17 @@
                 <input type="text" class="intervalsetsearhbar" id="toBl">
               </div>
 
+<<<<<<< HEAD
             </div>
+=======
+
+            <div class="col">
+              <button id="indexIntervalsButton" class="buttonsearch" onclick="performIndexEventsInIntervals(this)" >Search</button>
+            </div>
+
+            </div>
+
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
           </div>
           
         </div>
@@ -188,6 +333,146 @@
 <script>
   const intervalId = setInterval(IndexEventsMain, 2000)
 </script>
+<<<<<<< HEAD
+=======
+
+<script>
+
+  const xValues = ["monday","martes","wednesday","tuedsday","friday","saturday","sunday"];
+  
+  const aa = 520
+  
+  new Chart("myChart", {
+  
+    type: "line",
+    data: {
+      labels: xValues,
+      datasets: [{ 
+        data: [300,700,aa,5000,6000,4000,2000,1000,200,100],
+        borderColor: "blue",
+        backgroundColor: "#b0cfffc2",
+        fill: true,
+        borderColor: "#b0cfff", 
+        borderWidth: 1, 
+      }]
+    },
+  options: {
+      legend: {display: false},
+      scales: {
+        xAxes: [{
+          gridLines: {
+            display: false // Quita la rejilla del eje X
+          }, 
+          ticks: {
+          fontColor: "#FFF", 
+          fontSize: 12,
+
+        }
+        }],
+        yAxes: [{
+          gridLines: {
+            display: false // Quita la rejilla del eje Y
+          } , 
+          ticks: {
+          fontColor: "#FFF",  // Color texto eje Y (verde)
+          fontSize: 12,
+          callback: function(value) {
+            return "$" + value;  // Ejemplo: añade símbolo "$"
+          }
+        }
+        }]
+      }
+    }
+  });
+
+  new Chart("myChart2", {
+  
+  type: "line",
+  data: {
+    labels: xValues,
+    datasets: [{ 
+      data: [300,700,aa,5000,6000,4000,2000,1000,200,100],
+      borderColor: "#fd7e14",
+      backgroundColor: "#fd7e1473",
+      fill: true,
+      borderWidth: 1, 
+    }]
+  },
+options: {
+    legend: {display: false},
+    scales: {
+      xAxes: [{
+        gridLines: {
+          display: false // 
+        }, 
+        ticks: {
+        fontColor: "#FFF", 
+        fontSize: 12,
+
+      }
+      }],
+      yAxes: [{
+        gridLines: {
+          display: false // Quita la rejilla del eje Y
+        } , 
+        ticks: {
+        fontColor: "#FFF",  // Color texto eje Y (verde)
+        fontSize: 12,
+        callback: function(value) {
+          return "$" + value;  // Ejemplo: añade símbolo "$"
+        }
+      }
+      }]
+    }
+  }
+});
+
+new Chart("myChart3", {
+  
+  type: "line",
+  data: {
+    labels: xValues,
+    datasets: [{ 
+      data: [300,700,aa,5000,6000,4000,2000,1000,200,100],
+      borderColor: "blue",
+      backgroundColor: "#3f9f5e82",
+      fill: true,
+      borderColor: "#28a745", 
+      borderWidth: 1, 
+    }]
+  },
+options: {
+    legend: {display: false},
+    scales: {
+      xAxes: [{
+        gridLines: {
+          display: false // Quita la rejilla del eje X
+        }, 
+        ticks: {
+        fontColor: "#FFF", 
+        fontSize: 12,
+
+      }
+      }],
+      yAxes: [{
+        gridLines: {
+          display: false // Quita la rejilla del eje Y
+        } , 
+        ticks: {
+        fontColor: "#FFF",  // Color texto eje Y (verde)
+        fontSize: 12,
+        callback: function(value) {
+          return "$" + value;  // Ejemplo: añade símbolo "$"
+        }
+      }
+      }]
+    }
+  }
+});
+
+
+  </script>
+>>>>>>> ac220ad (update progress, The checklist file describes the work)
 
 
 </body>
