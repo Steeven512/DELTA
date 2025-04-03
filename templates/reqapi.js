@@ -1,5 +1,29 @@
 var serverurl = window.location.origin;
 
+let daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+function sixdecimals(value) {
+  if (typeof value !== 'string') {
+      value = String(value); 
+  }
+  
+  let decimalPart = '';
+  let integerPart = '';
+  
+  if (value.length <= 6) {
+      decimalPart = value.padStart(6, '0');
+      integerPart = '0';
+  } else {
+      const Index = value.length - 6;
+      decimalPart = value.slice(Index);
+      integerPart = value.slice(0, Index);
+  } 
+
+  integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  
+  return integerPart + '.' + decimalPart;
+}
+
 function ullToHex(ullValue) {
 
     let hex = ullValue.toString(16);
@@ -18,21 +42,16 @@ function clearTable(){
 
 function eventData(jsonObject){
 
-<<<<<<< HEAD
-  console.log(jsonObject["event"])
-
-=======
->>>>>>> ac220ad (update progress, The checklist file describes the work)
   if(jsonObject["event"] === "accountBalanceUpdate"){
-    return "Address: " +jsonObject["Account"] + " value: "+ jsonObject["balances"]
+    return "Address: " +jsonObject["Account"] + " value: "+ sixdecimals(jsonObject["balances"])
   }
 
   if(jsonObject["event"] === "Transfer"){
-    return "from: " +jsonObject["from"] + " to: "+ jsonObject["to"] + " value: "+ jsonObject["value"]
+    return "from: " +jsonObject["from"] + "   to: "+ jsonObject["to"] + " value: "+ sixdecimals(jsonObject["value"])
   }
 
   if(jsonObject["event"] === "Approval"){
-    return "owner: " +jsonObject["owner"] + " spender: "+ jsonObject["spender"] + " value: "+ jsonObject["value"]
+    return "owner: " +jsonObject["owner"] + " spender: "+ jsonObject["spender"] + " value: "+ sixdecimals(jsonObject["value"])
   }
 
   if(jsonObject["event"] === "FrozenAddressWiped"){
@@ -43,31 +62,26 @@ function eventData(jsonObject){
     return "Address: " +jsonObject["addr"] 
   }
 
-<<<<<<< HEAD
-  if(jsonObject["event"] === "FreezeAddress"){
-=======
   if(jsonObject["event"] === "UnfreezeAddress"){
->>>>>>> ac220ad (update progress, The checklist file describes the work)
     return "Address: " +jsonObject["addr"] 
   }
 
   if(jsonObject["event"] === "SupplyDecreased"){
-    return "from: " +jsonObject["from"] 
+    return "Address: " +jsonObject["from"] +" value: "+sixdecimals(jsonObject["value"])
   }
 
   if(jsonObject["event"] === "SupplyIncreased"){
-<<<<<<< HEAD
-    return "to: " +jsonObject["from"] 
-=======
-    return "to: " +jsonObject["to"] 
->>>>>>> ac220ad (update progress, The checklist file describes the work)
+    return "Address: " +jsonObject["to"] +" value: "+sixdecimals(jsonObject["value"])
   }
 
 }
 
-function createTableRow(logElements, number) {
+function createTableRow(logElements, number, trcontrast) {
 
   const tr = document.createElement('tr');
+  if(trcontrast){
+    tr.className = 'trContrast';
+  }
 
   let jsonObject = JSON.parse(logElements);
 
@@ -83,16 +97,16 @@ function createTableRow(logElements, number) {
   td2.classList.add('tableEventsCenter');
   td3.classList.add('tableEventsCenter');
   td4.classList.add('tableEventsCenter');
-  td5.classList.add('tableEventsCenter');
+  td5.classList.add('tableEventsdata');
 
-  td0.textContent = number;
-  td1.textContent = jsonObject["event"];
-  td2.textContent = jsonObject["blockNumber"];
-  td3.textContent = jsonObject["transactionIndex"];
-  td4.textContent = jsonObject["logIndex"];
+  //td0.textContent = number;
+  td1.textContent = jsonObject["blockNumber"];
+  td2.textContent = jsonObject["transactionIndex"];
+  td3.textContent = jsonObject["logIndex"];
+  td4.textContent = jsonObject["event"];
   td5.textContent = eventData(jsonObject)
 
-  tr.appendChild(td0);
+  //tr.appendChild(td0);
   tr.appendChild(td1);
   tr.appendChild(td2);
   tr.appendChild(td3);
@@ -105,31 +119,30 @@ function createTableRow(logElements, number) {
 
 function apprendTh(){
 
-  logElements = ['{"event" : "event", "blockNumber" : "blockNumber", "transactionIndex" : "transactionIndex" , "logIndex" : "logIndex"}'];
+  logElements = ['{"blockNumber" : "blockNumber", "transactionIndex" : "transactionIndex" , "logIndex" : "logIndex", "event" : "event"}'];
 
   let jsonObject = JSON.parse(logElements);
 
-  const tr = document.createElement('tr');
-
-  const th0 = document.createElement('th');
+  tr = document.createElement('tr');
+  //const th0 = document.createElement('th');
   const th1 = document.createElement('th');
   const th2 = document.createElement('th');
   const th3 = document.createElement('th');
   const th4 = document.createElement('th');
 
-  th0.classList.add('tableEventsLeft');
-  th1.classList.add('tableEventsLeft');
-  th2.classList.add('tableEventsLeft');
-  th3.classList.add('tableEventsLeft');
-  th4.classList.add('tableEventsLeft');
+  //th0.classList.add('tableEventsLeft');
+  th1.classList.add('tableEventsCenter');
+  th2.classList.add('tableEventsCenter');
+  th3.classList.add('tableEventsCenter');
+  th4.classList.add('tableEventsCenter');
 
-  th0.textContent = "N.";
-  th1.textContent = jsonObject["event"];
-  th2.textContent = jsonObject["blockNumber"];
-  th3.textContent = jsonObject["transactionIndex"];
-  th4.textContent = jsonObject["logIndex"];
+  //th0.textContent = "N.";
+  th1.textContent = jsonObject["blockNumber"];
+  th2.textContent = jsonObject["transactionIndex"];
+  th3.textContent = jsonObject["logIndex"];
+  th4.textContent = jsonObject["event"];
 
-  tr.appendChild(th0);
+  //tr.appendChild(th0);
   tr.appendChild(th1);
   tr.appendChild(th2);
   tr.appendChild(th3);
@@ -145,14 +158,18 @@ async function loadtable(araytable){
 
   apprendTh()
 
+  trcontrast = false;
+
   for (let i = 0; i < araytable.length; i++) {
-    createTableRow(araytable[i],i);
+    createTableRow(araytable[i],i,trcontrast);
+    if(trcontrast){
+      trcontrast = false
+    } else {
+      trcontrast = true
+    }
   }
 
 }
-<<<<<<< HEAD
-=======
-
 
 async function IndexEvents(f, t) {
 
@@ -242,8 +259,6 @@ function switchButtomintervals() {
 
 }
 
-
-
 async function performIndexEventsInIntervals(){
 
   let maxinterval = 50
@@ -328,7 +343,7 @@ async function updateBalance(){
   var data = await response.text()
 
   balanceUpdate = document.getElementById("balance")
-  balanceUpdate.textContent = data
+  balanceUpdate.textContent = sixdecimals(data)
 
   } catch (error) {
     console.log("error ",error);
@@ -340,7 +355,7 @@ async function IndexEventsAddressMain() {
 
   await updateNetworkIndexSelect() 
   await retrieveinfoIndexingSection()
-  await updateBalance()
+  GetBalanceAddress()
 
   from = ullToHex(0).toUpperCase();
   to = "last"
@@ -375,6 +390,55 @@ async function IndexEventsAddressMain() {
     console.log("error ",error);
   }
 
+}
+
+networkSelectUpdated = false;
+
+
+async function updateNetworkIndexSelect() {
+
+  if(!networkSelectUpdated){
+    try {
+      const response = await fetch(serverurl+"/api", {
+      method: 'POST',
+      headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({  "request": "savedNetworks", 
+                            })
+    })
+
+    var responsedata = await response.json()
+
+    console.log("debug update networks", responsedata)
+
+    var selectElement = document.getElementById('Networks');
+
+    while (selectElement.firstChild) {
+      selectElement.removeChild(selectElement.firstChild);
+    }
+
+    responsedata.forEach(opcion => {
+
+      NetworkData = JSON.parse(opcion)
+      const optionElement = document.createElement('option');
+      optionElement.value = NetworkData["networkName"]; 
+      optionElement.textContent = NetworkData["networkName"]; 
+      selectElement.appendChild(optionElement);
+
+    });
+
+    RetrieveVolumeTransactionsValueChart()
+    RetrieveMintedBurnedChart()
+    RetrieveAmountTransfersChart()
+
+    networkSelectUpdated = true;
+
+    } catch (error) {
+
+    }
+  }
 }
 
 function IndexAddress() {
@@ -439,13 +503,13 @@ async function retrieveinfo(){
   var data = await response.json()
 
   let totalSupply = document.getElementById('totalSupply');
-  totalSupply.textContent = data["totalSupply"];
+  totalSupply.textContent = "$"+sixdecimals(data["totalSupply"]);
 
   let inReserve = document.getElementById('inReserve');
-  inReserve.textContent = data["inReserve"];
+  inReserve.textContent = "$"+sixdecimals(data["inReserve"]);
 
   let inCirculation = document.getElementById('inCirculation');
-  inCirculation.textContent = data["inCirculation"];
+  inCirculation.textContent = "$"+sixdecimals(data["inCirculation"]);
 
   let networkName = document.getElementById('networkName');
   networkName.textContent = data["networkName"];
@@ -471,962 +535,551 @@ async function retrieveinfo(){
 
 }
 
-//setings network
-
-networkSelectUpdated = false;
-
-async function updateNetworkSelect() {
-
-  if(!networkSelectUpdated){
-    try {
-      const response = await fetch(serverurl+"/api", {
-      method: 'POST',
-      headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({  "request": "savedNetworks", 
-                            })
-    })
-
-    var responsedata = await response.json()
-
-    console.log("debug update networks", responsedata)
-
-    var selectElement = document.getElementById('Networks');
-
-    while (selectElement.firstChild) {
-      selectElement.removeChild(selectElement.firstChild);
-    }
-
-    responsedata.forEach(opcion => {
-
-      NetworkData = JSON.parse(opcion)
-      const optionElement = document.createElement('option');
-      optionElement.value = NetworkData["networkName"]; 
-      optionElement.textContent = NetworkData["networkName"]; 
-      selectElement.appendChild(optionElement);
-
-    });
-
-    networkSelectUpdated = true;
-
-    selectElement.addEventListener("change", function() {
-
-      const selectedValue = this.value; 
-      const selectedText = this.options[this.selectedIndex].text;
-
-      responsedata.forEach(opcion => {
-
-        NetworkData = JSON.parse(opcion)
-
-        if(NetworkData["networkName"]===selectedValue){
-
-          let networkidSetEdit = document.getElementById('networkidSetEdit');
-          networkidSetEdit.value = NetworkData["networkid"];
-      
-          let networkRPCSetEdit = document.getElementById('networkRPCSetEdit');
-          networkRPCSetEdit.value = NetworkData["rpc_address"];
-      
-          let networkSmartContractAddressSetEdit = document.getElementById('networkSmartContractAddressSetEdit');
-          networkSmartContractAddressSetEdit.value = NetworkData["sm_address"];
-
-          networkSelectUpdated = true;
-
-        }
-
-      });
-
-    });
-
-    } catch (error) {
-
-    }
-  }
-}
-
-networkSMSelectUpdated = false;
-
-async function updateNetworkSelectSM() {
-
-  if(!networkSMSelectUpdated){
-    try {
-      const response = await fetch(serverurl+"/api", {
-      method: 'POST',
-      headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({  "request": "savedNetworks", 
-                            })
-    })
-
-    var responsedata = await response.json()
-
-    console.log("debug update networksSM", responsedata)
-
-    var selectElement = document.getElementById('NetworksSM');
-
-    while (selectElement.firstChild) {
-      selectElement.removeChild(selectElement.firstChild);
-    }
-
-    responsedata.forEach(opcion => {
-
-      NetworkData = JSON.parse(opcion)
-      const optionElement = document.createElement('option');
-      optionElement.value = NetworkData["networkName"]; 
-      optionElement.textContent = NetworkData["networkName"]; 
-      selectElement.appendChild(optionElement);
-
-    });
-
-    networkSMSelectUpdated = true;
-
-    } catch (error) {
-
-    }
-  }
-}
-
-async function updateNetworkIndexSelect() {
-
-  if(!networkSelectUpdated){
-    try {
-      const response = await fetch(serverurl+"/api", {
-      method: 'POST',
-      headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({  "request": "savedNetworks", 
-                            })
-    })
-
-    var responsedata = await response.json()
-
-    console.log("debug update networks", responsedata)
-
-    var selectElement = document.getElementById('Networks');
-
-    while (selectElement.firstChild) {
-      selectElement.removeChild(selectElement.firstChild);
-    }
-
-    responsedata.forEach(opcion => {
-
-      NetworkData = JSON.parse(opcion)
-      const optionElement = document.createElement('option');
-      optionElement.value = NetworkData["networkName"]; 
-      optionElement.textContent = NetworkData["networkName"]; 
-      selectElement.appendChild(optionElement);
-
-    });
-
-    networkSelectUpdated = true;
-
-    } catch (error) {
-
-    }
-  }
-}
-
-async function setNetworkEdit() {
-
-  var networkNameSet = document.getElementById("Networks").value
-  var networkidSet = document.getElementById("networkidSetEdit").value
-  var networkRPCSet = document.getElementById("networkRPCSetEdit").value
-  var networkSmartContractAddressSet = document.getElementById("networkSmartContractAddressSetEdit").value
-
-  jsonset = JSON.stringify({
-
-    "networkName": networkNameSet,
-    "networkid": networkidSet,
-    "rpc_address": networkRPCSet,
-    "sm_address": networkSmartContractAddressSet,
-
-  })
+async function GetBalanceAddress(){
 
   try {
-    const response = await fetch(serverurl+"/api", {
-    method: 'POST',
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({  "request": "networkSet", 
-                            "networksetting": jsonset, 
-                          })
-  })
 
-    var responsedata = await response.text()
-
-    networkSelectUpdated = false;
-
-
-  } catch (error) {
-    console.log("error ",error);
-  }
-
-}
-
-async function setNetwork() {
-
-  var networkNameSet = document.getElementById("networkNameSet").value
-  var networkidSet = document.getElementById("networkidSet").value
-  var networkRPCSet = document.getElementById("networkRPCSet").value
-  var networkSmartContractAddressSet = document.getElementById("networkSmartContractAddressSet").value
-
-  jsonset = JSON.stringify({
-
-    "networkName": networkNameSet,
-    "networkid": networkidSet,
-    "rpc_address": networkRPCSet,
-    "sm_address": networkSmartContractAddressSet,
-
-  })
-
-  try {
-    const response = await fetch(serverurl+"/api", {
-    method: 'POST',
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({  "request": "networkSet", 
-                            "networksetting": jsonset, 
-                          })
-  })
-
-    var responsedata = await response.text()
-
-    networkSelectUpdated = false;
-
-  } catch (error) {
-    console.log("error ",error);
-  }
-
-}
-
-async function displayNetWorksSetting(){
-
-  let SM = document.getElementById('SM');
-  SM.style.display = 'none'; 
-
-  let smsidebar = document.getElementById('smsidebar');
-  smsidebar.classList.remove('active');
-
+      jsonValues = JSON.stringify({ 
+      "network": document.getElementById("Networks").value,
+      "option": "balanceOf",
+      "Address": document.getElementById('Address').textContent,
+      })
   
-  let NetworkSettings = document.getElementById('NetworkSettings');
-  NetworkSettings.style.display = 'grid'; 
 
-  let networksidebar = document.getElementById('networksidebar');
+      const response = await fetch(serverurl+"/api", {
+      method: 'POST',
+      headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({  "request": "getBalanceW3", 
+                              "values": jsonValues,
+                              })
+      })
 
-  networksidebar.classList.add("active")
-
-
-}
-
-async function displaySMSettings(){
-
-  let NetworkSettings = document.getElementById('NetworkSettings');
-  NetworkSettings.style.display = 'none'; 
-  let networksidebar = document.getElementById('networksidebar');
-  networksidebar.classList.remove('active');
-
-  let SM = document.getElementById('SM');
-  SM.style.display = 'grid'; 
-
-  let smsidebar = document.getElementById('smsidebar');
-  smsidebar.classList.add("active")
-
-  updateNetworkSelectSM()
-
-}
-
-function requestPK(){
-
-  return prompt('Admin Private Key');
-
-}
-
-async function increaseSupply(){
-
-  privateKey = requestPK()
-  amount = document.getElementById('increaseSupply').value
-  network = document.getElementById("Networks").value
-
-  jsonValues = JSON.stringify({ 
-    "network": network,
-    "option": "increaseSupply",
-    "amount": amount,
-    "privateKey": privateKey,
-   })
-
-  try {
-    const response = await fetch(serverurl+"/api", {
-    method: 'POST',
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({  "request": "AdminSM", 
-                            "values": jsonValues,
-                           })
-  })
-
-  var data = await response.text()
-
-  console.log(data)
-
-  } catch (error) {
-      console.log("error ",error);
-  }
-
-
-}
-
-async function burn(){
-
-  privateKey = requestPK()
-  amount = document.getElementById('burn').value
-  network = document.getElementById("Networks").value
-
-  jsonValues = JSON.stringify({ 
-    "network": network,
-    "option": "burn",
-    "amount": amount,
-    "privateKey": privateKey,
-   })
-
-  try {
-    const response = await fetch(serverurl+"/api", {
-    method: 'POST',
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({  "request": "AdminSM", 
-                            "values": jsonValues,
-                           })
-  })
-
-  var data = await response.text()
-
-  alert("operation result: ",data)
-
-  } catch (error) {
-      console.log("error ",error);
-  }
-
-
-}
-
-async function mint(){
-
-  privateKey = requestPK()
-  mint_address = document.getElementById('mint_address').value
-  amount = document.getElementById('mint_amount').value
-  network = document.getElementById("Networks").value
-
-  jsonValues = JSON.stringify({ 
-    "network": network,
-    "option": "mint",
-    "account": mint_address, 
-    "amount": amount,
-    "privateKey": privateKey,
-   })
-
-  try {
-    const response = await fetch(serverurl+"/api", {
-    method: 'POST',
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({  "request": "AdminSM", 
-                            "values": jsonValues,
-                           })
-  })
-
-  var data = await response.text()
-
-  alert("operation result: ",data)
-
-  } catch (error) {
-      console.log("error ",error);
-  }
-
-
-}
-
-async function decreaseSupply(){
-
-  privateKey = requestPK()
-  account = document.getElementById('decreaseSupply_address').value
-  amount = document.getElementById('decreaseSupply_value').value
-  network = document.getElementById("Networks").value
-
-  jsonValues = JSON.stringify({ 
-    "network": network,
-    "option": "decreaseSupply",
-    "account": account, 
-    "amount": amount,
-    "privateKey": privateKey,
-   })
-
-  try {
-    const response = await fetch(serverurl+"/api", {
-    method: 'POST',
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({  "request": "AdminSM", 
-                            "values": jsonValues,
-                           })
-  })
-
-  var data = await response.text()
-
-  alert("operation result: ",data)
-
+      var data = await response.text()
+      console.log(data)
+      document.getElementById('balance').textContent = "$"+sixdecimals(data)
+      
   } catch (error) {
       console.log("error ",error);
   }
 
 }
 
-async function freeze(){
+window.addEventListener('load', function() {
 
-  privateKey = requestPK()
-  account = document.getElementById('freeze').value
+  IndexEventsMain()
+  IndexEventsAddressMain()
 
-  network = document.getElementById("Networks").value
+});
 
-  jsonValues = JSON.stringify({ 
-    "network": network,
-    "option": "freeze",
-    "account": account, 
-    "privateKey": privateKey,
-   })
+//charts
+async function RetrieveVolumeTransactionsValueChart(){
+
+  let timestamp = Math.floor(Date.now() / 1000);
+  let date = new Date(timestamp * 1000);
+
+
+  console.log("actual timestamp ", date.getDay());
+
+  week = 604800
 
   try {
+
     const response = await fetch(serverurl+"/api", {
     method: 'POST',
     headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
     },
-    body: JSON.stringify({  "request": "AdminSM", 
-                            "values": jsonValues,
+    body: JSON.stringify({"request": "ChartInfo",
+                          "network": document.getElementById("Networks").value,
+                          "typeindexTime": "week",
+                          "TypeOfElement": "TransfersValueVolume", 
+                          "Fromdate": ullToHex(timestamp), 
+                          "to": ullToHex(timestamp-week)
                            })
-  })
+    })
 
-  var data = await response.text()
+    var data = await response.json()
 
-  alert("operation result: ",data)
+    data = [...data].reverse();
 
-  } catch (error) {
-      console.log("error ",error);
+    chartUpdateVolumeTransactionsValue(data)
+
+} catch (error) {
+    console.log("error ",error);    
   }
-
 }
 
-async function freeze(){
+async function RetrieveMintedBurnedChart(){
 
-  privateKey = requestPK()
-  account = document.getElementById('freeze').value
+  let timestamp = Math.floor(Date.now() / 1000);
+  let date = new Date(timestamp * 1000);
 
-  network = document.getElementById("Networks").value
+  console.log("actual timestamp ", date.getDay());
 
-  jsonValues = JSON.stringify({ 
-    "network": network,
-    "option": "freeze",
-    "account": account, 
-    "privateKey": privateKey,
-   })
+  week = 604800
 
   try {
+
     const response = await fetch(serverurl+"/api", {
     method: 'POST',
     headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
     },
-    body: JSON.stringify({  "request": "AdminSM", 
-                            "values": jsonValues,
+    body: JSON.stringify({"request": "ChartInfo",
+                          "network": document.getElementById("Networks").value,
+                          "typeindexTime": "week",
+                          "TypeOfElement": "MintedBurned", 
+                          "Fromdate": ullToHex(timestamp), 
+                          "to": ullToHex(timestamp-week)
                            })
-  })
+    })
 
-  var data = await response.text()
+   
+    var data = await response.json()
 
-  alert("operation result: ",data)
+    console.log(data)
 
-  } catch (error) {
-      console.log("error ",error);
+    minted = data[0]
+    burned = data[1]
+
+    minted = [...minted].reverse();
+    burned = [...burned].reverse();
+
+    chartUpdateMintedBurned(minted, burned)
+
+
+
+} catch (error) {
+    console.log("error ",error);    
   }
-
 }
 
-async function unfreeze(){
+async function RetrieveAmountTransfersChart(){
 
-  privateKey = requestPK()
-  account = document.getElementById('unfreeze').value
+  let timestamp = Math.floor(Date.now() / 1000);
+  let date = new Date(timestamp * 1000);
 
-  network = document.getElementById("Networks").value
+  console.log("actual timestamp ", date.getDay());
 
-  jsonValues = JSON.stringify({ 
-    "network": network,
-    "option": "unfreeze",
-    "account": account, 
-    "privateKey": privateKey,
-   })
+  week = 604800
 
   try {
+
     const response = await fetch(serverurl+"/api", {
     method: 'POST',
     headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
     },
-    body: JSON.stringify({  "request": "AdminSM", 
-                            "values": jsonValues,
+    body: JSON.stringify({"request": "ChartInfo",
+                          "network": document.getElementById("Networks").value,
+                          "typeindexTime": "week",
+                          "TypeOfElement": "amountTransfers", 
+                          "Fromdate": ullToHex(timestamp), 
+                          "to": ullToHex(timestamp-week)
                            })
-  })
+    })
 
-  var data = await response.text()
+   
+    var data = await response.json()
 
-  alert("operation result: ",data)
+    console.log("amount transfers data ", data)
 
-  } catch (error) {
-      console.log("error ",error);
+    data = [...data].reverse();
+
+    chartUpdateAmountTransfers(data)
+
+
+
+} catch (error) {
+    console.log("error ",error);    
   }
-
 }
 
-async function wipeFrozenAddress(){
+function arrangeDays(timestamptiming, splitTime){
 
-  privateKey = requestPK()
-  account = document.getElementById('wipeFrozenAddress').value
+  let timestamp = Math.floor(Date.now() / 1000)
+  let date = new Date(timestamp * 1000)
 
-  network = document.getElementById("Networks").value
+  var daysarrange = []
 
-  jsonValues = JSON.stringify({ 
-    "network": network,
-    "option": "wipeFrozenAddress",
-    "account": account, 
-    "privateKey": privateKey,
-   })
+  for(i = 0; i< splitTime; i++){
 
-  try {
-    const response = await fetch(serverurl+"/api", {
-    method: 'POST',
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({  "request": "AdminSM", 
-                            "values": jsonValues,
-                           })
-  })
-
-  var data = await response.text()
-
-  alert("operation result: ",data)
-
-  } catch (error) {
-      console.log("error ",error);
-  }
-
-}
-
-async function pause(){
-
-  privateKey = requestPK()
-  network = document.getElementById("Networks").value
-
-  jsonValues = JSON.stringify({ 
-    "network": network,
-    "option": "pause",
-    "privateKey": privateKey,
-   })
-
-  try {
-    const response = await fetch(serverurl+"/api", {
-    method: 'POST',
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({  "request": "AdminSM", 
-                            "values": jsonValues,
-                           })
-  })
-
-  var data = await response.text()
-
-  alert("operation result: ",data)
-
-  } catch (error) {
-      console.log("error ",error);
-  }
-
-}
-
-async function unpause(){
-
-  privateKey = requestPK()
-  network = document.getElementById("Networks").value
-
-  jsonValues = JSON.stringify({ 
-    "network": network,
-    "option": "unpause",
-    "privateKey": privateKey,
-   })
-
-  try {
-    const response = await fetch(serverurl+"/api", {
-    method: 'POST',
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({  "request": "AdminSM", 
-                            "values": jsonValues,
-                           })
-  })
-
-  var data = await response.text()
-
-  alert("operation result: ",data)
-
-  } catch (error) {
-      console.log("error ",error);
-  }
-
-}
-
-
->>>>>>> ac220ad (update progress, The checklist file describes the work)
-
-
-<<<<<<< HEAD
-    var elemento = document.getElementById("TotalSupply")
-    elemento.textContent = "Nuevo contenido de texto"
+    daysarrange[i]=daysOfWeek[date.getDay()]
+    timestamp -= timestamptiming;
+    date = new Date(timestamp * 1000);
     
-}
-
-async function IndexEvents(f, t) {
-
-    from = ullToHex(f).toUpperCase();
-    to = ullToHex(t).toUpperCase();
-
- 
-    const response = await fetch(serverurl+"/MakeWallet", {
-      method: 'POST',
-      headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({  "from": from, 
-        "to": to,
-        "filterTransactions": document.getElementById("filterTransactions").checked,
-        "filterBalances": document.getElementById("filterBalances").checked,
-        "filterApproval": document.getElementById("filterApproval").checked,
-        "filterSupply": document.getElementById("filterSupply").checked,
-        "filterFreezeAddress": document.getElementById("filterFreezeAddress").checked,
-        "filterPause": document.getElementById("filterPause").checked
-       })
-  })
-  .then(response => response.text())
-  .then(data => document.getElementById("response").innerHTML = data)
-  .catch(error => console.log(error));
-}
-
-async function IndexEventsMain() {
-
-  from = ullToHex(0).toUpperCase();
-  to = "last"
-  try {
-    const response = await fetch(serverurl+"/IndexEvents", {
-    method: 'POST',
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({  "from": from, 
-                            "to": to,
-                            "indexType": "general",
-                            "filterTransactions": document.getElementById("filterTransactions").checked,
-                            "filterBalances": document.getElementById("filterBalances").checked,
-                            "filterApproval": document.getElementById("filterApproval").checked,
-                            "filterSupply": document.getElementById("filterSupply").checked,
-                            "filterFreezeAddress": document.getElementById("filterFreezeAddress").checked,
-                            "filterPause": document.getElementById("filterPause").checked
-                           })
-  })
-
-  var data = await response.json()
-
-  await loadtable(data)
-
-} catch (error) {
-    console.log("error ",error);
   }
 
+  daysarrange = [...daysarrange].reverse();
+
+
+  return daysarrange
+
 }
 
-async function IndexEventsAddressMain() {
+async function chartUpdateAmountTransfers(dataChar){
 
-  from = ullToHex(0).toUpperCase();
-  to = "last"
-
-  var indexAddress = document.getElementById("Address").textContent
-  
-  try {
-    const response = await fetch(serverurl+"/IndexEvents", {
-    method: 'POST',
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({  "from": from, 
-                            "to": to,
-                            "indexType": indexAddress,
-                            "filterTransactions": document.getElementById("filterTransactions").checked,
-                            "filterBalances": document.getElementById("filterBalances").checked,
-                            "filterApproval": document.getElementById("filterApproval").checked,
-                            "filterSupply": document.getElementById("filterSupply").checked,
-                            "filterFreezeAddress": document.getElementById("filterFreezeAddress").checked,
-                            "filterPause": document.getElementById("filterPause").checked
-                           })
-  })
-
-  var data = await response.json()
-
-  await loadtable(data)
-
-} catch (error) {
-    console.log("error ",error);
+  if (window.amountTransfersChart) {
+    window.amountTransfersChart.destroy();
   }
 
-}
-
-function IndexAddress() {
-  Address = document.getElementById('IndexAddress').value;
-  console.log(Address)
-  window.open(serverurl+"/AddressIndexing/"+Address, '_blank');
-}
-
-async function retrieveinfo(){
-
-  try {
-    const response = await fetch(serverurl+"/IndexEvents", {
-    method: 'POST',
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({  
-                           })
-  })
-
-  var data = await response.json()
-
-
-} catch (error) {
-    console.log("error ",error);
+  if (typeof amountTransfersChart !== 'undefined' && amountTransfersChart !== null) {
+    amountTransfersChart.destroy();
   }
 
-}
 
+const ctx = document.getElementById('amountTransfersChart').getContext('2d');
 
-
-//setings network
-
-networkSelectUpdated = false;
-
-async function updateNetworkSelect() {
-
-  if(!networkSelectUpdated){
-    try {
-      const response = await fetch(serverurl+"/api", {
-      method: 'POST',
-      headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({  "request": "savedNetworks", 
-                            })
-    })
-
-    var responsedata = await response.json()
-
-    var selectElement = document.getElementById('Networks');
-
-    while (selectElement.firstChild) {
-      selectElement.removeChild(selectElement.firstChild);
-    }
-
-    responsedata.forEach(opcion => {
-
-      NetworkData = JSON.parse(opcion)
-      const optionElement = document.createElement('option');
-      optionElement.value = NetworkData["networkName"]; 
-      optionElement.textContent = NetworkData["networkName"]; 
-      selectElement.appendChild(optionElement);
-
-    });
-
-
-    selectElement.addEventListener("change", function() {
-
-      const selectedValue = this.value; 
-      const selectedText = this.options[this.selectedIndex].text;
-
-      responsedata.forEach(opcion => {
-
-        NetworkData = JSON.parse(opcion)
-
-        if(NetworkData["networkName"]===selectedValue){
-
-          let networkidSetEdit = document.getElementById('networkidSetEdit');
-          networkidSetEdit.value = NetworkData["networkid"];
-      
-          let networkRPCSetEdit = document.getElementById('networkRPCSetEdit');
-          networkRPCSetEdit.value = NetworkData["rpc_address"];
-      
-          let networkSmartContractAddressSetEdit = document.getElementById('networkSmartContractAddressSetEdit');
-          networkSmartContractAddressSetEdit.value = NetworkData["sm_address"];
-
-          networkSelectUpdated = true;
-
+window.amountTransfersChart = new Chart(ctx, {
+    type: "line",
+    data: {
+        labels: arrangeDays(86400, 7),
+        datasets: [{ 
+            data: dataChar,
+            backgroundColor: "rgba(186, 214, 255, 0.21)", 
+            borderColor: "#b0cfff",
+            fill: true,
+            borderWidth: 1, 
+            tension: 0.1,
+            pointRadius: 0,          
+            pointHoverRadius: 5,     
+            pointHitRadius: 10 
+        }]
+    },
+    options: {
+        plugins: {
+            legend: { display: false },
+            tooltip: { 
+                backgroundColor: 'rgba(0,0,0,0.8)',
+                titleFont: { size: 14 },
+                bodyColor: '#b0cfff',
+                bodyFont: { size: 12 },
+                displayColors: true,
+            }
+        },
+        scales: {
+            x: {
+                grid: { display: false },
+                ticks: {
+                    color: "rgba(230, 230, 230, 0.95)",
+                    font: { size: 12 }
+                }
+            },
+            y: { 
+                grid: { display: true },
+                ticks: {
+                    color: "rgb(219, 219, 219)",
+                    font: { size: 12 },
+                },
+                beginAtZero: true
+            }
+        },
+        animation: {
+            duration: 2000,
+            easing: 'easeOutQuart'
         }
+    }
+});
 
-      });
+}
 
-    });
+async function chartUpdateVolumeTransactionsValue(dataChar){
 
-    } catch (error) {
+  if (window.VolumeTransactionsValueChart) {
+    window.VolumeTransactionsValueChart.destroy();
+  }
 
+  if (typeof VolumeTransactionsValueChart !== 'undefined' && VolumeTransactionsValueChart !== null) {
+    VolumeTransactionsValueChart.destroy();
+  }
+
+const ctx = document.getElementById('VolumeTransactionsValueChart').getContext('2d');
+
+window.VolumeTransactionsValueChart = new Chart(ctx, {
+    type: "line",
+    data: {
+        labels: arrangeDays(86400, 7),
+        datasets: [{ 
+            data: dataChar,
+            backgroundColor: "rgba(186, 214, 255, 0.21)", 
+            borderColor: "#b0cfff",
+            fill: true,
+            borderWidth: 1, 
+            tension: 0.1,
+            pointRadius: 0,          
+            pointHoverRadius: 5,     
+            pointHitRadius: 10 
+        }]
+    },
+    options: {
+        plugins: {
+            legend: { display: false },
+            tooltip: { 
+                backgroundColor: 'rgba(0,0,0,0.8)',
+                titleFont: { size: 14 },
+                bodyColor: '#b0cfff',
+                bodyFont: { size: 12 },
+                displayColors: true,
+                callbacks: {
+                    label: function(context) {
+                        return '$' + context.parsed.y;
+                    }
+                }
+            }
+        },
+        scales: {
+            x: { 
+                grid: { display: false },
+                ticks: {
+                    color: "rgba(230, 230, 230, 0.95)",
+                    font: { size: 12 }
+                }
+            },
+            y: {
+                grid: { display: true },
+                ticks: {
+                    color: "rgb(219, 219, 219)",
+                    font: { size: 12 },
+                    callback: function(value) {
+                        return "$" + value;
+                    }
+                },
+                beginAtZero: true
+            }
+        },
+        animation: {
+            duration: 2000,
+            easing: 'easeOutQuart'
+        }
+    }
+});
+
+}
+
+async function chartUpdateMintedBurned(dataChartMinted, dataChartburned){
+
+  if (window.MintedBurnedChart) {
+    window.MintedBurnedChart.destroy();
+  }
+
+  if (typeof MintedBurnedChart !== 'undefined' && MintedBurnedChart !== null) {
+    MintedBurnedChart.destroy();
+  }
+
+  const ctx = document.getElementById('MintedBurnedChart').getContext('2d');
+
+  window.MintedBurnedChart = new Chart(ctx, {
+      type: "line",
+      data: {
+          labels: arrangeDays(86400, 7),
+          datasets: [{ 
+              data: dataChartburned,
+              backgroundColor: "rgba(255, 149, 0, 0.46)", 
+              borderColor: "rgba(255, 184, 19, 0.72)",
+              fill: true,
+              borderWidth: 1, 
+              tension: 0.1,
+              borderWidth: 1,
+              pointRadius: 0,          
+              pointHoverRadius: 5,     
+              pointHitRadius: 10 
+          }, { 
+            data: dataChartMinted,
+            backgroundColor: "rgba(73, 191, 110, 0.51)",
+            fill: true,
+            borderWidth: 1, 
+            tension: 0.1,
+            pointRadius: 0,          
+            pointHoverRadius: 5,     
+            pointHitRadius: 10 
+          }]
+      },
+      options: {
+          plugins: {
+              legend: { display: false },
+              tooltip: { 
+                  backgroundColor: 'rgba(0,0,0,0.8)',
+                  titleFont: { size: 14 },
+                  bodyColor: '#b0cfff',
+                  bodyFont: { size: 12 },
+                  displayColors: true,
+                  callbacks: {
+                      label: function(context) {
+                          return '$' + context.parsed.y;
+                      }
+                  }
+              }
+          },
+          scales: {
+              x: { 
+                  grid: { display: true },
+                  ticks: {
+                      color: "rgba(230, 230, 230, 0.95)",
+                      font: { size: 12 }
+                  }
+              },
+              y: { 
+                  grid: { display: true },
+                  ticks: {
+                      color: "rgb(219, 219, 219)",
+                      font: { size: 12 },
+                      callback: function(value) {
+                          return "$" + value;
+                      }
+                  },
+                  beginAtZero: true
+              }
+          },
+          animation: {
+              duration: 2000,
+              easing: 'easeOutQuart'
+          }
+      }
+  });
+
+}
+
+var amountTransfersChart = new Chart("amountTransfersChart", {
+  
+  type: "line",
+  data: {
+    labels: arrangeDays(86400, 7),
+    datasets: [{ 
+      data: [300,700,aa,5000,6000,4000,2000,1000,200,100],
+      borderColor: "blue",
+      backgroundColor: "#b0cfffc2",
+      fill: true,
+      borderColor: "#b0cfff", 
+      borderWidth: 1, 
+    }]
+  },
+options: {
+    legend: {display: false},
+    scales: {
+      xAxes: [{
+        gridLines: {
+          display: false 
+        }, 
+        ticks: {
+        fontColor: "rgba(129, 129, 129, 0.81)",
+        fontSize: 12,
+
+      }
+      }],
+      yAxes: [{
+        gridLines: {
+          display: false // 
+        } , 
+        ticks: {
+        fontColor: "rgba(129, 129, 129, 0.81)", 
+        fontSize: 12,
+      }
+      }]
     }
   }
-}
+});
 
-async function setNetworkEdit() {
-
-  var networkNameSet = document.getElementById("Networks").value
-  var networkidSet = document.getElementById("networkidSetEdit").value
-  var networkRPCSet = document.getElementById("networkRPCSetEdit").value
-  var networkSmartContractAddressSet = document.getElementById("networkSmartContractAddressSetEdit").value
-
-  jsonset = JSON.stringify({
-
-    "networkName": networkNameSet,
-    "networkid": networkidSet,
-    "rpc_address": networkRPCSet,
-    "sm_address": networkSmartContractAddressSet,
-
-  })
-
-  try {
-    const response = await fetch(serverurl+"/api", {
-    method: 'POST',
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({  "request": "networkSet", 
-                            "networksetting": jsonset, 
-                          })
-  })
-
-    var responsedata = await response.text()
-
-    networkSelectUpdated = false;
-
-
-  } catch (error) {
-    console.log("error ",error);
-  }
-
-}
-
-async function setNetwork() {
-
-  var networkNameSet = document.getElementById("networkNameSet").value
-  var networkidSet = document.getElementById("networkidSet").value
-  var networkRPCSet = document.getElementById("networkRPCSet").value
-  var networkSmartContractAddressSet = document.getElementById("networkSmartContractAddressSet").value
-
-  jsonset = JSON.stringify({
-
-    "networkName": networkNameSet,
-    "networkid": networkidSet,
-    "rpc_address": networkRPCSet,
-    "sm_address": networkSmartContractAddressSet,
-
-  })
-
-  try {
-    const response = await fetch(serverurl+"/api", {
-    method: 'POST',
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({  "request": "networkSet", 
-                            "networksetting": jsonset, 
-                          })
-  })
-
-    var responsedata = await response.text()
-
-    networkSelectUpdated = false;
-
-  } catch (error) {
-    console.log("error ",error);
-  }
-
-}
-
-async function displayNetWorksSetting(){
-
-  let SM = document.getElementById('SM');
-  SM.style.display = 'none'; 
-
-  let smsidebar = document.getElementById('smsidebar');
-  smsidebar.classList.remove('active');
-
+var VolumeTransactionsValueChart = new Chart("VolumeTransactionsValueChart", {
   
-  let NetworkSettings = document.getElementById('NetworkSettings');
-  NetworkSettings.style.display = 'grid'; 
+  type: "line",
+  data: {
+    labels: arrangeDays(86400, 7),
+    datasets: [{ 
+      data: [300,700,aa,5000,6000,4000,2000,1000,200,100],
+      borderColor: "blue",
+      backgroundColor: "#b0cfffc2",
+      fill: true,
+      borderColor: "#b0cfff", 
+      borderWidth: 1, 
+    }]
+  },
+options: {
+    legend: {display: false},
+    scales: {
+      xAxes: [{
+        gridLines: {
+          display: false 
+        }, 
+        ticks: {
+        fontColor: "rgba(129, 129, 129, 0.81)",
+        fontSize: 12,
 
-  let networksidebar = document.getElementById('networksidebar');
+      }
+      }],
+      yAxes: [{
+        gridLines: {
+          display: false // 
+        } , 
+        ticks: {
+        fontColor: "rgba(129, 129, 129, 0.81)", 
+        fontSize: 12,
+        callback: function(value) {
+          return "$" + value;  
+        }
+      }
+      }]
+    }
+  }
+});
 
-  networksidebar.classList.add("active")
+var MintedBurnedChart = new Chart("MintedBurnedChart", {
+  
+  type: "line",
+  data: {
+    labels: xValues,
+    datasets: [{ 
+      data: [0],
+      borderColor: "fd7e14",
+      backgroundColor: "#fd7e1473",
+      fill: true,
+      borderWidth: 1, 
+    }] ,    data: {
+      labels: xValues,
+      datasets: [{ 
+        data: [666, 777],
+        borderColor: "#28a745",
+        backgroundColor: "#3f9f5e82",
+        fill: true,
+        borderWidth: 1, 
+      }]
+    },
+
+  },
+options: {
+    legend: {display: false},
+    scales: {
+      xAxes: [{
+        gridLines: {
+          display: false 
+        }, 
+        ticks: {
+        fontColor: "#FFF", 
+        fontSize: 12,
+
+      }
+      }],
+      yAxes: [{
+        gridLines: {
+          display: false 
+        } , 
+        ticks: {
+        fontColor: "#FFF",  
+        fontSize: 12,
+        callback: function(value) {
+          return "$" + value; 
+        }
+      }
+      }]
+    }
+  }
+});
 
 
-}
-
-async function displaySMSettings(){
-
-  let NetworkSettings = document.getElementById('NetworkSettings');
-  NetworkSettings.style.display = 'none'; 
-  let networksidebar = document.getElementById('networksidebar');
-  networksidebar.classList.remove('active');
-
-  let SM = document.getElementById('SM');
-  SM.style.display = 'grid'; 
-
-  let smsidebar = document.getElementById('smsidebar');
-  smsidebar.classList.add("active")
-
-}
 
 
-
-
-=======
->>>>>>> ac220ad (update progress, The checklist file describes the work)

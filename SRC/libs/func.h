@@ -59,4 +59,12 @@ void storeSmartContracInfo(std::string network){
 
 }
 
+string DerivePublicKey(string PK){
+
+    string address =  DerivePublicKeyWeb3(PK);
+
+    return address;
+
+}
+
 #endif

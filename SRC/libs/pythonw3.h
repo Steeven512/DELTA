@@ -2,12 +2,9 @@
 #include <boost/python.hpp>
 #include <vector>
 
-<<<<<<< HEAD
-=======
 #ifndef PYTHONW3_H
 #define PYTHONW3_H
 
->>>>>>> ac220ad (update progress, The checklist file describes the work)
 using namespace std;
 
 vector<string> convert_python_list_to_vector(boost::python::object py_list) {
@@ -79,10 +76,7 @@ uint64_t LatestNetworkBlockNumber(string RPC_Network){
 }
 
 
-<<<<<<< HEAD
-=======
 string SmOperation(string &RPC_Network, string &sm_address, string &jsonStr){
-
 
     namespace py = boost::python;
     Py_Initialize();
@@ -107,7 +101,33 @@ string SmOperation(string &RPC_Network, string &sm_address, string &jsonStr){
     return "unexpected error";
 
 }
+
+string DerivePublicKeyWeb3(string pk){
+
+    namespace py = boost::python;
+    Py_Initialize();
+    py::object main_module = py::import("__main__");
+    py::object main_namespace = main_module.attr("__dict__");
+
+    try {
+
+        py::object sys = py::import("sys");
+        py::object sys_path = sys.attr("path");
+        sys_path.attr("insert")(0, "");
+        py::exec_file("PyScripts/deriveKey.py", main_namespace);
+        py::object result = main_namespace["deriveFromPriv"](pk);
+
+        return py::extract<string>(result);
+
+    } catch (const py::error_already_set& e) {
+            PyErr_Print();
+            return "py error catched";
+    }
+
+    return "unexpected error";
+
+}
+
 #endif
 
 
->>>>>>> ac220ad (update progress, The checklist file describes the work)

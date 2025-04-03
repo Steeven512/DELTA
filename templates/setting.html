@@ -6,42 +6,34 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" type="text/css" href="css/css.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-  <script  src="js/reqapi.js"></script>
+  <script  src="js/settings.js"></script>
 </head>
 
 <body>
   <div class="container">
-<<<<<<< HEAD
-      <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-=======
       <nav class="navbar navbar-expand-lg navbar-dark bg-light fixed-top">
->>>>>>> ac220ad (update progress, The checklist file describes the work)
         <a class="navbar-brand" href="/CryptoAdmin">S.S: Front Rest API Web</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarText">
           <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/CryptoAdmin">Index Log </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/transfer">Transfer </a>
+            </li>
             <li class="nav-item active">
-              <a class="nav-link" href="CryptoAdmin">Index Log <span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/login">Address indexing</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/#">Settings<span class="sr-only">(current)</span></a>
+              <a class="nav-link" href="#">Settings<span class="sr-only">(current)</span></a>
             </li>
           </ul>
           <span class="navbar-text">
-            web app en desarrollo
+            Developed by Steeven J Salazar
           </span>
         </div>
       </nav>
   </div>
-<<<<<<< HEAD
-
-=======
->>>>>>> ac220ad (update progress, The checklist file describes the work)
     <div class ="navbarspacer">
 
     </div>
@@ -63,17 +55,10 @@
     <div class="AddNetwork">
 
       <span class="TittleSetting">
-<<<<<<< HEAD
-        Add Network
-      </span>
-
-      <div class="AddressWrapper NetworkSettingGrouop">
-=======
         Add a Network
       </span>
 
       <div class="AddressWrapper NetworkSettingGroup">
->>>>>>> ac220ad (update progress, The checklist file describes the work)
 
         <div>
           <label>
@@ -124,19 +109,11 @@
         Edit Network Settings
       </span>
 
-<<<<<<< HEAD
-      <div class="AddressWrapper NetworkSettingGrouop">
-
-        <div>
-          <label for="networks">Choose a Network:</label>
-          <select name="Networks" id="Networks">
-=======
       <div class="AddressWrapper NetworkSettingGroup">
 
         <div>
           <label for="networks">Choose a Network:</label>
-          <select name="Networks" id="Networks"></select>
->>>>>>> ac220ad (update progress, The checklist file describes the work)
+          <select name="Networks" id="Networks" class="SelectorStyle"></select>
         </div>
         
         <div class="">
@@ -161,11 +138,6 @@
           </label>
         <br />
           <input type="text" class="settingInput" id="networkSmartContractAddressSetEdit">
-<<<<<<< HEAD
-        </div>    
-        
-        <button class="buttonSetSetting" onclick="setNetworkEdit(this)">Set</button>
-=======
           <br />
           <br />
         </div>    
@@ -173,7 +145,6 @@
         <div>
           <button class="buttonSetSetting" onclick="setNetworkEdit(this)">Set</button>
         </div>
->>>>>>> ac220ad (update progress, The checklist file describes the work)
 
       </div>
 
@@ -187,19 +158,13 @@
         Smart Contract Advanced settings
       </span>
 
-<<<<<<< HEAD
-
-      <div class="AddressWrapper">
-
-=======
       <div class="AddressWrapper">
 
         <div>
           <label for="networks"> Choose a Network: </label>
-          <select name="Networks" id="NetworksSM"></select>
+          <select name="Networks" id="NetworksSM" class="SelectorStyle" ></select>
         </div>
 
->>>>>>> ac220ad (update progress, The checklist file describes the work)
         <div class="AddNetwork">
         
           <span class="TittleSetting">mint / burn / increase supply / decrease supply</span>
@@ -208,15 +173,9 @@
 
             <span>increase amount supply</span>
             <br/>
-<<<<<<< HEAD
-            <input type="text" class="settingInput">
- 
-            <button class="buttonsearch" onclick="setNetwork(this)">Set</button>
-=======
             <input type="text" class="settingInput" id="increaseSupply">
  
             <button class="buttonsearch" onclick="increaseSupply(this)">Set</button>
->>>>>>> ac220ad (update progress, The checklist file describes the work)
             
           </div>
 
@@ -226,13 +185,8 @@
 
             <span>burn</span>
             <br />
-<<<<<<< HEAD
-            <input type="text" class="settingInput">
-            <button class="buttonsearch" onclick="setNetwork(this)">Set</button>
-=======
             <input type="text" class="settingInput" id="burn">
             <button class="buttonsearch" onclick="burn(this)">Set</button>
->>>>>>> ac220ad (update progress, The checklist file describes the work)
             
           </div>
 
@@ -241,19 +195,11 @@
             <span>mint</span>
             <br />
             <span>Address</span><br />
-<<<<<<< HEAD
-            <input type="text" class="settingInput">
-            <br />
-            <span>Value</span><br />
-            <input type="text" class="settingInput">
-            <button class="buttonsearch" onclick="setNetwork(this)">Set</button>
-=======
             <input type="text" class="settingInput" id="mint_address">
             <br />
             <span>Value</span><br />
             <input type="text" class="settingInput" id="mint_amount">
             <button class="buttonsearch" onclick="mint(this)">Set</button>
->>>>>>> ac220ad (update progress, The checklist file describes the work)
             
           </div>
 
@@ -263,19 +209,11 @@
             <span>decreaseSupplyFromAddress</span>
             <br />
             <span>Address</span><br />
-<<<<<<< HEAD
-            <input type="text" class="settingInput">
-            <br />
-            <span>Value</span><br />
-            <input type="text" class="settingInput">
-            <button class="buttonsearch" onclick="setNetwork(this)">Set</button>
-=======
             <input type="text" class="settingInput" id="decreaseSupply_address">
             <br />
             <span>Value</span><br />
             <input type="text" class="settingInput" id="decreaseSupply_value">
             <button class="buttonsearch" onclick="decreaseSupply(this)">Set</button>
->>>>>>> ac220ad (update progress, The checklist file describes the work)
             
           </div>
 
@@ -289,15 +227,9 @@
 
               <span>Freezze Address</span>
               <br/>
-<<<<<<< HEAD
-              <input type="text" class="settingInput">
-  
-              <button class="buttonsearch" onclick="setNetwork(this)">Set</button>
-=======
               <input type="text" class="settingInput" id="freeze">
   
               <button class="buttonsearch" onclick="freeze(this)">Set</button>
->>>>>>> ac220ad (update progress, The checklist file describes the work)
               
             </div>
 
@@ -305,15 +237,9 @@
 
               <span>unfreeze Address</span>
               <br/>
-<<<<<<< HEAD
-              <input type="text" class="settingInput">
-  
-              <button class="buttonsearch" onclick="setNetwork(this)">Set</button>
-=======
               <input type="text" class="settingInput" id="unfreeze">
   
               <button class="buttonsearch" onclick="unfreeze(this)">Set</button>
->>>>>>> ac220ad (update progress, The checklist file describes the work)
               
             </div>
 
@@ -321,15 +247,9 @@
 
               <span>wipeFrozenAddress Address</span>
               <br/>
-<<<<<<< HEAD
-              <input type="text" class="settingInput">
-  
-              <button class="buttonsearch" onclick="setNetwork(this)">Set</button>
-=======
               <input type="text" class="settingInput" id="wipeFrozenAddress">
   
               <button class="buttonsearch" onclick="wipeFrozenAddress(this)">Set</button>
->>>>>>> ac220ad (update progress, The checklist file describes the work)
               
             </div>
 
@@ -339,9 +259,6 @@
 
         <div class="AddNetwork">
 
-<<<<<<< HEAD
-          <span class="TittleSetting">pause</span>
-=======
           <span class="TittleSetting">Operational Switch</span>
 
           <div class="SMSettingGrouop ">
@@ -350,10 +267,9 @@
             <br/><br/>
 
             <button class="buttonsearch" onclick="pause(this)">Pause Smart Contract</button>
-            <button class="buttonsearch" onclick="unpause(this)">Unause Smart Contract</button>
+            <button class="buttonsearch" onclick="unpause(this)">Unpause Smart Contract</button>
             
           </div>
->>>>>>> ac220ad (update progress, The checklist file describes the work)
             
         </div>
 

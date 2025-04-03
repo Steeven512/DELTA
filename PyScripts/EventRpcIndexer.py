@@ -37,11 +37,11 @@ def eventsIndexer(RPC_Networkd_Address, SM_address, fromBlock, toBlock):
 
         return result
 
-<<<<<<< HEAD
-    Contract = contract(SM_address)
-=======
     Contract = contract(SM_address, W3)
->>>>>>> ac220ad (update progress, The checklist file describes the work)
+
+
+       
+          
 
     for log in logs:
 
@@ -60,6 +60,7 @@ def eventsIndexer(RPC_Networkd_Address, SM_address, fromBlock, toBlock):
             balances = event['args']['balances']
 
             data = {"event": "accountBalanceUpdate", 
+                    "timestamp": W3.eth.get_block(event['blockNumber'])['timestamp'],
                     "blockNumber" : blockNumber,
                     "transactionIndex" : transactionIndex,
                     "logIndex" : logIndex,
@@ -79,6 +80,7 @@ def eventsIndexer(RPC_Networkd_Address, SM_address, fromBlock, toBlock):
             logIndex = event['logIndex']
 
             data = {"event": "Transfer", 
+                    "timestamp": W3.eth.get_block(event['blockNumber'])['timestamp'],
                     "blockNumber" : blockNumber,
                     "transactionIndex" : transactionIndex,
                     "logIndex" : logIndex,
@@ -102,6 +104,7 @@ def eventsIndexer(RPC_Networkd_Address, SM_address, fromBlock, toBlock):
             value = event['args']['value']
 
             data = {"event": "Approval", 
+                    "timestamp": W3.eth.get_block(event['blockNumber'])['timestamp'],
                     "blockNumber" : blockNumber,
                     "transactionIndex" : transactionIndex,
                     "logIndex" : logIndex,
@@ -120,6 +123,7 @@ def eventsIndexer(RPC_Networkd_Address, SM_address, fromBlock, toBlock):
             logIndex = event['logIndex']
 
             data = {"event": "Pause", 
+                    "timestamp": W3.eth.get_block(event['blockNumber'])['timestamp'],
                     "blockNumber" : blockNumber,
                     "transactionIndex" : transactionIndex,
                     "logIndex" : logIndex,}
@@ -136,6 +140,7 @@ def eventsIndexer(RPC_Networkd_Address, SM_address, fromBlock, toBlock):
 
 
             data = {"event": "Unpause", 
+                    "timestamp": W3.eth.get_block(event['blockNumber'])['timestamp'],
                     "blockNumber" : blockNumber,
                     "transactionIndex" : transactionIndex,
                     "logIndex" : logIndex,}
@@ -152,6 +157,7 @@ def eventsIndexer(RPC_Networkd_Address, SM_address, fromBlock, toBlock):
             addr = event['args']['addr']
 
             data = {"event": "FrozenAddressWiped", 
+                    "timestamp": W3.eth.get_block(event['blockNumber'])['timestamp'],
                     "blockNumber" : blockNumber,
                     "transactionIndex" : transactionIndex,
                     "logIndex" : logIndex,
@@ -169,6 +175,7 @@ def eventsIndexer(RPC_Networkd_Address, SM_address, fromBlock, toBlock):
             addr = event['args']['addr']
 
             data = {"event": "FreezeAddress", 
+                    "timestamp": W3.eth.get_block(event['blockNumber'])['timestamp'],
                     "blockNumber" : blockNumber,
                     "transactionIndex" : transactionIndex,
                     "logIndex" : logIndex,
@@ -186,6 +193,7 @@ def eventsIndexer(RPC_Networkd_Address, SM_address, fromBlock, toBlock):
             addr = event['args']['addr']
 
             data = {"event": "UnfreezeAddress", 
+                    "timestamp": W3.eth.get_block(event['blockNumber'])['timestamp'], 
                     "blockNumber" : blockNumber,
                     "transactionIndex" : transactionIndex,
                     "logIndex" : logIndex,
@@ -204,14 +212,11 @@ def eventsIndexer(RPC_Networkd_Address, SM_address, fromBlock, toBlock):
             value = event['args']['value']
 
             data = {"event": "SupplyDecreased", 
+                    "timestamp": W3.eth.get_block(event['blockNumber'])['timestamp'],
                     "blockNumber" : blockNumber,
                     "transactionIndex" : transactionIndex,
                     "logIndex" : logIndex,
-<<<<<<< HEAD
-                    "From" : From,
-=======
                     "from" : From,
->>>>>>> ac220ad (update progress, The checklist file describes the work)
                     "value" : value}
 
             result.append(json.dumps(data))
@@ -223,22 +228,15 @@ def eventsIndexer(RPC_Networkd_Address, SM_address, fromBlock, toBlock):
             blockNumber = event['blockNumber']
             transactionIndex = event['transactionIndex']
             logIndex = event['logIndex']
-<<<<<<< HEAD
-            to = event['args']['from']
-=======
             to = event['args']['to']
->>>>>>> ac220ad (update progress, The checklist file describes the work)
             value = event['args']['value']
 
             data = {"event": "SupplyIncreased", 
+                    "timestamp": W3.eth.get_block(event['blockNumber'])['timestamp'],
                     "blockNumber" : blockNumber,
                     "transactionIndex" : transactionIndex,
                     "logIndex" : logIndex,
-<<<<<<< HEAD
-                    "From" : to,
-=======
                     "to" : to,
->>>>>>> ac220ad (update progress, The checklist file describes the work)
                     "value" : value}
 
             result.append(json.dumps(data))

@@ -30,8 +30,18 @@ struct network{
 
 inline std::unordered_map<string, struct network>Networks;
 
-<<<<<<< HEAD
-=======
+bool checkFileExist (string Path){
+
+    std::ifstream file(Path);
+    if (file.is_open()) {
+        return true;
+    } else {
+        return false; 
+    }
+    return false;
+
+}
+
 json ReadNetworkFileSet(std::string FilePath){
 
     std::ifstream jsonFileEvent(FilePath);
@@ -79,7 +89,6 @@ bool isNetworkExist(std::string Network){
     
 }
 
->>>>>>> ac220ad (update progress, The checklist file describes the work)
 std::string readlatestBlockNumberIndexed(std::string Network){
 
     std::ifstream fileData("DB/"+Network+"/latestEthBlockNumber", std::ios::binary | std::ios::ate);
@@ -271,26 +280,15 @@ bool SaveEventAddress(std::string Network, json &ethEvent){
     std::string addressA;
     std::string addressB;
 
-<<<<<<< HEAD
-    GetAddressOfEvent(ethEvent, addressA, addressB);
-
-    std::cout<<std::endl<<"fl1h "<< addressA.substr(2 , addressA.length()-2).length()<<std::endl;
-=======
     if(!GetAddressOfEvent(ethEvent, addressA, addressB)){
         return false;
     }
 
->>>>>>> ac220ad (update progress, The checklist file describes the work)
 
     if(addressA.substr(2 , addressA.length()-2).length() != 40 ){
         return false;
     }
 
-<<<<<<< HEAD
-    std::cout<<std::endl<<"fl2 h"<<std::endl;
-
-=======
->>>>>>> ac220ad (update progress, The checklist file describes the work)
     Path = pathOfAddressEvent(Network, ethEvent, addressA);
 
     std::ofstream File(Path+"/"+event);
@@ -309,10 +307,6 @@ bool SaveEventAddress(std::string Network, json &ethEvent){
         return true;
     }
 
-<<<<<<< HEAD
-    std::cout<<std::endl<<"fl3 "<<std::endl;
-=======
->>>>>>> ac220ad (update progress, The checklist file describes the work)
     if(addressB.substr(2 , addressB.length()-2).length() != 40 ){
         return false;
     }
@@ -328,6 +322,63 @@ bool SaveEventAddress(std::string Network, json &ethEvent){
 
     } else {
         std::cerr << "Error writing address event in DB " << std::endl;
+        return false; 
+    }
+
+    return true;
+
+}
+
+bool SaveTimeStampIndexEvent(std::string Network, json &ethEvent){
+
+    std::string bldir = ullToHex(ethEvent["blockNumber"]);
+
+    std::string Path = "DB";
+    if ( access(Path.c_str() , 0) != 0) {
+        if (mkdir(Path.c_str(), 0777) == 0) {
+        } else {
+            std::cerr << "error mkdir " + Path  << std::endl;
+            return false; 
+        }
+    }
+    Path += "/"+Network;
+
+    if ( access(Path.c_str() , 0) != 0) {
+        if (mkdir(Path.c_str(), 0777) == 0) {
+        } else {
+            std::cerr << "error mkdir " + Path  << std::endl;
+            return false; 
+        }
+    }
+
+    Path += "/EthEvents/";
+    if ( access(Path.c_str() , 0) != 0) {
+        if (mkdir(Path.c_str(), 0777) == 0) {
+        } else {
+            std::cerr << "error mkdir " + Path  << std::endl;
+            return false; 
+        }
+    }
+
+    Path += bldir;
+    if ( access(Path.c_str() , 0) != 0) {
+        if (mkdir(Path.c_str(), 0777) == 0) {
+        } else {
+
+            std::cerr << "error mkdir " + Path  << std::endl;
+            return false; 
+        }
+    }
+
+    std::ofstream archivo(Path+"/timestamp");
+
+    if (archivo.is_open()) {
+    archivo << ethEvent.dump(4); 
+    archivo.close();
+    std::cout << "EventStored." << std::endl;
+
+    } else {
+        std::cerr << "Error storing event file." << std::endl;
         return false; 
     }
 
@@ -377,6 +428,8 @@ bool saveEvent(std::string Network, json &ethEvent){
             return false; 
         }
     }
+
+
     Path += "/"+transactiondir;
     if ( access(Path.c_str() , 0) != 0) {
         if (mkdir(Path.c_str(), 0777) == 0) {
@@ -466,7 +519,7 @@ bool updateAccBalances(std::string Network, json &ethEvent){
 
 }
 
-json ReadEvent (string Path){
+json ReadEvent(string Path){
 
     std::ifstream jsonFileEvent(Path);
     if (jsonFileEvent.is_open()) {
@@ -504,18 +557,10 @@ vector<uint64_t> getDirOfTransactionsEvents(const std::string &Path, uint64_t &B
 
     std::sort(BlocksNumberIndex.begin(), BlocksNumberIndex.end(), std::greater<uint64_t>());
 
-<<<<<<< HEAD
-    std::cout << "Directorios ordenados:" << std::endl;
-    for (uint64_t dirNumber : BlocksNumberIndex) {
-        std::cout << dirNumber << std::endl;
-    }
-
-=======
     /*(uint64_t dirNumber : BlocksNumberIndex) {
         std::cout << dirNumber << std::endl;
     }
     */
->>>>>>> ac220ad (update progress, The checklist file describes the work)
     return BlocksNumberIndex;
 
 }
@@ -542,15 +587,6 @@ vector<uint64_t> getDirOfBlTransactions(const std::string &Path, const uint64_t 
 
     std::sort(BlocksNumberIndex.begin(), BlocksNumberIndex.end(), std::greater<uint64_t>());
 
-<<<<<<< HEAD
-    std::cout << "Directorios ordenados:" << std::endl;
-    for (uint64_t dirNumber : BlocksNumberIndex) {
-        std::cout << dirNumber << std::endl;
-    }
-
-    return BlocksNumberIndex;
-
-=======
     /*std::cout << "Directories order:" << std::endl;
     for (uint64_t dirNumber : BlocksNumberIndex) {
         std::cout << dirNumber << std::endl;
@@ -558,7 +594,6 @@ vector<uint64_t> getDirOfBlTransactions(const std::string &Path, const uint64_t 
     */
     return BlocksNumberIndex;
   
->>>>>>> ac220ad (update progress, The checklist file describes the work)
 }
 
 vector<uint64_t> getDirOfBlocksInRange(const std::string &Path, const uint64_t &from, const uint64_t &to){
@@ -573,6 +608,7 @@ vector<uint64_t> getDirOfBlocksInRange(const std::string &Path, const uint64_t &
     for (const auto& entry : fs::directory_iterator(Path)) {
         if (fs::is_directory(entry.status())) {
             try {
+
                 uint64_t BlockNumberEvent = hexToULL(entry.path().filename().string());
                 if(BlockNumberEvent >= from && BlockNumberEvent <= to ){
                     BlocksNumberIndex.push_back(BlockNumberEvent);
@@ -585,24 +621,20 @@ vector<uint64_t> getDirOfBlocksInRange(const std::string &Path, const uint64_t &
 
     std::sort(BlocksNumberIndex.begin(), BlocksNumberIndex.end(), std::greater<uint64_t>());
 
-<<<<<<< HEAD
-    std::cout << "Directorios ordenados:" << std::endl;
-    for (uint64_t dirNumber : BlocksNumberIndex) {
-        std::cout << dirNumber << std::endl;
-    }
-=======
     /*std::cout << "Directories order:" << std::endl;
     for (uint64_t dirNumber : BlocksNumberIndex) {
         std::cout << dirNumber << std::endl;
     }
     */
->>>>>>> ac220ad (update progress, The checklist file describes the work)
 
     return BlocksNumberIndex;
 
 }
 
 vector<json> indexEvents(const std::string Path, const uint64_t &from, const uint64_t &to, const bool &filterTransactions, const bool &filterBalances, const bool &filterApproval, const bool &filterSupply, const bool &filterFreezeAddress, const bool &filterPause){
+
+
+    cout<<endl<<"call debug indexEvents Path "<<Path<<endl;
 
     vector<uint64_t> BlocksNumberIndex = getDirOfBlocksInRange(Path, from, to);
     vector<json> EthEvents;
@@ -645,7 +677,6 @@ vector<json> indexEvents(const std::string Path, const uint64_t &from, const uin
 
     return EthEvents;
 
-
 }
 
 uint64_t AddressBalance(std::string &Network, string address){
@@ -662,24 +693,6 @@ uint64_t AddressBalance(std::string &Network, string address){
 
 }
 
-<<<<<<< HEAD
-json ReadNetworkFileSet(std::string FilePath){
-
-    std::ifstream jsonFileEvent(FilePath);
-    if (jsonFileEvent.is_open()) {
-        json EventData;
-        jsonFileEvent >> EventData;
-        jsonFileEvent.close();
-        return EventData;
-    } else {
-        std::cerr << "Error reading network setting file  " << FilePath << std::endl;
-        return 1; 
-    }
-
-}
-
-=======
->>>>>>> ac220ad (update progress, The checklist file describes the work)
 bool mkDir(std::string Path){
 
     if ( access(Path.c_str() , 0) != 0) {
@@ -728,26 +741,6 @@ bool saveNetwork(json &networtSet){
 
 }
 
-<<<<<<< HEAD
-void loadnetworks(){
-
-    for ( const auto& File : fs::directory_iterator("sets/networks/") ) {
-
-        json networkset = ReadNetworkFileSet(File.path().string());
-
-        Networks[File.path().filename().string()].networkName = networkset["networkName"];
-        Networks[File.path().filename().string()].rpc_address = networkset["rpc_address"];
-        Networks[File.path().filename().string()].sm_address = networkset["sm_address"];
-        Networks[File.path().filename().string()].networkid = networkset["networkid"];
-
-    }
-
-    return;
-
-}
-
-=======
->>>>>>> ac220ad (update progress, The checklist file describes the work)
 vector<json> loadnetworksJson(){
 
     vector<json>networks;
@@ -776,8 +769,6 @@ vector<string> savedNetworks(){
     
 }
 
-<<<<<<< HEAD
-=======
 bool storeSmartContracInfoDB(std::string network, json tokenInfo){
 
     std::ofstream archivo("DB/"+network+"/tokenInfo");
@@ -807,5 +798,189 @@ json ReadSmartContracInfoDB(std::string network){
 
 }
 
->>>>>>> ac220ad (update progress, The checklist file describes the work)
+string elementForIndexSum(string TypeOfElement){
+
+    if(TypeOfElement == "TransfersValueVolume"){
+        return "value";
+    }
+
+    if(TypeOfElement == "MintVolume"){
+        return "value";
+    }
+
+    if(TypeOfElement == "burnVolume"){
+        return "value";
+    }
+
+    return "error elementForIndexSum";
+
+}
+
+uint64_t readTimeStampOfBlock(string network, uint64_t blockNumber){
+
+    json timestamp = ReadEvent("DB/"+network+"/EthEvents/"+ullToHex(blockNumber)+"/timestamp");
+    return timestamp["timestamp"];
+
+}
+
+vector<uint64_t> SumEventsElementOnTime(vector<json> events, uint64_t lastDate, uint64_t PeriodTime, uint16_t splitIntervals, string TypeOfElement){
+
+    vector<uint64_t>timeSums;
+    uint64_t splitedIntervals = PeriodTime / splitIntervals;
+
+    for(uint i = 0 ; i < splitIntervals ; i++){
+
+        timeSums.push_back(0);
+        uint64_t intervaltime = lastDate-splitedIntervals;
+
+        for(uint e = 0 ; e < events.size(); e++){
+        
+            if(events[e]["timestamp"] > intervaltime && events[e]["timestamp"] <= intervaltime + splitedIntervals ){
+
+                timeSums[i]++;
+            }
+
+        }
+
+        lastDate = intervaltime;
+
+    }
+
+    return timeSums;
+
+}
+
+vector<uint64_t> EventsElementOnTime(vector<json> events, uint64_t lastDate, uint64_t PeriodTime, uint16_t splitIntervals, string TypeOfElement){
+
+    vector<uint64_t>timeSums;
+    uint64_t splitedIntervals = PeriodTime / splitIntervals;
+
+    for(uint i = 0 ; i < splitIntervals ; i++){
+
+        timeSums.push_back(0);
+        uint64_t intervaltime = lastDate-splitedIntervals;
+
+        for(uint e = 0 ; e < events.size(); e++){
+        
+            if(events[e]["timestamp"] > intervaltime && events[e]["timestamp"] <= intervaltime + splitedIntervals ){
+                uint64_t sum =  events[e][elementForIndexSum(TypeOfElement)];
+                timeSums[i]+= sum;
+            }
+
+        }
+
+        lastDate = intervaltime;
+
+    }
+
+    return timeSums;
+
+}
+
+void SetFilterElements(string TypeOfElement, string &filterElement,bool &filterTransactions,  bool &filterBalances,  bool &filterApproval,  bool &filterSupply,  bool &filterFreezeAddress,  bool &filterPause){
+
+    if(TypeOfElement == "TransfersValueVolume" || TypeOfElement == "amountTransfers" ){
+
+        filterTransactions = true;
+        filterElement = "Transfer";
+
+    }
+
+    if(TypeOfElement == "MintVolume" ){
+
+        filterSupply = true;
+        filterElement = "SupplyIncreased";
+
+    }
+
+    if(TypeOfElement == "burnVolume" ){
+
+        filterSupply = true;
+        filterElement = "SupplyDecreased";
+
+    }
+
+}
+
+vector<json> readEventsTimestampEvent(string network, uint64_t last, uint64_t old, string TypeOfElement){
+
+    vector<json> eventsFiltered;
+    vector<json> events;
+    uint64_t blockTimestamp;
+
+    bool filterTransactions;
+    bool filterBalances;
+    bool filterApproval;
+    bool filterSupply;
+    bool filterFreezeAddress;
+    bool filterPause;
+    string filterElement;
+
+    SetFilterElements(TypeOfElement, filterElement, filterTransactions, filterBalances, filterApproval, filterSupply, filterFreezeAddress, filterPause);
+
+    for(uint64_t blockNumber = hexToULL(readlatestBlockNumberIndexed(network)) ; blockNumber>0 ; blockNumber--){
+
+        if( !checkFileExist("DB/"+network+"/EthEvents/"+ullToHex(blockNumber)+"/timestamp") ){
+            continue;
+        }
+
+        blockTimestamp = readTimeStampOfBlock(network, blockNumber);
+
+        if( blockTimestamp >  last){
+            continue;
+        }
+
+        if( old > blockTimestamp ){
+            break;
+        }
+
+        events.clear();
+        events = indexEvents("DB/"+network+"/EthEvents/", blockNumber, blockNumber, filterTransactions, filterBalances, filterApproval, filterSupply, filterFreezeAddress, filterPause);
+
+        cout<<endl<<" eventFilter "<< filterElement<<endl;
+
+        for(auto& event: events){
+
+            string eventstr = event["event"];
+
+            if(eventstr == filterElement){
+                eventsFiltered.push_back(event);
+            }
+        }
+    }
+
+    return eventsFiltered;
+
+}
+
+
+vector<uint64_t> eventsPointInTimeLine(string network, uint64_t last, uint64_t old, string TypeOfElement, string typeindexTime){
+
+    vector<uint64_t > xyElements;
+
+    if(typeindexTime == "week"){
+
+        uint PeriodTime = 604800;
+        uint16_t splitIntervals = 7;
+        vector<json> events = readEventsTimestampEvent( network, last, last-PeriodTime, TypeOfElement);
+
+        if(TypeOfElement == "amountTransfers"){
+
+            xyElements = SumEventsElementOnTime(events, last, PeriodTime, splitIntervals, TypeOfElement);
+
+        }  else {
+
+            xyElements = EventsElementOnTime(events, last, PeriodTime, splitIntervals, TypeOfElement);
+
+        }
+
+    }
+
+    return xyElements;
+    
+}
+
+
+
+
 #endif

@@ -2,10 +2,7 @@
 #include "../thirdparty/json.hpp"
 #include "../libs/DB.h"
 #include "../libs/codec.h"
-<<<<<<< HEAD
-=======
 #include "../libs/func.h"
->>>>>>> ac220ad (update progress, The checklist file describes the work)
 #include <string>
 
 
@@ -28,14 +25,8 @@ int http_server(){
 
     });
 
-<<<<<<< HEAD
-
     CROW_ROUTE(server, "/setting")([](const crow::request &req){ 
 
-=======
-    CROW_ROUTE(server, "/setting")([](const crow::request &req){ 
-
->>>>>>> ac220ad (update progress, The checklist file describes the work)
         auto page = crow::mustache::load("setting.html");
         crow::mustache::context ctx;
         ctx["AccAdmin"] ="0x56237900a95ab58e4c75ff37357b7e507db43501f395534b263eb9e8bef6e0f1";
@@ -43,19 +34,39 @@ int http_server(){
 
     });
 
-<<<<<<< HEAD
-    CROW_ROUTE(server, "/AddressIndexing/<string>")([](const crow::request &req,  string Path){ 
+    CROW_ROUTE(server, "/transfer")([](const crow::request &req){ 
 
-        auto page = crow::mustache::load("AddressIndexing.html");
+        auto page = crow::mustache::load("transfer.html");
         crow::mustache::context ctx;
-        ctx["Address"] = Path;
-=======
+        ctx["AccAdmin"] ="";
+        return page.render(ctx);
+
+    });
+
+    CROW_ROUTE(server, "/test_transfer").methods("POST"_method)([](const crow::request &req){
+
+
+        auto x = crow::json::load(req.body);
+        const string request = x["request"].s();
+  
+        if(request == "getPublic"){
+
+            string privKey = x["pk"].s();
+
+            return crow::response(DerivePublicKey(privKey));
+
+        }
+
+
+        return crow::response("response"); 
+
+    });
+
     CROW_ROUTE(server, "/AddressIndexing/<string>")([](const crow::request &req,  string Address){ 
 
         auto page = crow::mustache::load("AddressIndexing.html");
         crow::mustache::context ctx;
         ctx["Address"] = Address;
->>>>>>> ac220ad (update progress, The checklist file describes the work)
         return page.render(ctx);
 
     });
@@ -122,11 +133,6 @@ int http_server(){
         const bool filterSupply = x["filterSupply"].b();
         const bool filterFreezeAddress = x["filterFreezeAddress"].b();
         const bool filterPause = x["filterPause"].b();
-<<<<<<< HEAD
-        const uint64_t From = hexToULL(from);
-        uint64_t To1;
-        crow::json::wvalue response;
-=======
         const uint64_t From = stoull(from);
         uint64_t To1;
         crow::json::wvalue response;
@@ -134,7 +140,6 @@ int http_server(){
         if(!isNetworkExist(network)){
             return crow::response(response);
         }
->>>>>>> ac220ad (update progress, The checklist file describes the work)
         
         if(to == "last" ){
             To1 = hexToULL(readlatestBlockNumberIndexed(network));
@@ -142,11 +147,7 @@ int http_server(){
             if(to.length()!=16 && !HexCheck(to)){
                 return crow::response(response); 
             }
-<<<<<<< HEAD
-            To1 = hexToULL(to);
-=======
             To1 = stoull(to);
->>>>>>> ac220ad (update progress, The checklist file describes the work)
         }
 
         const uint64_t To = To1;
@@ -154,13 +155,7 @@ int http_server(){
         
         if(indexType == "general"){
 
-<<<<<<< HEAD
-            const string Path = "DB/EthEvents/";
-=======
-            cout<<endl<<"debugg entrye server"<<endl;
-
             const string Path = "DB/"+network+"/EthEvents/";
->>>>>>> ac220ad (update progress, The checklist file describes the work)
             fl = indexEvents(Path, From , To, filterTransactions, filterBalances, filterApproval, filterSupply, filterFreezeAddress, filterPause);
 
         } else if( indexType.length() != 42 || !HexCheck(indexType.substr( 2 , indexType.length()-2)) ) {
@@ -168,22 +163,13 @@ int http_server(){
             return crow::response(response); 
 
         } else {
-<<<<<<< HEAD
-            const string Path = "DB/AccountIndex/"+indexType+"/";
-=======
             const string Path = "DB/"+network+"/AccountIndex/"+indexType+"/";
->>>>>>> ac220ad (update progress, The checklist file describes the work)
             fl = indexEvents(Path, From , To, filterTransactions, filterBalances, filterApproval, filterSupply, filterFreezeAddress, filterPause);
         }
 
         vector<string>jsonString;
         for (nlohmann::json transaction : fl) { 
             jsonString.push_back(transaction.dump());
-<<<<<<< HEAD
-            cout<<endl<<"debug json event "<<transaction.dump();
-
-=======
->>>>>>> ac220ad (update progress, The checklist file describes the work)
         }
         response = jsonString;
         return crow::response(response); 
@@ -192,17 +178,6 @@ int http_server(){
 
     CROW_ROUTE(server, "/api").methods("POST"_method)([](const crow::request &req){
 
-<<<<<<< HEAD
-        auto x = crow::json::load(req.body);
-        const string request = x["request"].s();
-  
-        if(request == " AddressBalance "){
-
-            string network = x["request"].s();
-            const string address = x["last"].s();
-
-            AddressBalance(network,address);
-=======
 
         auto x = crow::json::load(req.body);
         const string request = x["request"].s();
@@ -213,7 +188,6 @@ int http_server(){
             const string address = x["address"].s();
 
             return crow::response(to_string(AddressBalance(network,address)));
->>>>>>> ac220ad (update progress, The checklist file describes the work)
 
         }
 
@@ -239,8 +213,6 @@ int http_server(){
 
         }
 
-<<<<<<< HEAD
-=======
         if(request == "AdminSM"){
 
             string jsonValues = x["values"].s();
@@ -268,7 +240,50 @@ int http_server(){
 
         }
 
->>>>>>> ac220ad (update progress, The checklist file describes the work)
+        if(request == "ChartInfo"){
+
+            string network = x["network"].s();
+
+            if(!isNetworkExist(network)){
+                
+                return crow::response("network not found");
+            }
+
+            string typeindexTime = x["typeindexTime"].s();
+            string TypeOfElement = x["TypeOfElement"].s();
+            string from = x["Fromdate"].s();
+            string to = x["to"].s();
+
+            uint64_t From = hexToULL(from);
+            uint64_t To = hexToULL(to);
+
+            crow::json::wvalue response;
+
+            if(TypeOfElement == "MintedBurned"){
+
+                vector<uint64_t> minted = eventsPointInTimeLine(network,From,To,"MintVolume",typeindexTime);
+                vector<uint64_t> burned = eventsPointInTimeLine(network,From,To,"burnVolume",typeindexTime);
+
+                response[0] = minted;
+                response[1] = burned;
+
+            } else if(TypeOfElement == "TransfersValueVolume" || TypeOfElement == "amountTransfers"|| TypeOfElement == "MintedBurned"){ 
+
+                response = eventsPointInTimeLine(network,From,To,TypeOfElement,typeindexTime);
+
+            }
+
+            return crow::response(response); 
+
+        }
+
+        if(request == "getBalanceW3"){
+
+            return crow::response(AdminSM(x["values"].s()));
+
+        }
+
+
         return crow::response("response"); 
 
     });

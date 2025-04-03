@@ -16,7 +16,7 @@ body {
 
 .CryptoInfo{
     justify-content: center;
-    display: flex;
+    display: grid;
     width: 100%;
     margin-top: 3vh;
     padding: 51px;
@@ -73,8 +73,17 @@ font-size: 24px;
     text-align: left;
 }
 
+.trContrast{
+  background-color: #c0e0ff12;
+}
+
 .tableEventsCenter {
     text-align: center;
+}
+
+.tableEventsdata {
+  text-align: center;
+  color: #eef;
 }
 
 .tableEventsRight {
@@ -85,27 +94,17 @@ font-size: 24px;
     justify-content: right;
     display: flex;
     max-width: 1200px; 
-<<<<<<< HEAD
-=======
     outline: none;
->>>>>>> ac220ad (update progress, The checklist file describes the work)
 }
 .searchbar{
   width: 440px;
-  background-color: #80a3b526;
+  background-color: #def4ff26;
   border: aqua;
   border-radius: 4px;
   color: azure;
-<<<<<<< HEAD
-}
-
-.intervalsetsearhbar{
-    width: 128px;
-    background-color: #304e5e80;;
-    border: rgb(0, 0, 0);
-    border-radius: 4px;
-=======
   outline: none;
+  font-size: 15px;
+  color: #c3d1dde8;
 }
 
 .WrapperIntervalSets{
@@ -114,33 +113,24 @@ font-size: 24px;
   max-width: 423px;
 }
 
-.intervalsetsearhbar{
+.intervalsetsearchbar{
     width: 96px;
-    background-color: #304e5e80;;
+    background-color: #45515752;;
     border: rgb(0, 0, 0);
     border-radius: 4px;
     color: ghostwhite;
     outline: none;
+    text-align: right;
 
->>>>>>> ac220ad (update progress, The checklist file describes the work)
 }
 
 .intervalsetsearhbarDiv{
 
-<<<<<<< HEAD
-    max-width: 148px;
-=======
     max-width: 89px;
->>>>>>> ac220ad (update progress, The checklist file describes the work)
 }
 
 
 
-<<<<<<< HEAD
-.amountsCoin{
-    justify-content: center;
-  display: flex;
-=======
 .amountsCoindiv{
   justify-content: center;
   display: flex;
@@ -150,7 +140,6 @@ font-size: 24px;
 .amountsCoin{
   font-size: 20px;
   color: #aac2d7;
->>>>>>> ac220ad (update progress, The checklist file describes the work)
 }
   
 
@@ -174,7 +163,15 @@ font-size: 24px;
 }
 
 .buttonsearch{
-  background-color: #739fa63b;
+  background-color: #6e7e8a;
+  color: aliceblue;
+  border: turquoise;
+  margin-left: 15px;
+  border-radius: 4px;
+}
+
+.buttonIndexIntervals{
+  background-color:  #48526447;
   color: aliceblue;
   border: turquoise;
   margin-left: 15px;
@@ -185,8 +182,6 @@ font-size: 24px;
     display: block ruby;
 }
 
-<<<<<<< HEAD
-=======
 .ToMargin{
   margin-left: 18px;
 }
@@ -194,7 +189,6 @@ font-size: 24px;
   margin-left: 15px;
 }
 
->>>>>>> ac220ad (update progress, The checklist file describes the work)
 .searchFrom{
     max-width: 136px;
     min-width: 136px;
@@ -209,13 +203,13 @@ font-size: 24px;
     
 }
 
-<<<<<<< HEAD
-=======
 .chartsdiv{
-  padding: 12px;
-  border-radius: 15px;
-  width: 100%;
+
+  justify-content: center;
+  border-radius: 6px;
   background-color: #48484826;
+  top: -22px;
+  position: relative;
 }
 
 .chartIndividualCont{
@@ -224,7 +218,6 @@ font-size: 24px;
   margin: 15px;
 }
 
->>>>>>> ac220ad (update progress, The checklist file describes the work)
 .CheckboxContainer {
     display: block;
     position: relative;
@@ -238,7 +231,6 @@ font-size: 24px;
     user-select: none;
   }
     
-/* Hide the browser's default checkbox */
 .CheckboxContainer input {
     position: absolute;
     opacity: 0;
@@ -247,7 +239,6 @@ font-size: 24px;
     width: 0;
   }
   
-  /* Create a custom checkbox */
   .checkmark {
     position: absolute;
     top: 0;
@@ -258,12 +249,6 @@ font-size: 24px;
     background-color: #13243180;
   }
   
-  /* On mouse-over, add a grey background color */
-  .CheckboxContainer:hover input ~ .checkmark {
-
-  }
-  
-  /* When the checkbox is checked, add a blue background */
   .CheckboxContainer input:checked ~ .checkmark {
     background-color: #b0cfff;
     height: 14px;
@@ -390,14 +375,6 @@ font-size: 24px;
     padding: 22px;
     background-color: #221d1d36;
     margin-top: 15px;
-<<<<<<< HEAD
-  }
-
-  .NetworkSettingGrouop{
-    padding: 22px;
-    background-color: #221d1d36;
-    margin-top: 15px;
-=======
     border-radius: 2px;
   }
 
@@ -406,7 +383,6 @@ font-size: 24px;
     background-color: #221d1d36;
     margin-top: 15px;
     border-radius: 2px
->>>>>>> ac220ad (update progress, The checklist file describes the work)
   }
 
   .settingInput{
@@ -423,9 +399,6 @@ font-size: 24px;
 
 
   .bg-light {
-<<<<<<< HEAD
-    background-color: #75929d66 !important;
-=======
     background-color: #657985 !important;
   }
 
@@ -438,19 +411,26 @@ font-size: 24px;
     justify-content: space-between;
   } 
 
-  .SelectorStyliced{
+  .SelectorStyle{
     background-color: #00000003;
     border-radius: 4px;
     border: none;
     color: ghostwhite;
   }
 
-  .left-col {
-
-
+  option {
+    background-color: lightyellow;
   }
 
-  .right-col {
-   
->>>>>>> ac220ad (update progress, The checklist file describes the work)
+  .error-border {
+    border: 2px solid red;
   }
+
+  .error-message {
+    color: red;
+    font-size: 0.8em;
+  }
+
+
+
+

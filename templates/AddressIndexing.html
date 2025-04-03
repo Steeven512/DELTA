@@ -11,37 +11,25 @@
 
 <body>
   <div class="container">
-<<<<<<< HEAD
-      <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-=======
       <nav class="navbar navbar-expand-lg navbar-dark bg-light fixed-top">
->>>>>>> ac220ad (update progress, The checklist file describes the work)
         <a class="navbar-brand" href="#">S.S: Front Rest API Web</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarText">
           <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-<<<<<<< HEAD
-              <a class="nav-link" href="#">Index log<span class="sr-only">(current)</span></a>
-=======
-              <a class="nav-link" href="/CryptoAdmin">Index log<span class="sr-only">(current)</span></a>
->>>>>>> ac220ad (update progress, The checklist file describes the work)
+            <li class="nav-item">
+              <a class="nav-link" href="/CryptoAdmin">Index log</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/AddressIndexing">Address indexing</a>
+              <a class="nav-link" href="/transfer">transfer</a>
             </li>
             <li class="nav-item">
-<<<<<<< HEAD
-              <a class="nav-link" href="/settigns">Settings</a>
-=======
               <a class="nav-link" href="/setting">Settings</a>
->>>>>>> ac220ad (update progress, The checklist file describes the work)
             </li>
           </ul>
           <span class="navbar-text">
-            web app en desarrollo
+            Developed by Steeven J Salazar
           </span>
         </div>
       </nav>
@@ -51,23 +39,13 @@
 
   </div>
 
-<<<<<<< HEAD
-  <div class="col-xs-2 searchbarIndex">
-      <label for="ex1" class="searchbarspan">Index Account </label>
-      <input type="text" class="searchbar" id="IndexAddress">
-      <button class="buttonsearch" onclick="IndexAddress()">Search</button>
-  </div>
-
-  <div class="CryptoInfoContainer">
-
-=======
   <div>
 
     <div class="center-container">
 
       <div class="left-col">
         <label for="networks">Choose a Network:</label>
-        <select name="Networks" id="Networks" class="SelectorStyliced"></select>
+        <select name="Networks" id="Networks" class="SelectorStyle"></select>
       </div>
     
       <div class="col-xs-2 searchbarIndex">
@@ -80,18 +58,10 @@
   </div>
 
   <div class="CryptoInfoContainer">
->>>>>>> ac220ad (update progress, The checklist file describes the work)
     <div class="CryptoInfo">
       <div class="row">
 
         <div class="col ">
-<<<<<<< HEAD
-          <span id="Address" class="cryptoName">{{Address}}</span>
-        </div>
-
-        <div class="col">
-          <span id="AccAdmin" class="AccAdmin">balance  </span><span class="monospaceFont">{{balance}}</span>
-=======
           <span id="name" class="cryptoName">{{NameCoin}}</span>
           <br>
           <span id="symbol" class="cryptoName">{{NameCoin}}</span>
@@ -111,7 +81,6 @@
           <span id="AccAdmin" class="AccAdmin">balance  </span> 
           <br>
           <span class="monospaceFont amountsCoin" id="balance">{{balance}}</span>
->>>>>>> ac220ad (update progress, The checklist file describes the work)
         </div>
 
       </div>
@@ -120,36 +89,6 @@
 
   <div class="tablecontainer">
 
-<<<<<<< HEAD
-    <div class="row w-100">
-
-      <div class="col">
-        <p>{{symbol}} Events</p>
-      </div>
-
-      <div class="col">
-        <div class="row  filterselection">
-          <div class="col">
-            <p>filter</p>
-          </div>
-          <div class="col">
-            <label class="checkbox-inline"><input type="checkbox" value="" id="filterTransactions">Transactions</label>
-          </div>
-          <div class="col">
-            <label class="checkbox-inline"><input type="checkbox" value="" id="filterBalances">Balances</label>
-          </div>
-          <div class="col">
-            <label class="checkbox-inline"><input type="checkbox" value="" id="filterApproval">Approval</label> 
-          </div>
-          <div class="col">
-            <label class="checkbox-inline"><input type="checkbox" value="" id="filterSupply">Supply</label> 
-          </div>
-          <div class="col">
-            <label class="checkbox-inline"><input type="checkbox" value="" id="filterFreezeAddress">FreezeAddress</label> 
-          </div>
-          <div class="col">
-            <label class="checkbox-inline"><input type="checkbox" value="" id="filterPause">Pause</label> 
-=======
     <div class="row w-100" style="align-items: center;justify-content: center;" >
 
       <div class="col filterselection tableheadCoinSymbol">
@@ -189,39 +128,43 @@
             <label class="CheckboxContainer">Pause
               <input type="checkbox" checked="checked" id="filterPause">
               <span class="checkmark"></span> 
->>>>>>> ac220ad (update progress, The checklist file describes the work)
           </div>
 
         </div>
       </div>
 
-<<<<<<< HEAD
-=======
-      <div class="col filterselection intervalsetMaxWidth">
+      <div class="col filterselection  intervalsetMaxWidth">
 
         <div class="row ">
-          <div class="col searchFrom">
+          <div class="col FromMargin searchFrom">
             <p>index From Block N</p>
           </div>
           <div class="col intervalsetsearhbarDiv">
-            <input type="text" class="intervalsetsearhbar" id="fromBl">
+            <input type="text" class="intervalsetsearchbar" id="fromBl">
           </div>
-          <div class="col">
+          <div class="col ToMargin">
+
             <div class="row displayRowSearchInterval">
+
               <div class="col searchTo">
                 <p>To</p>
               </div>
               <div class="col intervalsetsearhbarDiv">
-                <input type="text" class="intervalsetsearhbar" id="toBl">
+                <input type="text" class="intervalsetsearchbar" id="toBl">
               </div>
 
+
+            <div class="col">
+              <button id="indexIntervalsButton" class="buttonIndexIntervals" onclick="performIndexEventsInIntervals(this)" >Search</button>
             </div>
+
+            </div>
+
           </div>
           
         </div>
       </div>
 
->>>>>>> ac220ad (update progress, The checklist file describes the work)
     </div>
 
   <div class="tableEvents">
@@ -231,14 +174,10 @@
     </table>
   </div>
 
-<<<<<<< HEAD
   </div>
-=======
-</div>
->>>>>>> ac220ad (update progress, The checklist file describes the work)
 
   <script>
-    const intervalId = setInterval(IndexEventsAddressMain, 2000)
+    const intervalId = setInterval(IndexEventsAddressMain, 5000)
   </script>
 
 </body>

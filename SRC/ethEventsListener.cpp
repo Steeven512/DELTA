@@ -5,10 +5,7 @@
 #include "eth_event_listener/setting.h"
 #include <thread>
 #include <csignal>
-<<<<<<< HEAD
-=======
 #include "libs/func.h"
->>>>>>> ac220ad (update progress, The checklist file describes the work)
 
 //  g++ SRC/ethEventsListener.cpp -o eventslistener -I/usr/include/python3.11 -lboost_python311 -lpython3.11  -lssl -lcrypto -lcryptopp -std=c++17
 
@@ -25,26 +22,11 @@ void  main_thread(){
     signal(SIGINT, signalHandler);
 
     vector<string> Result;
-<<<<<<< HEAD
-    uint64_t intervalIndex = 5;
-=======
     uint64_t intervalIndex = 200;
->>>>>>> ac220ad (update progress, The checklist file describes the work)
     
     while(true){ 
 
         loadnetworks();
-<<<<<<< HEAD
-
-        for (const auto& network : Networks) {
-
-            cout<<endl<<"indexing events on "<<network.first;
-
-            Result.clear();
-
-            if(network.second.LatestNetworkBl >= network.second.LatestIndexedbl){
-
-=======
         
         for (const auto& network : Networks) {
             storeSmartContracInfo(network.first);
@@ -54,7 +36,6 @@ void  main_thread(){
 
             if(network.second.LatestNetworkBl >= network.second.LatestIndexedbl){
 
->>>>>>> ac220ad (update progress, The checklist file describes the work)
                 uint64_t to;
 
                 if (network.second.LatestNetworkBl - network.second.LatestIndexedbl < intervalIndex ){
@@ -69,22 +50,6 @@ void  main_thread(){
 
                 try{
 
-<<<<<<< HEAD
-                    vector result = EthEvents(network.second.rpc_address, network.second.sm_address, network.second.LatestIndexedbl, to);
-
-                    for(uint i = 0; i < result.size(); i++){
-
-                        json jsonResult = json::parse(result[i]);
-
-                        auto it = jsonResult.find("event");
-
-                        std::string event = jsonResult["event"];
-
-                        cout<<endl<<"event =  " << event;
-
-                        if (event != "emty"){
-
-=======
                     storeSmartContracInfo(network.first);
 
                     vector result = EthEvents(network.second.rpc_address, network.second.sm_address, network.second.LatestIndexedbl, to);
@@ -92,11 +57,8 @@ void  main_thread(){
                     for(uint i = 0; i < result.size(); i++){
 
                         json jsonResult = json::parse(result[i]);
-
                         auto it = jsonResult.find("event");
-
                         std::string event = jsonResult["event"];
-
                         cout<<endl<<"event =  " << event;
 
                         for(auto & eventElement : jsonResult){
@@ -105,23 +67,15 @@ void  main_thread(){
 
                         if (event != "emty"){
 
->>>>>>> ac220ad (update progress, The checklist file describes the work)
-                            if(!saveEvent(network.first, jsonResult) || !SaveEventAddress(network.first, jsonResult)){
-
+                            if(!saveEvent(network.first, jsonResult) || !SaveEventAddress(network.first, jsonResult)|| !SaveTimeStampIndexEvent(network.first, jsonResult)){
                                 
                                 cout <<"error saving local data "<< network.first << endl;
                                 return ;
 
                             }
 
-<<<<<<< HEAD
-
                             if (event == "accountBalanceUpdate"){
 
-=======
-                            if (event == "accountBalanceUpdate"){
-
->>>>>>> ac220ad (update progress, The checklist file describes the work)
                                 if(!updateAccBalances(network.first, jsonResult)){
 
                                     cout <<"error saving local data "<<endl;

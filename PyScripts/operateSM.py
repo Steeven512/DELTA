@@ -285,16 +285,27 @@ def burn(RPC_Networkd_Address, sm_address, amount, private_key):
     signed_txn = W3.eth.account.sign_transaction(transaction, private_key)
     return W3.eth.send_raw_transaction(signed_txn.rawTransaction) #return hash transaction
 
+def balanceOf(RPC_Networkd_Address, sm_address, address):
+
+    W3 = RPC(RPC_Networkd_Address)
+    Contract = contract(sm_address, W3)
+    result = Contract.functions.balanceOf(address).call()
+
+    return str(result) 
+
 def performTransactionSM(RPC_Networkd_Address, sm_address, options_sm):
 
     transactionValues = json.loads(options_sm)
+
+    if(transactionValues["option"] == "balanceOf"):
+
+        return balanceOf(RPC_Networkd_Address, sm_address, transactionValues["Address"])
 
     if(transactionValues["option"] == "increaseSupply"):
 
         amount = string_to_uint256(transactionValues["amount"])
 
         return increaseSupply(RPC_Networkd_Address, sm_address, amount, transactionValues["privateKey"])
-
 
     if(transactionValues["option"] == "burn"):
 
