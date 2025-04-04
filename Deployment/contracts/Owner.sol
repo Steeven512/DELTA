@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.4.16 <0.9.0;
+pragma solidity 0.8.25;
 
 /**
  * @title Owner
@@ -47,7 +47,7 @@ contract Owner {
      * @dev Return owner address 
      * @return address of owner
      */
-    function getOwner() external view returns (address) {
+    function getOwner() public view virtual returns (address) {
         return owner;
     }
 }

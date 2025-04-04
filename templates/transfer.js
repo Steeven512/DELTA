@@ -1,9 +1,29 @@
 var serverurl = window.location.origin;
 
-checkpk = false
-checkaddress = false
-checkvalue = false
-publicderived = false
+var checkpk = false
+var checkaddress = false
+var checkvalue = false
+var publicderived = false
+
+
+function ullToHex(ullValue) {
+
+    let hex = ullValue.toString(16);
+    while (hex.length < 16) {
+      hex = "0" + hex;
+    }
+    return hex;
+}
+
+function deleteleftzeroes(str) {
+    if (str === null || str === undefined || str === "") {
+      return "";
+    }
+    if (str.startsWith("0") && str.length > 1 && str[1] !== ".") {
+      return str.substring(1).replace(/^0+/, '');
+    }
+    return str;
+  }
 
 function sixdecimals(value) {
     if (typeof value !== 'string') {
@@ -30,11 +50,15 @@ function sixdecimals(value) {
 
 function checkAddress(address) {
     const regex = /^0x[0-9a-fA-F]{40}$/;
+
+    console.log("checkAddress ", address)
+
     if(regex.test(address)){
         checkaddress = true
     } else {
         checkaddress = false
     }
+
     return checkaddress;
 }
 
@@ -78,7 +102,6 @@ async function retrieveAddressInfo(){
             console.log(data)
             if(checkAddress(data)){
                 document.getElementById('Address').textContent = data
-                GetBalanceAddress()
                 publicderived = true
             }
 
@@ -88,34 +111,44 @@ async function retrieveAddressInfo(){
 
     }
 
+
+
 }
 
 async function GetBalanceAddress(){
 
     try {
 
-        jsonValues = JSON.stringify({ 
-        "network": document.getElementById("Networks").value,
-        "option": "balanceOf",
-        "Address": document.getElementById('Address').textContent,
-        })
-    
+        if(publicderived){
 
-        const response = await fetch(serverurl+"/api", {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({  "request": "getBalanceW3", 
-                                "values": jsonValues,
-                                })
-        })
-
-        var data = await response.text()
-        console.log(data)
-        document.getElementById('balance').textContent = "$"+sixdecimals(data)
+            jsonValues = JSON.stringify({ 
+            "network": document.getElementById("Networks").value,
+            "option": "balanceOf",
+            "Address": document.getElementById('Address').textContent,
+            })
         
+    
+            const response = await fetch(serverurl+"/api", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({  "request": "getBalanceW3", 
+                                    "values": jsonValues,
+                                    })
+            })
+    
+            var data = await response.text()
+            console.log(data)
+            document.getElementById('balance').textContent = "$"+sixdecimals(data)
+
+            estimateGas()
+            
+
+        }
+
+
     } catch (error) {
         console.log("error ",error);
     }
@@ -139,10 +172,15 @@ async function updateNetworkIndexSelect() {
 
     console.log("debug update networks", responsedata)
 
-    var selectElement = document.getElementById('Networks');
+    var selectorFrom = document.getElementById('Networks');
+    var selectorTo = document.getElementById('NetworksTo');
 
-    while (selectElement.firstChild) {
-      selectElement.removeChild(selectElement.firstChild);
+    while (selectorFrom.firstChild) {
+        selectorFrom.removeChild(selectorFrom.firstChild);
+    }
+
+    while (selectorTo.firstChild) {
+        selectorTo.removeChild(selectorTo.firstChild);
     }
 
     responsedata.forEach(opcion => {
@@ -151,9 +189,19 @@ async function updateNetworkIndexSelect() {
       const optionElement = document.createElement('option');
       optionElement.value = NetworkData["networkName"]; 
       optionElement.textContent = NetworkData["networkName"]; 
-      selectElement.appendChild(optionElement);
-
+      selectorFrom.appendChild(optionElement);
+      
     });
+
+    responsedata.forEach(opcion => {
+
+        NetworkData = JSON.parse(opcion)
+        const optionElement = document.createElement('option');
+        optionElement.value = NetworkData["networkName"]; 
+        optionElement.textContent = NetworkData["networkName"]; 
+        selectorTo.appendChild(optionElement);
+        
+      });
 
     retrieveinfo()
 
@@ -178,20 +226,13 @@ async function retrieveinfo(){
                             "network": document.getElementById("Networks").value,
                              })
       })
-
-
   
         var data = await response.json()
 
         console.log("debug retrieve info", data)
 
-
-
-        
-    
         let networkName = document.getElementById('networkName');
         networkName.textContent = data["networkName"];
-
 
 
         let name = document.getElementById('name');
@@ -210,6 +251,101 @@ function IndexAddress() {
     Address = document.getElementById('IndexAddress').value;
     console.log(Address)
     window.open(serverurl+"/AddressIndexing/"+Address, '_blank');
-  }
+}
+
+async function estimateGas(){
+
+    amount = parseInt(getIntAmount(document.getElementById('AmountTransfer').value))
+
+    if( checkpk && checkaddress && publicderived && amount > 0 ){
+
+        fromAddress = document.getElementById('Address').textContent
+        addressReceiver = document.getElementById('AddressToTransfer').value
+        network = document.getElementById("Networks").value
+
+        console.log(" addressReceiver", addressReceiver)
+
+        jsonValues = JSON.stringify({ 
+            "network": network,
+            "option": "estimateGas",
+            "from": fromAddress, 
+            "to": addressReceiver,
+            "amount": amount,
+            })
+
+        try {
+            const response = await fetch(serverurl+"/test_transfer", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({  "request": "estimateGas", 
+                                    "values": jsonValues,
+                                    })
+
+        })
+
+        var data = await response.text()
+
+        let gas = document.getElementById('gasTransaction');
+        gas.textContent = data;
+
+
+
+        } catch (error) {
+            console.log("error ",error);
+        }
+
+    }
+  
+}
+
+function getIntAmount(value) {
+    const parts = value.replace(/,/g, '').split('.');
+    const integerPart = parts[0] || '0';
+    const decimalPart = (parts[1] || '0').padEnd(decimalPlaces, '0');
+    return  deleteleftzeroes(integerPart + decimalPart);
+  
+}
+
+async function SendTransfer(){
+    
+    if( checkpk && checkaddress && publicderived && amount > 0 ){
+
+        jsonValues = JSON.stringify({ 
+          "network": document.getElementById("Networks").value,
+          "networkTo": document.getElementById("NetworksTo").value,
+          "option": "transfer",
+          "to": document.getElementById('addressReceiver').value, 
+          "amount": parseInt(getIntAmount(document.getElementById('AmountTransfer').value)),
+          "privateKey": document.getElementById("privKeyValue").value,
+         })
+      
+        try {
+          const response = await fetch(serverurl+"/transfer_test", {
+          method: 'POST',
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({  "request": "transfer", 
+                                  "values": jsonValues,
+                                 })
+        })
+      
+        var data = await response.text()
+      
+        alert("operation result: ",data)
+      
+        } catch (error) {
+            console.log("error ",error);
+        }
+
+    }
+}
+
+
+
 
 

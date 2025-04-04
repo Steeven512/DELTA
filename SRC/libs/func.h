@@ -29,11 +29,53 @@ bool noConsecutivePeriods(const std::string& input) {
 string AdminSM(std::string jsonStr){
 
     json jsonOptions = json::parse(jsonStr);
+
     loadnetworks();
+
     string rpc_address = Networks[jsonOptions["network"]].rpc_address;
     string sm_address = Networks[jsonOptions["network"]].sm_address;
 
-    return SmOperation(rpc_address, sm_address, jsonStr);
+    if(rpc_address.length() == 0 || rpc_address.length() == 0 ){
+        return "the selected network does not exist";
+    }
+
+    string result = SmOperation(rpc_address, sm_address, jsonStr);
+
+    return result;
+
+}
+
+string Transfer(std::string jsonStr){
+
+    string result
+
+    json jsonOptions = json::parse(jsonStr);
+    string result;
+
+    loadnetworks();
+
+    string from_rpc_address = Networks[jsonOptions["network"]].rpc_address;
+    string from_sm_address = Networks[jsonOptions["network"]].sm_address;
+
+    string to_rpc_address = Networks[jsonOptions["network"]].rpc_address;
+    string to_sm_address = Networks[jsonOptions["network"]].sm_address;
+
+    if(from_rpc_address.length() == 0 || from_sm_address.length() == 0 || to_rpc_address.length() == 0 || to_sm_address.length() == 0){
+        return "the selected network does not exist";
+    }
+
+    if(from_rpc_address == to_rpc_address &&  from_sm_address == to_sm_address){
+
+        result = SmOperation(rpc_address, sm_address, jsonStr);
+
+    } else {
+
+        cout<<endl<<"transaction bridge "<<endl;
+        result = SmOperation(rpc_address, sm_address, jsonStr);
+
+    }
+
+    return result;
 
 }
 

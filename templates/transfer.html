@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Demo APP SS</title>
+  <title>SS: DELTA Transfer</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" type="text/css" href="css/css.css">
@@ -73,12 +73,24 @@
                 <br>
 
                 <div>
-                <span id="AccAdmin" class="AccAdmin">account  </span>
-                <span id = "Address" class="monospaceFont amountsCoin">{{AccAdmin}}</span>
+                  <span id="AccAdmin" class="AccAdmin">account  </span>
+                  <span id = "Address" class="monospaceFont amountsCoin">{{AccAdmin}}</span>
                 </div>
-                <span span id="AccAdmin" class="AccAdmin">balance</span> 
-                <br>
-                <span id = "balance" class="monospaceFont amountsCoin">0</span>
+
+                <div>
+                  <span span id="AccAdmin" class="AccAdmin">balance</span> 
+                  <br>
+                  <span id = "balance" class="monospaceFont amountsCoin">0</span>
+                </div>
+
+                <div>
+                  <span span id="AccAdmin" class="AccAdmin">Gas Transaction</span> 
+                  <br>
+                  <span id = "gasTransaction" class="monospaceFont amountsCoin">0</span>
+                </div>
+
+
+
             </div>
             </div>
 
@@ -91,31 +103,57 @@
               <select name="Networks" id="Networks" class="SelectorStyle"></select>
             </div>
 
-            <div class="SMSettingGrouop">
+            <div class="transactioDivGrouop">
+
+              <div class="">
 
                 <span>Private Key</span>
                 <br />
-                <input type="text" class="settingInput" id="privKeyValue">
+                <input type="text" class="transferInput" id="privKeyValue">
                 <span id="error-message" class="error-message"></span>
+
+              </div>
+
+              <div class="">
+
                 <br />
                 <span>Address Receiver</span>
                 <br />
-                <input type="text" class="settingInput" id="AddressToTransfer">
+                <input type="text" class="transferInput" id="AddressToTransfer">
                 <br />
                 <span id="error-message2" class="error-message"></span>
-                <span>amount value</span>
-                <br />
-                <input type="text" class="settingInput" id="AmountTransfer">
+
+              </div>
+
+              <div class="transferthirdrow row ">
 
 
-                <button class="buttonsearch" onclick="burn(this)">Set</button>
+                <div class="col">
+                
+                  <span>amount value</span>
+                  <br />
+                  <input type="text" class="transferInputValue" id="AmountTransfer" placeholder="0,000.000000">
+
+                </div>
+
+
+                <div class="col">
+                  <label for="networks">network to transfer:</label>
+                  <select name="Networks" id="NetworksTo" class="SelectorStyle"></select>
+                </div>
+
+
+                <div class="col">
+                  <button class="buttontransfer" onclick="SendTransfer(this)">Send</button>
+                </div>
+
+
+
+              </div>
                 
               </div>
-            
+
         </div>
-
-
-
     </div>
   </div>
 </div>
@@ -126,16 +164,18 @@
 <script>
 
     updateNetworkIndexSelect()
+    retrieveAddressInfo()
+    GetBalanceAddress()
     inputPk = document.getElementById('privKeyValue');
     inputAddress = document.getElementById('AddressToTransfer');
     errormessage = document.getElementById('error-message');
     errormessage2 = document.getElementById('error-message2');
 
-    const intervalId = setInterval(retrieveAddressInfo, 4000)
-    
+    const intervalId = setInterval(GetBalanceAddress, 8000)
+    const intervalId2 = setInterval(retrieveinfo, 4000)
     
     inputPk.addEventListener('input', function() {
-    
+
         if (checkPrivate(this.value)) {
             this.classList.remove('error-border');
             errormessage.textContent = '';
@@ -151,7 +191,7 @@
 
     inputAddress.addEventListener('input', function() {
     
-    if (checkPrivate(this.value)) {
+    if (checkAddress(this.value)) {
         this.classList.remove('error-border');
         errormessage2.textContent = '';
     } else {
@@ -160,6 +200,76 @@
     }
         
 });
+
+
+
+
+
+
+
+const amountInput = document.getElementById('AmountTransfer');
+const decimalPlaces = 6;
+let hasDecimal = false; 
+let hasInput = false;   
+
+amountInput.addEventListener('input', function() {
+  hasInput = true; // El usuario ha escrito algo
+  let value = this.value.replace(/[^0-9.]/g, '');
+
+  if (value.includes('.') && !hasDecimal) {
+    hasDecimal = true;
+  } else if (!value.includes('.')) {
+    hasDecimal = false;
+  }
+
+  const parts = value.split('.');
+  let integerPart = parts[0] || '';
+  let decimalPart = (parts[1] || '').slice(0, decimalPlaces);
+
+  integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+  let formattedValue = integerPart;
+  if (hasDecimal) {
+    formattedValue += "." + decimalPart;
+  }
+
+  this.value = formattedValue;
+});
+
+amountInput.addEventListener('focus', function() {
+  this.select();
+  this.style.textAlign = 'left';
+});
+
+amountInput.addEventListener('blur', function() {
+  this.style.textAlign = 'right';
+  const value = this.value;
+  if (hasInput && !hasDecimal && value) {
+    this.value = value + ".00";
+  } else if (hasDecimal && value.endsWith('.')) {
+    this.value = value + "00";
+  } else if (!hasInput && !value) {
+    this.value = ""; // dont show 0.00
+  }
+});
+
+amountInput.addEventListener('click', function() {
+  const caretPosition = this.selectionStart;
+  const value = this.value;
+  const dotIndex = value.indexOf('.');
+
+  if (dotIndex === -1) {
+    this.select();
+  } else if (caretPosition < dotIndex) {
+    this.setSelectionRange(0, dotIndex);
+  } else if (caretPosition > dotIndex) {
+    this.setSelectionRange(dotIndex + 1, value.length);
+  }
+});
+
+window.onload = function() {
+  amountInput.style.textAlign = 'right';
+};
 
 
 

@@ -170,6 +170,14 @@ font-size: 24px;
   border-radius: 4px;
 }
 
+.buttontransfer{
+  background-color: #0e151b5c;
+  color: aliceblue;
+  border: turquoise;
+  padding: 10px;
+  border-radius: 35px;
+}
+
 .buttonIndexIntervals{
   background-color:  #48526447;
   color: aliceblue;
@@ -378,6 +386,14 @@ font-size: 24px;
     border-radius: 2px;
   }
 
+  .transactioDivGrouop{
+    padding: 22px;
+    background-color: #221d1d36;
+    margin-top: 15px;
+    border-radius: 2px;
+    max-width: 484px;
+  }
+
   .NetworkSettingGroup{
     padding: 22px;
     background-color: #221d1d36;
@@ -395,6 +411,37 @@ font-size: 24px;
     color: azure;
 
 }
+
+.transferInput{
+
+  width: 440px;
+  outline: none;
+  background-color: #929eac57;
+  border: aqua;
+  border-radius: 4px;
+  color: azure;
+  font-size: 18px;
+
+}
+
+.transferInputValue{
+
+  width: 225px;
+  outline: none;
+  background-color: #929eac57;
+  border: aqua;
+  border-radius: 4px;
+  color: azure;
+  font-size: 18px;
+
+}
+
+.transferthirdrow{
+  padding-top: 20px;
+  max-width: 462px;
+}
+
+
 
 
 
@@ -424,11 +471,15 @@ font-size: 24px;
 
   .error-border {
     border: 2px solid red;
+    
   }
 
   .error-message {
-    color: red;
     font-size: 0.8em;
+    color: #ff8484;
+    font-size: 1.0em;
+    display: relative;
+    text-shadow: 1px 0px 4px black;
   }
 
 

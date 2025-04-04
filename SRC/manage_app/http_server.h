@@ -52,13 +52,29 @@ int http_server(){
         if(request == "getPublic"){
 
             string privKey = x["pk"].s();
-
+            
             return crow::response(DerivePublicKey(privKey));
 
         }
 
+        if(request == "estimateGas"){
 
-        return crow::response("response"); 
+            string jsonValues = x["values"].s();
+            string status = AdminSM(jsonValues);
+            return crow::response(status); 
+
+        }
+
+        if(request == "transfer"){
+
+            string jsonValues = x["values"].s();
+            string status = AdminSM(jsonValues);
+            return crow::response(status); 
+
+        }
+
+
+        return crow::response("bad_req"); 
 
     });
 
@@ -279,7 +295,9 @@ int http_server(){
 
         if(request == "getBalanceW3"){
 
-            return crow::response(AdminSM(x["values"].s()));
+            string result = AdminSM(x["values"].s());
+
+            return crow::response(result);
 
         }
 

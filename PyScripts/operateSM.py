@@ -291,80 +291,126 @@ def balanceOf(RPC_Networkd_Address, sm_address, address):
     Contract = contract(sm_address, W3)
     result = Contract.functions.balanceOf(address).call()
 
-    return str(result) 
+    return result 
+
+def transfer(RPC_Networkd_Address, sm_address, address, amount, private_key):
+
+    W3 = RPC(RPC_Networkd_Address)
+    Contract = contract(sm_address, W3)
+    account = W3.eth.account.from_key(private_key)
+    nonce = W3.eth.get_transaction_count(account.address)
+    gas_estimate = Contract.functions.transfer(address, amount).estimate_gas({'from': account.address})
+
+    transaction = Contract.functions.transfer(address, amount).build_transaction({
+        'from': account.address,
+        'gas': gas_estimate,
+        'nonce': nonce,
+    })
+
+    signed_txn = W3.eth.account.sign_transaction(transaction, private_key)
+    return W3.eth.send_raw_transaction(signed_txn.rawTransaction) #return hash transaction
+
+def estimateGas(RPC_Networkd_Address, sm_address, From, to, amount):
+
+    W3 = RPC(RPC_Networkd_Address)
+    Contract = contract(sm_address, W3)
+    gas_estimate = Contract.functions.transfer(to, amount).estimate_gas({'from': From})
+
+    return gas_estimate
 
 def performTransactionSM(RPC_Networkd_Address, sm_address, options_sm):
 
-    transactionValues = json.loads(options_sm)
+    try:
 
-    if(transactionValues["option"] == "balanceOf"):
+        transactionValues = json.loads(options_sm)
 
-        return balanceOf(RPC_Networkd_Address, sm_address, transactionValues["Address"])
+        if(transactionValues["option"] == "balanceOf"):
 
-    if(transactionValues["option"] == "increaseSupply"):
+            result = balanceOf(RPC_Networkd_Address, sm_address, transactionValues["Address"])
 
-        amount = string_to_uint256(transactionValues["amount"])
+            return str(result)
 
-        return increaseSupply(RPC_Networkd_Address, sm_address, amount, transactionValues["privateKey"])
+        if(transactionValues["option"] == "increaseSupply"):
 
-    if(transactionValues["option"] == "burn"):
+            amount = string_to_uint256(transactionValues["amount"])
 
-        amount = string_to_uint256(transactionValues["amount"])
+            return increaseSupply(RPC_Networkd_Address, sm_address, amount, transactionValues["privateKey"])
 
-        return burn(RPC_Networkd_Address, sm_address, amount, transactionValues["privateKey"])
+        if(transactionValues["option"] == "burn"):
 
-    if(transactionValues["option"] == "mint"):
+            amount = string_to_uint256(transactionValues["amount"])
 
-        amount = string_to_uint256(transactionValues["amount"])
+            return burn(RPC_Networkd_Address, sm_address, amount, transactionValues["privateKey"])
 
-        return mint(RPC_Networkd_Address, sm_address, transactionValues["account"], amount, transactionValues["privateKey"])
+        if(transactionValues["option"] == "mint"):
 
+            amount = string_to_uint256(transactionValues["amount"])
 
-    if(transactionValues["option"] == "decreaseSupply"):
+            return mint(RPC_Networkd_Address, sm_address, transactionValues["account"], amount, transactionValues["privateKey"])
 
-        amount = string_to_uint256(transactionValues["amount"])
+        if(transactionValues["option"] == "decreaseSupply"):
 
-        return decreaseSupply(RPC_Networkd_Address, sm_address, transactionValues["account"], amount, transactionValues["privateKey"])
+            amount = string_to_uint256(transactionValues["amount"])
 
-    if(transactionValues["option"] == "freeze"):
+            return decreaseSupply(RPC_Networkd_Address, sm_address, transactionValues["account"], amount, transactionValues["privateKey"])
 
-        return freeze(RPC_Networkd_Address, sm_address, transactionValues["account"], transactionValues["privateKey"])
+        if(transactionValues["option"] == "freeze"):
 
-    if(transactionValues["option"] == "unfreeze"):
+            return freeze(RPC_Networkd_Address, sm_address, transactionValues["account"], transactionValues["privateKey"])
 
-        return unfreeze(RPC_Networkd_Address, sm_address, transactionValues["account"], transactionValues["privateKey"])
+        if(transactionValues["option"] == "unfreeze"):
 
-    if(transactionValues["option"] == "wipeFrozenAddress"):
+            return unfreeze(RPC_Networkd_Address, sm_address, transactionValues["account"], transactionValues["privateKey"])
 
-        return wipeFrozenAddress(RPC_Networkd_Address, sm_address, transactionValues["account"], transactionValues["privateKey"])
+        if(transactionValues["option"] == "wipeFrozenAddress"):
 
-    if(transactionValues["option"] == "pause"):
+            return wipeFrozenAddress(RPC_Networkd_Address, sm_address, transactionValues["account"], transactionValues["privateKey"])
 
-        return pause(RPC_Networkd_Address, sm_address, transactionValues["privateKey"])
+        if(transactionValues["option"] == "pause"):
 
-    if(transactionValues["option"] == "unpause"):
+            return pause(RPC_Networkd_Address, sm_address, transactionValues["privateKey"])
 
-        return unpause(RPC_Networkd_Address, sm_address, transactionValues["privateKey"])
+        if(transactionValues["option"] == "unpause"):
 
-    if(transactionValues["option"] == "getOwner"):
+            return unpause(RPC_Networkd_Address, sm_address, transactionValues["privateKey"])
 
-        return getOwner(RPC_Networkd_Address, sm_address)
+        if(transactionValues["option"] == "getOwner"):
 
-    if(transactionValues["option"] == "totalSupply"):
+            return getOwner(RPC_Networkd_Address, sm_address)
 
-        return totalSupply(RPC_Networkd_Address, sm_address)
+        if(transactionValues["option"] == "totalSupply"):
 
-    if(transactionValues["option"] == "inReserve"):
+            return totalSupply(RPC_Networkd_Address, sm_address)
 
-        return inReserve(RPC_Networkd_Address, sm_address)
+        if(transactionValues["option"] == "inReserve"):
 
-    if(transactionValues["option"] == "inCirculation"):
+            return inReserve(RPC_Networkd_Address, sm_address)
 
-        return inCirculation(RPC_Networkd_Address, sm_address)
+        if(transactionValues["option"] == "inCirculation"):
 
-    if(transactionValues["option"] == "SmartContracInfo"):
+            return inCirculation(RPC_Networkd_Address, sm_address)
 
-        return SmartContracInfo(RPC_Networkd_Address, sm_address)
+        if(transactionValues["option"] == "SmartContracInfo"):
 
+            return SmartContracInfo(RPC_Networkd_Address, sm_address)
 
+        if(transactionValues["option"] == "transfer"):
 
+            amount = string_to_uint256(transactionValues["amount"])
+            return transfer(RPC_Networkd_Address, sm_address, transactionValues["to"], amount, transactionValues["privateKey"])
+
+        if(transactionValues["option"] == "estimateGas"):
+
+            #amount = string_to_uint256(transactionValues["amount"]) 
+            #print("amount debug ",transactionValues["amount"])
+
+            return str(estimateGas(RPC_Networkd_Address, sm_address, transactionValues["from"], transactionValues["to"], transactionValues["amount"]))
+    
+    except :
+        return "unexpected py error"
+
+def deriveFromPriv(private_key):
+
+    result = RPC("null").eth.account.from_key(private_key).address
+
+    return result

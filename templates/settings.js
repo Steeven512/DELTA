@@ -3,6 +3,7 @@ var serverurl = window.location.origin;
 //setings network
 
 networkSelectUpdated = false;
+networkSMSelectUpdated = false;
 
 async function updateNetworkSelect() {
 
@@ -73,8 +74,6 @@ async function updateNetworkSelect() {
     }
   }
 }
-
-networkSMSelectUpdated = false;
 
 async function updateNetworkSelectSM() {
 

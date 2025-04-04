@@ -7,7 +7,19 @@
 
 using namespace std;
 
+namespace py = boost::python;
+
+namespace {
+    bool python_initialized = false;
+}
+
 vector<string> convert_python_list_to_vector(boost::python::object py_list) {
+
+        if (!python_initialized) {
+        Py_Initialize();
+        python_initialized = true;
+        // Considerar PyEval_InitThreads() si usarás threads en Python
+    }
 
     vector<string> result;
     boost::python::ssize_t length = boost::python::len(py_list);
@@ -22,14 +34,18 @@ vector<string> convert_python_list_to_vector(boost::python::object py_list) {
 
 vector<string> EthEvents(string RPC_Network, string SM_address, uint64_t from, uint64_t To){
 
-    namespace py = boost::python;
-    Py_Initialize();
-    py::object main_module = py::import("__main__");
-    py::object main_namespace = main_module.attr("__dict__");
+        if (!python_initialized) {
+        Py_Initialize();
+        python_initialized = true;
+        // Considerar PyEval_InitThreads() si usarás threads en Python
+    }
+
     std::vector<string> cpp_vector;
 
     try {
 
+        py::object main_module = py::import("__main__");
+        py::object main_namespace = main_module.attr("__dict__");
         py::object sys = py::import("sys");
         py::object sys_path = sys.attr("path");
         sys_path.attr("insert")(0, "");
@@ -49,13 +65,18 @@ vector<string> EthEvents(string RPC_Network, string SM_address, uint64_t from, u
 
 uint64_t LatestNetworkBlockNumber(string RPC_Network){
 
+        if (!python_initialized) {
+        Py_Initialize();
+        python_initialized = true;
+        // Considerar PyEval_InitThreads() si usarás threads en Python
+    }
+
     uint64_t bl= 0;
-    namespace py = boost::python;
-    Py_Initialize();
-    py::object main_module = py::import("__main__");
-    py::object main_namespace = main_module.attr("__dict__");
 
     try {
+
+        py::object main_module = py::import("__main__");
+        py::object main_namespace = main_module.attr("__dict__");
 
         py::object sys = py::import("sys");
         py::object sys_path = sys.attr("path");
@@ -78,19 +99,24 @@ uint64_t LatestNetworkBlockNumber(string RPC_Network){
 
 string SmOperation(string &RPC_Network, string &sm_address, string &jsonStr){
 
-    namespace py = boost::python;
-    Py_Initialize();
-    py::object main_module = py::import("__main__");
-    py::object main_namespace = main_module.attr("__dict__");
+    if (!python_initialized) {
+        Py_Initialize();
+        python_initialized = true;
+
+    }
+
+    int counterfl = 0;
 
     try {
-
-        py::object sys = py::import("sys");
-        py::object sys_path = sys.attr("path");
+        
+        py::object main_module = py::import("__main__");
+        py::object main_namespace = main_module.attr("__dict__");
+        py::object sys = py::import("sys");       
+        py::object sys_path = sys.attr("path");   
         sys_path.attr("insert")(0, "");
         py::exec_file("PyScripts/operateSM.py", main_namespace);
         py::object result = main_namespace["performTransactionSM"](RPC_Network, sm_address, jsonStr);
-
+        
         return py::extract<string>(result);
 
     } catch (const py::error_already_set& e) {
@@ -104,20 +130,27 @@ string SmOperation(string &RPC_Network, string &sm_address, string &jsonStr){
 
 string DerivePublicKeyWeb3(string pk){
 
-    namespace py = boost::python;
-    Py_Initialize();
-    py::object main_module = py::import("__main__");
-    py::object main_namespace = main_module.attr("__dict__");
+        if (!python_initialized) {
+            Py_Initialize();
+            python_initialized = true;
+        // Considerar PyEval_InitThreads() si usarás threads en Python
+        }
+
+    int counterfl = 0;
 
     try {
-
+        
+        py::object main_module = py::import("__main__");
+        py::object main_namespace = main_module.attr("__dict__");
         py::object sys = py::import("sys");
         py::object sys_path = sys.attr("path");
         sys_path.attr("insert")(0, "");
-        py::exec_file("PyScripts/deriveKey.py", main_namespace);
+        py::exec_file("PyScripts/operateSM.py", main_namespace);
         py::object result = main_namespace["deriveFromPriv"](pk);
 
-        return py::extract<string>(result);
+        string resultstr = py::extract<string>(result);
+
+        return resultstr;
 
     } catch (const py::error_already_set& e) {
             PyErr_Print();

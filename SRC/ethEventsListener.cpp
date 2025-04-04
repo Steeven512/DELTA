@@ -21,6 +21,8 @@ void  main_thread(){
 
     signal(SIGINT, signalHandler);
 
+    Py_Initialize();
+
     vector<string> Result;
     uint64_t intervalIndex = 200;
     
