@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>SS: DELTA Transfer</title>
+  <title>SS: &#916; DELTA Transfer</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" type="text/css" href="css/css.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-  <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
   <script  src="js/transfer.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.11.1/dist/ethers.umd.min.js"></script>
 </head>
 
 <body>
@@ -80,6 +80,7 @@
                 <div>
                   <span span id="AccAdmin" class="AccAdmin">balance</span> 
                   <br>
+                  <span class="deltaformat">&#916;</span>
                   <span id = "balance" class="monospaceFont amountsCoin">0</span>
                 </div>
 
@@ -132,7 +133,7 @@
                 
                   <span>amount value</span>
                   <br />
-                  <input type="text" class="transferInputValue" id="AmountTransfer" placeholder="0,000.000000">
+                  <input type="text" class="transferInputValue" id="AmountTransfer" placeholder=" &#916;0,000.000000">
 
                 </div>
 
@@ -144,7 +145,7 @@
 
 
                 <div class="col">
-                  <button class="buttontransfer" onclick="SendTransfer(this)">Send</button>
+                  <button class="buttontransfer" onclick="signTransaction(this)">Send</button>
                 </div>
 
 
@@ -164,15 +165,16 @@
 <script>
 
     updateNetworkIndexSelect()
-    retrieveAddressInfo()
-    GetBalanceAddress()
+    deriveEthAddressFromKey()
+
     inputPk = document.getElementById('privKeyValue');
     inputAddress = document.getElementById('AddressToTransfer');
     errormessage = document.getElementById('error-message');
     errormessage2 = document.getElementById('error-message2');
 
-    const intervalId = setInterval(GetBalanceAddress, 8000)
     const intervalId2 = setInterval(retrieveinfo, 4000)
+    const intervalId = setInterval(GetBalanceAddress, 8000)
+
     
     inputPk.addEventListener('input', function() {
 
@@ -180,7 +182,7 @@
             this.classList.remove('error-border');
             errormessage.textContent = '';
             publicderived = false;
-            retrieveAddressInfo()
+            deriveEthAddressFromKey()
             GetBalanceAddress()
             } else {
             this.classList.add('error-border');
@@ -270,6 +272,10 @@ amountInput.addEventListener('click', function() {
 window.onload = function() {
   amountInput.style.textAlign = 'right';
 };
+
+
+
+
 
 
 

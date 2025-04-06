@@ -953,7 +953,6 @@ vector<json> readEventsTimestampEvent(string network, uint64_t last, uint64_t ol
 
 }
 
-
 vector<uint64_t> eventsPointInTimeLine(string network, uint64_t last, uint64_t old, string TypeOfElement, string typeindexTime){
 
     vector<uint64_t > xyElements;

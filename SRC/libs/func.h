@@ -6,6 +6,11 @@
 
 using namespace std;
 
+void signalHandler(int signum) {
+    std::cout << "exit call (" << signum << ") .\n";
+    exit(signum);
+}
+
 bool checkJson(const std::string& jsonString) {
     try {
         json parsedJson = json::parse(jsonString);
@@ -47,11 +52,8 @@ string AdminSM(std::string jsonStr){
 
 string Transfer(std::string jsonStr){
 
-    string result
-
-    json jsonOptions = json::parse(jsonStr);
     string result;
-
+    json jsonOptions = json::parse(jsonStr);
     loadnetworks();
 
     string from_rpc_address = Networks[jsonOptions["network"]].rpc_address;
@@ -66,12 +68,12 @@ string Transfer(std::string jsonStr){
 
     if(from_rpc_address == to_rpc_address &&  from_sm_address == to_sm_address){
 
-        result = SmOperation(rpc_address, sm_address, jsonStr);
+        result = SmOperation(from_rpc_address, from_sm_address, jsonStr);
 
     } else {
 
         cout<<endl<<"transaction bridge "<<endl;
-        result = SmOperation(rpc_address, sm_address, jsonStr);
+        result = SmOperation(to_rpc_address, to_sm_address, jsonStr);
 
     }
 
@@ -86,6 +88,8 @@ void storeSmartContracInfo(std::string network){
     string sm_address = Networks[network].sm_address;
 
     try {
+
+        cout<<endl<<" storeSmartContracInfo "<<endl;
 
         string tokenInfo =  SmOperation(rpc_address, sm_address, jsonSrt);
 

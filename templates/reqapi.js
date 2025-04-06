@@ -503,13 +503,13 @@ async function retrieveinfo(){
   var data = await response.json()
 
   let totalSupply = document.getElementById('totalSupply');
-  totalSupply.textContent = "$"+sixdecimals(data["totalSupply"]);
+  totalSupply.textContent = sixdecimals(data["totalSupply"]);
 
   let inReserve = document.getElementById('inReserve');
-  inReserve.textContent = "$"+sixdecimals(data["inReserve"]);
+  inReserve.textContent = sixdecimals(data["inReserve"]);
 
   let inCirculation = document.getElementById('inCirculation');
-  inCirculation.textContent = "$"+sixdecimals(data["inCirculation"]);
+  inCirculation.textContent = sixdecimals(data["inCirculation"]);
 
   let networkName = document.getElementById('networkName');
   networkName.textContent = data["networkName"];
@@ -559,7 +559,7 @@ async function GetBalanceAddress(){
 
       var data = await response.text()
       console.log(data)
-      document.getElementById('balance').textContent = "$"+sixdecimals(data)
+      document.getElementById('balance').textContent = sixdecimals(data)
       
   } catch (error) {
       console.log("error ",error);
@@ -1072,7 +1072,7 @@ options: {
         fontColor: "#FFF",  
         fontSize: 12,
         callback: function(value) {
-          return "$" + value; 
+          return totalSupply + value; 
         }
       }
       }]

@@ -21,7 +21,7 @@ body {
     margin-top: 3vh;
     padding: 51px;
     border: 1px solid #0000000f;
-    background-color: rgba(217, 248, 255, 0.15);
+    background-color: rgba(17, 18, 18, 0.15);
     position: relative;
     border-radius: 4px;
     max-width: 1200px; 
@@ -141,6 +141,11 @@ font-size: 24px;
   font-size: 20px;
   color: #aac2d7;
 }
+
+.deltaformat{
+  font-size: 20px;
+  color: #ffffff75;
+}
   
 
 .intervalsetMaxWidth{
@@ -215,7 +220,7 @@ font-size: 24px;
 
   justify-content: center;
   border-radius: 6px;
-  background-color: #48484826;
+  background-color: #08080826;
   top: -22px;
   position: relative;
 }
@@ -438,7 +443,7 @@ font-size: 24px;
 
 .transferthirdrow{
   padding-top: 20px;
-  max-width: 462px;
+  border-radius: 3px;
 }
 
 

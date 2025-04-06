@@ -307,16 +307,71 @@ def transfer(RPC_Networkd_Address, sm_address, address, amount, private_key):
         'nonce': nonce,
     })
 
+
     signed_txn = W3.eth.account.sign_transaction(transaction, private_key)
+
+    print("transfer signed_txn : ", signed_txn)
+    print("transfer signed_txn.rawTransaction : ", signed_txn.rawTransaction)
+
     return W3.eth.send_raw_transaction(signed_txn.rawTransaction) #return hash transaction
 
-def estimateGas(RPC_Networkd_Address, sm_address, From, to, amount):
+def GetDataTransfer(RPC_Networkd_Address, sm_address, address, amount, private_key):
 
     W3 = RPC(RPC_Networkd_Address)
     Contract = contract(sm_address, W3)
-    gas_estimate = Contract.functions.transfer(to, amount).estimate_gas({'from': From})
+    account = W3.eth.account.from_key(private_key)
+    nonce = W3.eth.get_transaction_count(account.address)
+    gas_estimate = Contract.functions.transfer(address, amount).estimate_gas({'from': account.address})
+
+    transaction = Contract.functions.transfer(address, amount).build_transaction({
+        'from': account.address,
+        'gas': gas_estimate,
+        'nonce': nonce,
+        'gasLimit': gas_estimate+100,
+    })
+
+
+
+    return transaction
+
+def SendSidnedTransfer(RPC_Networkd_Address, sm_address, signed_txn):
+
+    print("debug send transaction")
+
+    if signed_txn.startswith("0x"):
+        signed_txn = signed_txn[2:]
+
+    raw_transaction_bytes = bytes.fromhex(signed_txn)
+    w3 = RPC(RPC_Networkd_Address)
+
+    try:
+        tx_hash = w3.eth.send_raw_transaction(raw_transaction_bytes)
+        print(f"Transaction Hash: {tx_hash.hex()}")
+    except Exception as e:
+        print(f"Error sending raw transaction: {e}")
+
+    return tx_hash
+
+
+
+def estimateGas(RPC_Networkd_Address, sm_address, From, to, amount):
+
+ 
+
+    W3 = RPC(RPC_Networkd_Address)
+    Contract = contract(sm_address, W3)
+    print("  debug gas ", amount)
+    gas_estimate = Contract.functions.transfer(to, 500).estimate_gas({'from': From})
+    print("  debug gas 2")
 
     return gas_estimate
+
+
+def deriveFromPriv(private_key):
+
+    result = RPC("null").eth.account.from_key(private_key).address
+
+    return result
 
 def performTransactionSM(RPC_Networkd_Address, sm_address, options_sm):
 
@@ -396,21 +451,21 @@ def performTransactionSM(RPC_Networkd_Address, sm_address, options_sm):
 
         if(transactionValues["option"] == "transfer"):
 
-            amount = string_to_uint256(transactionValues["amount"])
-            return transfer(RPC_Networkd_Address, sm_address, transactionValues["to"], amount, transactionValues["privateKey"])
+            return transfer(RPC_Networkd_Address, sm_address, transactionValues["to"], string_to_uint256(transactionValues["amount"]), transactionValues["privateKey"])
 
         if(transactionValues["option"] == "estimateGas"):
 
-            #amount = string_to_uint256(transactionValues["amount"]) 
-            #print("amount debug ",transactionValues["amount"])
-
             return str(estimateGas(RPC_Networkd_Address, sm_address, transactionValues["from"], transactionValues["to"], transactionValues["amount"]))
+
+        if(transactionValues["option"] == "GetDataTransfer"):
+
+            return json.dumps(GetDataTransfer(RPC_Networkd_Address, sm_address, transactionValues["to"], string_to_uint256(transactionValues["amount"]), transactionValues["privateKey"]))
+
+        if(transactionValues["option"] == "SendSidnedTransfer"):
+
+            print("SendSidnedTransfer" , transactionValues["signedTransfer"])
+
+            return SendSidnedTransfer(RPC_Networkd_Address, sm_address, transactionValues["signedTransfer"]) 
     
     except :
         return "unexpected py error"
-
-def deriveFromPriv(private_key):
-
-    result = RPC("null").eth.account.from_key(private_key).address
-
-    return result

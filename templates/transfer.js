@@ -73,6 +73,7 @@ function checkPrivate(pk) {
         checkpk = true
 
     } else {
+        publicderived = false
         checkpk = false
     }
     return checkpk;
@@ -99,7 +100,8 @@ async function retrieveAddressInfo(){
             })
         
             var data = await response.text()
-            console.log(data)
+            console.log("retrieveAddressInfo response: ", data)
+
             if(checkAddress(data)){
                 document.getElementById('Address').textContent = data
                 publicderived = true
@@ -126,7 +128,6 @@ async function GetBalanceAddress(){
             "option": "balanceOf",
             "Address": document.getElementById('Address').textContent,
             })
-        
     
             const response = await fetch(serverurl+"/api", {
             method: 'POST',
@@ -140,12 +141,13 @@ async function GetBalanceAddress(){
             })
     
             var data = await response.text()
-            console.log(data)
-            document.getElementById('balance').textContent = "$"+sixdecimals(data)
+
+            console.log("GetBalanceAddress response query ", data)
+            
+            document.getElementById('balance').textContent = sixdecimals(data)
 
             estimateGas()
             
-
         }
 
 
@@ -158,6 +160,7 @@ async function GetBalanceAddress(){
 async function updateNetworkIndexSelect() {
 
     try {
+
       const response = await fetch(serverurl+"/api", {
       method: 'POST',
       headers: {
@@ -169,8 +172,6 @@ async function updateNetworkIndexSelect() {
     })
 
     var responsedata = await response.json()
-
-    console.log("debug update networks", responsedata)
 
     var selectorFrom = document.getElementById('Networks');
     var selectorTo = document.getElementById('NetworksTo');
@@ -204,7 +205,8 @@ async function updateNetworkIndexSelect() {
       });
 
     retrieveinfo()
-
+    GetBalanceAddress()
+    estimateGas()
 
 
     } catch (error) {
@@ -229,8 +231,6 @@ async function retrieveinfo(){
   
         var data = await response.json()
 
-        console.log("debug retrieve info", data)
-
         let networkName = document.getElementById('networkName');
         networkName.textContent = data["networkName"];
 
@@ -238,9 +238,12 @@ async function retrieveinfo(){
         let name = document.getElementById('name');
         name.textContent = data["name"];
 
+
+    /*
         let symbol = document.getElementById('symbol');
         symbol.textContent = data["symbol"];
-    
+    */
+
     } catch (error) {
         console.log("error ",error);
         }
@@ -256,14 +259,14 @@ function IndexAddress() {
 async function estimateGas(){
 
     amount = parseInt(getIntAmount(document.getElementById('AmountTransfer').value))
+    checkAddress(document.getElementById('AddressToTransfer').value)
 
     if( checkpk && checkaddress && publicderived && amount > 0 ){
+
 
         fromAddress = document.getElementById('Address').textContent
         addressReceiver = document.getElementById('AddressToTransfer').value
         network = document.getElementById("Networks").value
-
-        console.log(" addressReceiver", addressReceiver)
 
         jsonValues = JSON.stringify({ 
             "network": network,
@@ -285,6 +288,9 @@ async function estimateGas(){
                                     })
 
         })
+
+
+
 
         var data = await response.text()
 
@@ -317,13 +323,13 @@ async function SendTransfer(){
           "network": document.getElementById("Networks").value,
           "networkTo": document.getElementById("NetworksTo").value,
           "option": "transfer",
-          "to": document.getElementById('addressReceiver').value, 
+          "to": document.getElementById('AddressToTransfer').value, 
           "amount": parseInt(getIntAmount(document.getElementById('AmountTransfer').value)),
           "privateKey": document.getElementById("privKeyValue").value,
          })
       
         try {
-          const response = await fetch(serverurl+"/transfer_test", {
+          const response = await fetch(serverurl+"/test_transfer", {
           method: 'POST',
           headers: {
               'Accept': 'application/json',
@@ -335,14 +341,110 @@ async function SendTransfer(){
         })
       
         var data = await response.text()
+
+        console.log("send transfer ", data)
       
-        alert("operation result: ",data)
+        alert("operation result: "+data)
       
         } catch (error) {
             console.log("error ",error);
         }
 
     }
+}
+
+function deriveEthAddressFromKey() {
+    try {
+
+      if(!checkPrivate(document.getElementById("privKeyValue").value)){
+        return 
+      }
+
+      const privatekey = document.getElementById("privKeyValue").value
+
+      const wallet = new ethers.Wallet(privatekey);
+      console.log(wallet.address);
+      document.getElementById('Address').textContent = wallet.address
+      publicderived=true;
+
+      return
+
+    } catch (error) {
+      console.error("Error deriving Ethereum address:", error);
+      return null; 
+    }
+}
+
+async function signTransaction(){
+
+    if(!checkPrivate(document.getElementById("privKeyValue").value)){
+        return 
+    }
+
+    const privatekey = document.getElementById("privKeyValue").value
+    const wallet = new ethers.Wallet(privatekey);
+
+    if( checkpk && checkaddress && publicderived && amount > 0 ){
+
+        jsonValues = JSON.stringify({ 
+          "network": document.getElementById("Networks").value,
+          "networkTo": document.getElementById("NetworksTo").value,
+          "option": "GetDataTransfer",
+          "to": document.getElementById('AddressToTransfer').value, 
+          "amount": parseInt(getIntAmount(document.getElementById('AmountTransfer').value)),
+          "privateKey": document.getElementById("privKeyValue").value,
+         })
+      
+        try {
+          const DataTransfer = await fetch(serverurl+"/test_transfer", {
+          method: 'POST',
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({  "request": "transfer", 
+                                  "values": jsonValues,
+                                 })
+        })
+      
+        var data = await DataTransfer.json()
+
+        
+
+        const signedTransaction = await wallet.signTransaction(data)
+
+        console.log("signedTransaction ", signedTransaction)
+
+        jsonValues = JSON.stringify({ 
+            "network": document.getElementById("Networks").value,
+            "networkTo": document.getElementById("NetworksTo").value,
+            "option": "SendSidnedTransfer",
+            "signedTransfer": signedTransaction,
+           })
+
+        const statusSignedTransfer = await fetch(serverurl+"/test_transfer", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({  "request": "transfer", 
+                                    "values": jsonValues,
+                                   })
+          })
+
+
+           var statustransfer = await statusSignedTransfer.text()
+
+           console.log("status transfer ", statustransfer)
+      
+      
+        } catch (error) {
+            console.log("error ",error);
+        }
+
+    }
+
 }
 
 

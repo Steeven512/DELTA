@@ -39,10 +39,6 @@ def eventsIndexer(RPC_Networkd_Address, SM_address, fromBlock, toBlock):
 
     Contract = contract(SM_address, W3)
 
-
-       
-          
-
     for log in logs:
 
         print(log)

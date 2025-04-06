@@ -12,10 +12,7 @@
 using namespace std;
 using json = nlohmann::json;
 
-void signalHandler(int signum) {
-    std::cout << "exit call (" << signum << ") .\n";
-    exit(signum);
-}
+
 
 void  main_thread(){
 
@@ -24,14 +21,17 @@ void  main_thread(){
     Py_Initialize();
 
     vector<string> Result;
-    uint64_t intervalIndex = 200;
+
+    uint64_t intervalIndex = 5;
     
     while(true){ 
 
         loadnetworks();
         
         for (const auto& network : Networks) {
+            
             storeSmartContracInfo(network.first);
+
             cout<<endl<<"indexing events on "<<network.first;
 
             Result.clear();
