@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>SS: DELTA Settings</title>
+  <title>S.S: &#916; DELTA</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" type="text/css" href="css/css.css">
@@ -10,9 +10,11 @@
 </head>
 
 <body>
-  <div class="container">
-      <nav class="navbar navbar-expand-lg navbar-dark bg-light fixed-top">
-        <a class="navbar-brand" href="/CryptoAdmin">S.S: Front Rest API Web</a>
+	
+<div class="container">
+	
+    <nav class="navbar navbar-expand-lg navbar-dark bg-light fixed-top">
+        <a class="navbar-brand" href="/CryptoAdmin">S.S: &#916; DELTA</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -28,261 +30,349 @@
               <a class="nav-link" href="#">Settings<span class="sr-only">(current)</span></a>
             </li>
           </ul>
-          <span class="navbar-text">
+          <a class="navbar-text navbar-brand" href="https://steevjadev.blogspot.com/2025/01/hello.html">
             Developed by Steeven J Salazar
-          </span>
+          </a>
         </div>
       </nav>
-  </div>
-    <div class ="navbarspacer">
+	</div>
+    
+<div class ="navbarspacer">
 
     </div>
 
  <div class="sidebar">
   <a class="active" id="networksidebar"href="javascript:void(0);" onclick="displayNetWorksSetting()">networks</a>
   <a href="javascript:void(0);" id="smsidebar" onclick="displaySMSettings()">smart contract Advanced settings </a>
-  <a href="#about">About</a>
+  <a href="javascript:void(0);" id="aboutsidebar" onclick="displayAbout()" >About</a>
 </div>
 
 <div class="content">
 
-  <div id="NetworkSettings">
+	<div id="NetworkSettings" class="SMSettings">
 
-    <span class="h2">
-      Network Settings
-    </span>
+		<span class="h2">
+		  Network Settings
+		</span>
 
-    <div class="AddNetwork">
+		<div class="AddNetwork">
 
-      <span class="TittleSetting">
-        Add a Network
-      </span>
+		  <span class="TittleSetting">
+			Add a Network
+		  </span>
 
-      <div class="AddressWrapper NetworkSettingGroup">
+		  <div class="AddressWrapper NetworkSettingGroup">
 
-        <div>
-          <label>
-            Name
-          </label>
-          <br />
-          <input type="text" class="settingInput" id="networkNameSet">
-        </div>
-
-        <div>
-          <label>
-            id
-          </label>
-          <br />
-          <input type="text" class="settingInput" id="networkidSet">
-        </div>
-
-        <div>
-          <label>
-            RPC
-          </label>
-          <br />
-          <input type="text" class="settingInput" id="networkRPCSet">
-        </div>   
-
-        <div>
-          <label>
-            Smart Contract address
-          </label>
-            <br />
-          <input type="text" class="settingInput" id="networkSmartContractAddressSet">
-          <br />
-          <br />
-        </div>      
-
-
-        <div>
-        <button class="buttonsearch" onclick="setNetwork(this)">Set</button>
-        </div>  
-
-      </div>
-
-    </div>
-
-    <div class="AddNetwork">
-      
-      <span class="TittleSetting">
-        Edit Network Settings
-      </span>
-
-      <div class="AddressWrapper NetworkSettingGroup">
-
-        <div>
-          <label for="networks">Choose a Network:</label>
-          <select name="Networks" id="Networks" class="SelectorStyle"></select>
-        </div>
-        
-        <div class="">
-          <span>
-            id
-          </span>
-        <br />
-          <input type="text" class="settingInput" id="networkidSetEdit">
-        </div>
-
-        <div>
-          <span>
-            RPC
-          </span>
-        <br />
-          <input type="text" class="settingInput" id="networkRPCSetEdit">
-        </div>   
-
-        <div>
-          <label>
-            Smart Contract address
-          </label>
-        <br />
-          <input type="text" class="settingInput" id="networkSmartContractAddressSetEdit">
-          <br />
-          <br />
-        </div>    
-
-        <div>
-          <button class="buttonSetSetting" onclick="setNetworkEdit(this)">Set</button>
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-  <div id="SM" class="SMSettings">
-    
-      <span class="h2">
-        Smart Contract Advanced settings
-      </span>
-
-      <div class="AddressWrapper">
-
-        <div>
-          <label for="networks"> Choose a Network: </label>
-          <select name="Networks" id="NetworksSM" class="SelectorStyle" ></select>
-        </div>
-
-        <div class="AddNetwork">
-        
-          <span class="TittleSetting">mint / burn / increase supply / decrease supply</span>
-
-          <div class="SMSettingGrouop">
-
-            <span>increase amount supply</span>
-            <br/>
-            <input type="text" class="settingInput" id="increaseSupply">
- 
-            <button class="buttonsearch" onclick="increaseSupply(this)">Set</button>
-            
-          </div>
+			<div class = "settingDivElement">
+				<div class="row inputdivMidRow">
+					<div class="col">
+						
+						<label>Name</label>
+					  <br />
+					  <input type="text" class="settingInputMid" id="networkNameSet">
+						
+					</div>
+					
+					<div class="col">
+						
+						<label>
+						id
+					  </label>
+					  <br />
+					  <input type="text" class="settingInputMid" id="networkidSet">
+					</div>
+				</div>
+			</div>
 
 
 
-          <div class="SMSettingGrouop">
 
-            <span>burn</span>
-            <br />
-            <input type="text" class="settingInput" id="burn">
-            <button class="buttonsearch" onclick="burn(this)">Set</button>
-            
-          </div>
+			<div class = "settingDivElement">
+			  <label>
+				RPC
+			  </label>
+			  <br />
+			  <input type="text" class="settingInput" id="networkRPCSet">
+			</div>   
 
-          <div class="SMSettingGrouop">
+			<div class = "settingDivElement">
+			  <label>
+				Smart Contract address
+			  </label>
+				<br />
+			  <input type="text" class="settingInput" id="networkSmartContractAddressSet">
+			  <br />
 
-            <span>mint</span>
-            <br />
-            <span>Address</span><br />
-            <input type="text" class="settingInput" id="mint_address">
-            <br />
-            <span>Value</span><br />
-            <input type="text" class="settingInput" id="mint_amount">
-            <button class="buttonsearch" onclick="mint(this)">Set</button>
-            
-          </div>
-
-
-          <div class="SMSettingGrouop">
-
-            <span>decreaseSupplyFromAddress</span>
-            <br />
-            <span>Address</span><br />
-            <input type="text" class="settingInput" id="decreaseSupply_address">
-            <br />
-            <span>Value</span><br />
-            <input type="text" class="settingInput" id="decreaseSupply_value">
-            <button class="buttonsearch" onclick="decreaseSupply(this)">Set</button>
-            
-          </div>
-
-        </div>
-
-        <div class="AddNetwork">
-
-          <span class="TittleSetting">Freeze</span>
-
-            <div class="SMSettingGrouop">
-
-              <span>Freezze Address</span>
-              <br/>
-              <input type="text" class="settingInput" id="freeze">
-  
-              <button class="buttonsearch" onclick="freeze(this)">Set</button>
-              
-            </div>
-
-            <div class="SMSettingGrouop">
-
-              <span>unfreeze Address</span>
-              <br/>
-              <input type="text" class="settingInput" id="unfreeze">
-  
-              <button class="buttonsearch" onclick="unfreeze(this)">Set</button>
-              
-            </div>
-
-            <div class="SMSettingGrouop">
-
-              <span>wipeFrozenAddress Address</span>
-              <br/>
-              <input type="text" class="settingInput" id="wipeFrozenAddress">
-  
-              <button class="buttonsearch" onclick="wipeFrozenAddress(this)">Set</button>
-              
-            </div>
-
-        </div>
+			</div>
+			
+			<div class = "settingDivElement">
+				
+				<div class="row inputdivMidRow">
+					
+					<div class="col">
+						<label>start indexing from block number</label>
+						<br />
+						<input type="text" class="settingInputMid" id="startIndexingFrom">
+					</div>
+					
+					<div class="col">
+						<label>number of blocks per request</label>
+						<br />
+						<input type="text" class="settingInputMid" id="requestInterval">
+					</div>
+				
+				</div>
+				
+			</div>
+			   
 
 
+			<div class = "settingDivElement" style="left: -5px;position: relative;align-items: center;display: flex;justify-content: right;">
+			<button class="buttonSetSetting" onclick="setNetwork(this)">Save</button>
+			</div>  
 
-        <div class="AddNetwork">
+		  </div>
 
-          <span class="TittleSetting">Operational Switch</span>
+		</div>
 
-          <div class="SMSettingGrouop ">
+		<div class="AddNetwork">
+		  
+			<span class="TittleSetting">
+			Edit Network Settings
+		  </span>
 
-            <span>turn  On / Off Smart Contract</span>
-            <br/><br/>
+			<div class="AddressWrapper NetworkSettingGroup">
 
-            <button class="buttonsearch" onclick="pause(this)">Pause Smart Contract</button>
-            <button class="buttonsearch" onclick="unpause(this)">Unpause Smart Contract</button>
-            
-          </div>
-            
-        </div>
+			<div>
+			  <label for="networks">Choose a Network:</label>
+			  <select name="Networks" id="Networks" class="SelectorStyle"></select>
+			</div>
+			
+			<div class="settingDivElement">
+			  <span>
+				id
+			  </span>
+			<br />
+			  <input type="text" class="settingInputMid" id="networkidSetEdit">
+			</div>
 
-      </div>
+			<div class="settingDivElement">
+			  <span>
+				RPC
+			  </span>
+			<br />
+			  <input type="text" class="settingInput" id="networkRPCSetEdit">
+			</div>   
+
+			<div class="settingDivElement">
+			  <label>
+				Smart Contract address
+			  </label>
+			<br />
+			  <input type="text" class="settingInput" id="networkSmartContractAddressSetEdit">
+			  <br />
+			</div>    
+
+			<div class = "settingDivElement">
+				
+				<div class="row inputdivMidRow">
+					
+					<div class="col">
+						<label>start indexing from block number</label>
+						<br />
+						<input type="text" class="settingInputMid" id="startIndexingFromEdit">
+					</div>
+					
+					<div class="col">
+						<label>number of blocks per request</label>
+						<br />
+						<input type="text" class="settingInputMid" id="requestIntervalEdit">
+					</div>
+				
+				</div>
+				
+			</div>  
+
+			<div class="settingDivElement">
+				<div class="row" style=" align-content: end; */display: flex;position: relative;align-items: normal;justify-content: right;">
+					<div class="col" style="max-width: 135px;">
+						<button class="buttonSetSetting" onclick="eraseNewtork(this)" style="background-color: #4c1c1c8f;" >Delete Network</button>
+					</div>
+					<div class="col" style="max-width: 76px;">
+						<button class="buttonSetSetting" onclick="setNetworkEdit(this)">Save</button>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+	</div>
+
+	<div id="SM" class="SMSettings">
+		
+		  <span class="h2">
+			Smart Contract Advanced settings
+		  </span>
+
+		  <div class="AddressWrapper">
+
+			<div>
+			  <label for="networks"> Choose a Network: </label>
+			  <select name="Networks" id="NetworksSM" class="SelectorStyle" ></select>
+			</div>
+
+			<div class="AddNetwork">
+			
+			  <span class="TittleSetting">mint / burn / increase supply / decrease supply</span>
+
+			  <div class="SMSettingGrouop">
+
+				<span>increase amount supply</span>
+				<br/>
+				<input type="text" class="settingInput" id="increaseSupply">
+	 
+				<button class="buttonsearch" onclick="increaseSupply(this)">Set</button>
+				
+			  </div>
 
 
-    </div>
 
+			  <div class="SMSettingGrouop">
+
+				<span>burn</span>
+				<br />
+				<input type="text" class="settingInput" id="burn">
+				<button class="buttonsearch" onclick="burn(this)">Set</button>
+				
+			  </div>
+
+			  <div class="SMSettingGrouop">
+
+				<span>mint</span>
+				<br />
+				<span>Address</span><br />
+				<input type="text" class="settingInput" id="mint_address">
+				<br />
+				<span>Value</span><br />
+				<input type="text" class="settingInput" id="mint_amount">
+				<button class="buttonsearch" onclick="mint(this)">Set</button>
+				
+			  </div>
+
+
+			  <div class="SMSettingGrouop">
+
+				<span>decreaseSupplyFromAddress</span>
+				<br />
+				<span>Address</span><br />
+				<input type="text" class="settingInput" id="decreaseSupply_address">
+				<br />
+				<span>Value</span><br />
+				<input type="text" class="settingInput" id="decreaseSupply_value">
+				<button class="buttonsearch" onclick="decreaseSupply(this)">Set</button>
+				
+			  </div>
+
+			</div>
+
+			<div class="AddNetwork">
+
+			  <span class="TittleSetting">Freeze</span>
+
+				<div class="SMSettingGrouop">
+
+				  <span>Freezze Address</span>
+				  <br/>
+				  <input type="text" class="settingInput" id="freeze">
+	  
+				  <button class="buttonsearch" onclick="freeze(this)">Set</button>
+				  
+				</div>
+
+				<div class="SMSettingGrouop">
+
+				  <span>unfreeze Address</span>
+				  <br/>
+				  <input type="text" class="settingInput" id="unfreeze">
+	  
+				  <button class="buttonsearch" onclick="unfreeze(this)">Set</button>
+				  
+				</div>
+
+				<div class="SMSettingGrouop">
+
+				  <span>wipeFrozenAddress Address</span>
+				  <br/>
+				  <input type="text" class="settingInput" id="wipeFrozenAddress">
+	  
+				  <button class="buttonsearch" onclick="wipeFrozenAddress(this)">Set</button>
+				  
+				</div>
+
+			</div>
+
+
+
+			<div class="AddNetwork">
+
+			  <span class="TittleSetting">Operational Switch</span>
+
+			  <div class="SMSettingGrouop ">
+
+				<span>turn  On / Off Smart Contract</span>
+				<br/><br/>
+
+				<button class="buttonSetSetting" onclick="pause(this)">Pause Smart Contract</button>
+				<button class="buttonSetSetting" onclick="unpause(this)">Unpause Smart Contract</button>
+				
+			  </div>
+				
+			</div>
+
+		  </div>
+
+
+		</div>
+
+	<div id="about">
+		<div class="settingDivElement">
+			
+			<h2>DELTA </h2>
+			
+			<p>General client interface engineered for the management of regulated stablecoins.</p>
+			<p> provides users with tools to easy interact with regulated stable coins ERC-20 by 
+			synchronizing with </br> Ethereum-based blockchain RPCs to request and index specific events 
+			within a local database for </br>efficient access and tracing, alongside the integration of  
+			wallet management and transaction handling </br>capabilities.</p>
+			
+			<br>
+			
+			<h2>Third parties</h2>
+			
+			  <ul>
+				<li>Web3.py</li>
+				<li>Crow Server</li>
+				<li>Boost C++ Libraries</li>
+				<li>Boost.Python</li>
+				<li>Ethers.js</li>
+				<li>nlohmann json</li>
+			  </ul>
+						<br>
+			
+		  <h2>Copyright</h2>
+		  <p>This software was designed and developed by Steeven J Salazar.</p>
+
+		  <p>Licensed under the MIT License.</p>
+		
+		</div>
+		
+</div>
 
 </div> 
 
 </body>
 
 <script>
-  const intervalId = setInterval(updateNetworkSelect, 2000)
+  displayNetWorksSetting()
+  updateNetworkSelect()
 </script>

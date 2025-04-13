@@ -5,9 +5,17 @@ var serverurl = window.location.origin;
 networkSelectUpdated = false;
 networkSMSelectUpdated = false;
 
+function ullToHex(number) {
+  if (typeof number !== 'number' || number < 0 || number > 18446744073709551615) {
+    return "Invalid input"; // Or throw an error, depending on your needs
+  }
+  const hexString = number.toString(16).toUpperCase();
+  console.log("skibidi ",hexString.padStart(16, '0') )
+  return hexString.padStart(16, '0');
+ }
+
 async function updateNetworkSelect() {
 
-  if(!networkSelectUpdated){
     try {
       const response = await fetch(serverurl+"/api", {
       method: 'POST',
@@ -60,8 +68,9 @@ async function updateNetworkSelect() {
       
           let networkSmartContractAddressSetEdit = document.getElementById('networkSmartContractAddressSetEdit');
           networkSmartContractAddressSetEdit.value = NetworkData["sm_address"];
-
-          networkSelectUpdated = true;
+          
+          document.getElementById('startIndexingFromEdit').value = parseInt(NetworkData["startIndexingFrom"],16)
+          document.getElementById('requestIntervalEdit').value = NetworkData["requestInterval"]
 
         }
 
@@ -72,7 +81,7 @@ async function updateNetworkSelect() {
     } catch (error) {
 
     }
-  }
+  
 }
 
 async function updateNetworkSelectSM() {
@@ -117,47 +126,6 @@ async function updateNetworkSelectSM() {
   }
 }
 
-async function updateNetworkIndexSelect() {
-
-  if(!networkSelectUpdated){
-    try {
-      const response = await fetch(serverurl+"/api", {
-      method: 'POST',
-      headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({  "request": "savedNetworks", 
-                            })
-    })
-
-    var responsedata = await response.json()
-
-    console.log("debug update networks", responsedata)
-
-    var selectElement = document.getElementById('Networks');
-
-    while (selectElement.firstChild) {
-      selectElement.removeChild(selectElement.firstChild);
-    }
-
-    responsedata.forEach(opcion => {
-
-      NetworkData = JSON.parse(opcion)
-      const optionElement = document.createElement('option');
-      optionElement.value = NetworkData["networkName"]; 
-      optionElement.textContent = NetworkData["networkName"]; 
-      selectElement.appendChild(optionElement);
-
-    });
-
-    networkSelectUpdated = true;
-
-    } catch (error) {
-
-    }
-  }
-}
 
 async function setNetworkEdit() {
 
@@ -165,6 +133,16 @@ async function setNetworkEdit() {
   var networkidSet = document.getElementById("networkidSetEdit").value
   var networkRPCSet = document.getElementById("networkRPCSetEdit").value
   var networkSmartContractAddressSet = document.getElementById("networkSmartContractAddressSetEdit").value
+  var requestInterval = document.getElementById("requestIntervalEdit").value
+  var startIndexingFrom = document.getElementById("startIndexingFromEdit").value
+
+  if(!(networkNameSet || networkidSet || networkRPCSet  || networkSmartContractAddressSet  || startIndexingFrom  || requestInterval 
+	|| ((startIndexingFrom) => /\d/.test(startIndexingFrom) )
+	||( (requestInterval) => /\d/.test(requestInterval) )
+	|| (requestInterval > 0) ) )
+	{
+		alert("invalid input value")  
+	}
 
   jsonset = JSON.stringify({
 
@@ -172,6 +150,8 @@ async function setNetworkEdit() {
     "networkid": networkidSet,
     "rpc_address": networkRPCSet,
     "sm_address": networkSmartContractAddressSet,
+    "startIndexingFrom": startIndexingFrom,
+    "requestInterval": requestInterval,
 
   })
 
@@ -188,13 +168,20 @@ async function setNetworkEdit() {
   })
 
     var responsedata = await response.text()
+    
+    if(responsedata == "success" ){
+		setBlIndexNewNetwork(networkNameSet, ullToHex(parseInt(startIndexingFrom)))
+		alert("network "+networkNameSet+" added sucessfully")
+	} else {
+		alert("fail storing "+networkNameSet)
+		}
 
-    networkSelectUpdated = false;
-
+    updateNetworkSelect()
 
   } catch (error) {
     console.log("error ",error);
   }
+
 
 }
 
@@ -204,6 +191,16 @@ async function setNetwork() {
   var networkidSet = document.getElementById("networkidSet").value
   var networkRPCSet = document.getElementById("networkRPCSet").value
   var networkSmartContractAddressSet = document.getElementById("networkSmartContractAddressSet").value
+  var startIndexingFrom = document.getElementById("startIndexingFrom").value
+  var requestInterval = document.getElementById("requestInterval").value
+  
+  if(!(networkNameSet || networkidSet || networkRPCSet  || networkSmartContractAddressSet  || startIndexingFrom  || requestInterval 
+	|| ((startIndexingFrom) => /\d/.test(startIndexingFrom) )
+	||( (requestInterval) => /\d/.test(requestInterval) )
+	|| (requestInterval > 0) ) )
+	{
+		alert("invalid input value")  
+	}
 
   jsonset = JSON.stringify({
 
@@ -211,6 +208,8 @@ async function setNetwork() {
     "networkid": networkidSet,
     "rpc_address": networkRPCSet,
     "sm_address": networkSmartContractAddressSet,
+    "startIndexingFrom": startIndexingFrom,
+    "requestInterval": requestInterval,
 
   })
 
@@ -227,8 +226,15 @@ async function setNetwork() {
   })
 
     var responsedata = await response.text()
-
-    networkSelectUpdated = false;
+    
+    if(responsedata == "success" ){
+		setBlIndexNewNetwork(networkNameSet, ullToHex(parseInt(startIndexingFrom)))
+		alert("network "+networkNameSet+" added sucessfully")
+	} else {
+		alert("fail storing "+networkNameSet)
+		}
+		
+		updateNetworkSelect()
 
   } catch (error) {
     console.log("error ",error);
@@ -236,41 +242,151 @@ async function setNetwork() {
 
 }
 
+async function eraseNewtork() {
+
+  jsonset = JSON.stringify({
+
+  })
+
+  try {
+    const response = await fetch(serverurl+"/api", {
+    method: 'POST',
+    headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({  "request": "eraseNetwork", 
+                            "networkName": document.getElementById("Networks").value, 
+                          })
+  })
+
+    var responsedata = await response.text()
+    
+    if(responsedata == "success" ){
+		alert("network "+document.getElementById("Networks").value+" erased")
+	} else {
+		alert("deleting fail "+document.getElementById("Networks").value)
+		}
+
+    updateNetworkSelect()
+
+  } catch (error) {
+    console.log("error ",error);
+  }
+
+
+}
+
+
+async function setBlIndexNewNetwork(networkNameSet, blnumber) {
+
+  console.log("networksetting " , networkNameSet)
+
+  try {
+    const response = await fetch(serverurl+"/api", {
+    method: 'POST',
+    headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({  "request": "SaveLatestIndexedBl", 
+                            "networksetting": networkNameSet,
+                            "numberBl": blnumber, 
+                          })
+  })
+
+    var responsedata = await response.text()
+
+    console.log ("status "+responsedata)
+
+  } catch (error) {
+    console.log("error ",error);
+  }
+
+}
+
+
+async function setBlIndex() {
+
+  var networkNameSet = document.getElementById("Networks").value
+  var blnumber = ullToHex(parseInt(document.getElementById("blnumber").value))
+
+  console.log("networksetting " , networkNameSet)
+
+  try {
+    const response = await fetch(serverurl+"/api", {
+    method: 'POST',
+    headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({  "request": "SaveLatestIndexedBl", 
+                            "networksetting": networkNameSet,
+                            "numberBl": blnumber, 
+                          })
+  })
+
+    var responsedata = await response.text()
+
+    console.log ("status "+responsedata)
+
+    alert("status "+responsedata)
+
+  } catch (error) {
+    console.log("error ",error);
+  }
+
+}
+
+
+
+
 async function displayNetWorksSetting(){
 
-  let SM = document.getElementById('SM');
-  SM.style.display = 'none'; 
-
-  let smsidebar = document.getElementById('smsidebar');
-  smsidebar.classList.remove('active');
-
+  document.getElementById('about').style.display = 'none'; 
+  document.getElementById('SM').style.display = 'none'; 
   
-  let NetworkSettings = document.getElementById('NetworkSettings');
-  NetworkSettings.style.display = 'grid'; 
-
-  let networksidebar = document.getElementById('networksidebar');
-
-  networksidebar.classList.add("active")
+  document.getElementById('smsidebar').classList.remove('active');
+  document.getElementById('aboutsidebar').classList.remove('active');
+  
+  document.getElementById('NetworkSettings').style.display = 'grid';
+  document.getElementById('networksidebar').classList.add("active")
 
 
 }
 
 async function displaySMSettings(){
 
-  let NetworkSettings = document.getElementById('NetworkSettings');
-  NetworkSettings.style.display = 'none'; 
-  let networksidebar = document.getElementById('networksidebar');
-  networksidebar.classList.remove('active');
-
-  let SM = document.getElementById('SM');
-  SM.style.display = 'grid'; 
-
-  let smsidebar = document.getElementById('smsidebar');
-  smsidebar.classList.add("active")
+  document.getElementById('about').style.display = 'none'; 
+  document.getElementById('NetworkSettings').style.display = 'none'; 
+  
+  document.getElementById('networksidebar').classList.remove('active');
+  document.getElementById('aboutsidebar').classList.remove('active');
+  
+  document.getElementById('SM').style.display = 'grid';
+  document.getElementById('smsidebar').classList.add("active")
 
   updateNetworkSelectSM()
 
 }
+
+async function displayAbout(){
+
+  document.getElementById('NetworkSettings').style.display = 'none'; 
+  document.getElementById('SM').style.display = 'none'; 
+  
+  document.getElementById('networksidebar').classList.remove('active');
+  document.getElementById('smsidebar').classList.remove('active');
+  
+  document.getElementById('about').style.display = 'grid';
+  document.getElementById('aboutsidebar').classList.add("active")
+
+}
+
+
+
+
+
 
 function requestPK(){
 
@@ -282,7 +398,7 @@ async function increaseSupply(){
 
   privateKey = requestPK()
   amount = document.getElementById('increaseSupply').value
-  network = document.getElementById("Networks").value
+  network = document.getElementById("NetworksSM").value
 
   jsonValues = JSON.stringify({ 
     "network": network,
@@ -318,7 +434,7 @@ async function burn(){
 
   privateKey = requestPK()
   amount = document.getElementById('burn').value
-  network = document.getElementById("Networks").value
+  network = document.getElementById("NetworksSM").value
 
   jsonValues = JSON.stringify({ 
     "network": network,
@@ -355,7 +471,7 @@ async function mint(){
   privateKey = requestPK()
   mint_address = document.getElementById('mint_address').value
   amount = document.getElementById('mint_amount').value
-  network = document.getElementById("Networks").value
+  network = document.getElementById("NetworksSM").value
 
   jsonValues = JSON.stringify({ 
     "network": network,
@@ -393,7 +509,7 @@ async function decreaseSupply(){
   privateKey = requestPK()
   account = document.getElementById('decreaseSupply_address').value
   amount = document.getElementById('decreaseSupply_value').value
-  network = document.getElementById("Networks").value
+  network = document.getElementById("NetworksSM").value
 
   jsonValues = JSON.stringify({ 
     "network": network,
@@ -430,43 +546,7 @@ async function freeze(){
   privateKey = requestPK()
   account = document.getElementById('freeze').value
 
-  network = document.getElementById("Networks").value
-
-  jsonValues = JSON.stringify({ 
-    "network": network,
-    "option": "freeze",
-    "account": account, 
-    "privateKey": privateKey,
-   })
-
-  try {
-    const response = await fetch(serverurl+"/api", {
-    method: 'POST',
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({  "request": "AdminSM", 
-                            "values": jsonValues,
-                           })
-  })
-
-  var data = await response.text()
-
-  alert("operation result: ",data)
-
-  } catch (error) {
-      console.log("error ",error);
-  }
-
-}
-
-async function freeze(){
-
-  privateKey = requestPK()
-  account = document.getElementById('freeze').value
-
-  network = document.getElementById("Networks").value
+  network = document.getElementById("NetworksSM").value
 
   jsonValues = JSON.stringify({ 
     "network": network,
@@ -502,7 +582,7 @@ async function unfreeze(){
   privateKey = requestPK()
   account = document.getElementById('unfreeze').value
 
-  network = document.getElementById("Networks").value
+  network = document.getElementById("NetworksSM").value
 
   jsonValues = JSON.stringify({ 
     "network": network,
@@ -538,7 +618,7 @@ async function wipeFrozenAddress(){
   privateKey = requestPK()
   account = document.getElementById('wipeFrozenAddress').value
 
-  network = document.getElementById("Networks").value
+  network = document.getElementById("NetworksSM").value
 
   jsonValues = JSON.stringify({ 
     "network": network,
@@ -572,7 +652,7 @@ async function wipeFrozenAddress(){
 async function pause(){
 
   privateKey = requestPK()
-  network = document.getElementById("Networks").value
+  network = document.getElementById("NetworksSM").value
 
   jsonValues = JSON.stringify({ 
     "network": network,
@@ -605,7 +685,7 @@ async function pause(){
 async function unpause(){
 
   privateKey = requestPK()
-  network = document.getElementById("Networks").value
+  network = document.getElementById("NetworksSM").value
 
   jsonValues = JSON.stringify({ 
     "network": network,
@@ -634,6 +714,7 @@ async function unpause(){
   }
 
 }
+
 
 
 

@@ -162,7 +162,7 @@ contract regulatedStableCoin is Owner{
 
     function canBurnFromAddress(address burnFromAddress, address caller) internal virtual view  returns (bool) {
 
-        address owner = getOwner();
+        address owner = owner();
 
         if(caller == owner || caller == burnFromAddress){
             return true;
@@ -226,13 +226,12 @@ contract regulatedStableCoin is Owner{
 
                 //DELTA Bridge implementarion 
 
-
     function NewBridge(string memory _bridgeName) public onlyOwner {
 
-        bytes32 bridgeName = keccak256(bytes(_BridgeName));
+        bytes32 bridgeName = keccak256(bytes(_bridgeName));
 
         for (uint i = 0; i < Bridges.length; i++) {
-            if ( Bridges[i]  == BridgeToDel ) {
+            if ( Bridges[i] == bridgeName ) {
 
                 return;
             }
@@ -252,7 +251,7 @@ contract regulatedStableCoin is Owner{
                     Bridges[i] = Bridges[Bridges.length - 1];
                 }
                 Bridges.pop();
-                BridgeDeleted(BridgeToDel);
+                emit BridgeDeleted(BridgeToDel);
                 return;
             }
         }
@@ -263,7 +262,7 @@ contract regulatedStableCoin is Owner{
 
         bytes32 BridgeTo_ = keccak256(bytes(_bridgeTo));
         for (uint i = 0; i < Bridges.length; i++) {
-            if ( Bridges[i]  == BridgeTo ) {
+            if ( Bridges[i]  == BridgeTo_ ) {
 
                 require(decreaseSupplyFromAddress( _value, msg.sender), "transferBridge decreaseSupplyFromAddress error");
 
@@ -282,7 +281,7 @@ contract regulatedStableCoin is Owner{
     function bridgeIn(address _to, string memory _bridgeFrom, uint256 _value) public onlyOwner() returns (bool){
 
         mint(_to,  _value);
-        emit BridgeIn(_to , keccak256(bytes(_bridgeFrom)), _value);
+        emit BridgeIn( keccak256(bytes(_bridgeFrom)), _to, _value);
 
         return true;
 

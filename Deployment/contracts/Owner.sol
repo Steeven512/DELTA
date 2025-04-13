@@ -10,7 +10,7 @@ pragma solidity 0.8.25;
 
 contract Owner {
 
-    address private owner;
+    address private _owner;
     
     // event for EVM logging
     event OwnerSet(address indexed oldOwner, address indexed newOwner);
@@ -22,7 +22,7 @@ contract Owner {
         // This used to consume all gas in old EVM versions, but not anymore.
         // It is often a good idea to use 'require' to check if functions are called correctly.
         // As a second argument, you can also provide an explanation about what went wrong.
-        require(msg.sender == owner, "Caller is not owner");
+        require(msg.sender == _owner, "Caller is not owner");
         _;
     }
     
@@ -30,8 +30,8 @@ contract Owner {
      * @dev Set contract deployer as owner
      */
     constructor() public {
-        owner = msg.sender; // 'msg.sender' is sender of current call, contract deployer for a constructor
-        emit OwnerSet(address(0), owner);
+        _owner = msg.sender; // 'msg.sender' is sender of current call, contract deployer for a constructor
+        emit OwnerSet(address(0), _owner);
     }
 
     /**
@@ -39,15 +39,15 @@ contract Owner {
      * @param newOwner address of new owner
      */
     function changeOwner(address newOwner) public onlyOwner {
-        emit OwnerSet(owner, newOwner);
-        owner = newOwner;
+        emit OwnerSet(_owner, newOwner);
+        _owner = newOwner;
     }
 
     /**
      * @dev Return owner address 
      * @return address of owner
      */
-    function getOwner() public view virtual returns (address) {
-        return owner;
+    function owner() public view virtual returns (address) {
+        return _owner;
     }
 }

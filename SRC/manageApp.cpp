@@ -1,6 +1,6 @@
 #include "manage_app/http_server.h"
 
-// g++ SRC/manageApp.cpp -o manageApp -lpthread -DCROW_ENABLE_SSL -lssl -lcrypto -lcryptopp -std=c++17
+// g++ SRC/manageApp.cpp -o BIN/manageApp -lpthread -std=c++17 -I/usr/include/python3.11 -lboost_python311 -lpython3.11
 
 int main(){
     Py_Initialize();

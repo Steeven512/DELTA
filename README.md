@@ -1,48 +1,92 @@
-Delta Provides a easy and smooth interface for manage Based Tokens erc20 and regulated stable coins, 
-handle and retrieve data from multiple chains and build a local side-chain database for local indexing
-by secuencial syncing to latest chain block.
+# ▲ DELTA: Intuitive Stablecoin Management & Tracing Platform
+
+**DELTA**  Streamlined and efficient interface for managing and tracing regulated stablecoin operations. Seamlessly interact with your digital assets and gain deep insights into their lifecycle across multiple blockchain networks.
+
+**Key Features:**
+
+**🔗 Multi-Chain Data Handling & Local Indexing:**
+
+* Effortlessly retrieve and manage data from various blockchain networks.
+* Build a local side-chain database for rapid indexing and querying.
+* Maintain up-to-date information through sequential syncing with the latest blockchain blocks.
+
+**🔎 Advanced Block Explorer for Tokens:**
+
+* **Comprehensive Event Indexing:** Track crucial on-chain events, including transactions, minting, burning, and specific events related to regulated stablecoins.
+* **Precise Event Filtering:** Utilize specific options to filter events based on type and define custom block number intervals.
+* **Multi-Chain Exploration:** Select your desired network and instantly visualize relevant event data.
+
+**📊 Interactive Monitoring Charts:**
+
+* Visualize key metrics over time:
+    * Transaction Volume
+    * Transaction Amount
+    * Tokens Burned
+    * Tokens Minted
+      
+**🔑 Local Wallet Management & Transaction Handling:**
+
+* Provides an interface for managing user wallets, securely storing them locally with encryption.
+* Enables users to initiate and manage transactions directly from the front-end using a built-in signer powered by Ethers.js.
+
+**👤 In-Depth Address Indexer:**
+
+* Quickly view the current balances of any specified address.
+* Access a detailed history of events associated with a particular address.
+
+**⚙️ Powerful Admin Panel:**
+
+* Easily manage network configurations.
+* Interact with and control smart contract functionalities.
+
+## 🛠️ Build Instructions
+
+**Dependencies:**
+
+Ensure the following dependencies are installed on your system:
+
+* `g++` (GNU C++ Compiler)
+* `crow-server` (A fast and lightweight C++ web framework)
+* `Boost C++ Libraries`
+* `Boost.Python`
+* `Web3.py` (Python library for interacting with Ethereum)
+* `nlohmann json` 
+
+**Compilation:**
+
+Execute the following commands in your terminal to build the project:
 
  
-block explorer event for Tokens
+```bash
+ g++ SRC/ethEventsListener.cpp -o BIN/eventslistener -I/usr/include/python3.11 -lboost_python311 -lpython3.11 -std=c++17
+ g++ SRC/manageApp.cpp -o BIN/manageApp -I/usr/include/python3.11 -lboost_python311 -lpython3.11 -std=c++17
 
-    indexing data events: transactions, mint, burn and some events of Regulated Stables coins 
+```
 
-    specific option filter events and intervals by block number.
+🚀 Execution
+To run DELTA, you need to execute the compiled binaries:
 
-    multichain indexing: select the specific network and displays the events data
+**Run the Data Synchronizer:**
 
-charts  monitor
+```bash
+./BIN/eventslistener
 
-    transaction volume, amount, burned and mint on timeline.
+```
 
-Address indexer
+This process will connect to the configured Ethereum-based blockchain RPC(s) and synchronize specific events into the local database.
 
-    shows the balances and events of the specific address
+Run the Web Application Server:
 
-Transfer
+```bash
+./BIN/manageApp
 
-    demonstrative implementation of transfers and bridge between chains.
+```
 
-admin panel
+This will start the web application server, making the DELTA interface accessible through your web browser at the following address: http://127.0.0.1:12015/CryptoAdmin.
 
-    manage the network settings and smart contract functions.
-
-
-
-
-build 
-
-    dependencies: g++, crow server, Boost.Python, boost, web3py
-
-    g++ SRC/ethEventsListener.cpp -o BIN/eventslistener -I/usr/include/python3.11 -lboost_python311 -lpython3.11  -lssl -lcrypto -lcryptopp -std=c++17
-
-    g++ SRC/manageApp.cpp -o BIN/manageApp -lpthread -DCROW_ENABLE_SSL -lssl -lcrypto -lcryptopp -std=c++17
-
-deployment smart contract
-
-    brownie run regulatedStableCoin.sol --network ganache
-
-    then set the smart contract deployment address in PyScripts/ContractObj.py contract_address var
+**Important:** Upon the first execution of the web application, you will need to configure at least one network through the DELTA interface accessible via the above address. Navigate to the settings section to add the necessary network parameters (RPC URL, Chain ID, Token Contract Address, etc.).
 
 
-setup
+## ⚙️ Configuration
+
+For detailed instructions on how to configure DELTA for specific networks, please refer to [CONFIGURATION.md](CONFIGURATION.md).

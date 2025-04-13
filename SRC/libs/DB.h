@@ -5,9 +5,11 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <regex>
 #include "../thirdparty/json.hpp"
 #include "io.h"
 #include "codec.h"
+
 
 #ifndef DB_H
 #define DB_H
@@ -23,6 +25,7 @@ struct network{
     string rpc_address;
     string sm_address;
     string networkid;
+    uint requestInterval;
     uint64_t LatestIndexedbl;
     uint64_t LatestNetworkBl;
     
@@ -30,7 +33,79 @@ struct network{
 
 inline std::unordered_map<string, struct network>Networks;
 
-bool checkFileExist (string Path){
+json ReadEvent(string Path){
+
+    std::ifstream jsonFileEvent(Path);
+    if (jsonFileEvent.is_open()) {
+        json EventData;
+        jsonFileEvent >> EventData;
+        jsonFileEvent.close();
+        return EventData;
+    } else {
+        std::cerr << "directory does not exist  " << Path << std::endl;
+        return  {{"value", "emty"}}; 
+    }
+
+}
+
+bool eraseFile(string Path){
+
+    if (Path.empty()) {
+        std::cerr << "Error: Path cannot be empty." << std::endl;
+        return false;
+    }
+
+    if (std::filesystem::exists(Path)) {
+        try {
+            return std::filesystem::remove(Path);
+        } catch (const std::filesystem::filesystem_error& e) {
+            std::cerr << "Error deleting file '" << Path << "': " << e.what() << std::endl;
+            return false;
+        }
+    } else {
+        std::cerr << "Warning: File '" << Path << "' does not exist." << std::endl;
+        return true; 
+    }
+
+}
+
+json ReadDataChart(string network , string blockTimestamp, string typeindexTime, string TypeOfElement){
+
+    return ReadEvent("DB/"+network+"/Chart/"+typeindexTime+"/"+blockTimestamp+"/"+TypeOfElement);
+
+}
+
+bool SaveData(string Path, json Data){
+
+    std::ofstream archivo(Path);
+    if (archivo.is_open()){
+        archivo << Data.dump(4); 
+        archivo.close();
+        std::cout << Path+" saved succesfully." << std::endl;
+        return true;
+    } else {
+        std::cerr << "Error storing "+Path << std::endl;
+    }
+    return false;
+
+}
+
+bool mkDir(std::string Path){
+
+    if ( access(Path.c_str() , 0) != 0) {
+        if (mkdir(Path.c_str(), 0777) == 0) {
+            return true;
+        } else {
+            std::cerr << "error mkdir " + Path  << std::endl;
+            return false; 
+        }
+    }
+
+    return false;
+
+}
+
+bool checkFileExist(string Path){
 
     std::ifstream file(Path);
     if (file.is_open()) {
@@ -57,17 +132,33 @@ json ReadNetworkFileSet(std::string FilePath){
 
 }
 
+time_t getHour0day(time_t timedata){
+
+    return timedata - (timedata % 86400);
+
+}
+
+std::time_t getStartOfCurrentHour(time_t timedata) {
+
+    std::tm* utcTime = std::gmtime(&timedata);
+    if (utcTime != nullptr) {
+        return timedata - (timedata % 3600);
+    } else {
+        return -1;
+    }
+
+}
+
 void loadnetworks(){
 
     for ( const auto& File : fs::directory_iterator("sets/networks/") ) {
-
+		
         json networkset = ReadNetworkFileSet(File.path().string());
-
         Networks[File.path().filename().string()].networkName = networkset["networkName"];
         Networks[File.path().filename().string()].rpc_address = networkset["rpc_address"];
         Networks[File.path().filename().string()].sm_address = networkset["sm_address"];
         Networks[File.path().filename().string()].networkid = networkset["networkid"];
-
+        Networks[File.path().filename().string()].requestInterval = stoi(networkset["requestInterval"].get<std::string>());
     }
 
     return;
@@ -79,7 +170,6 @@ bool isNetworkExist(std::string Network){
     loadnetworks();
 
     for(auto &network: Networks){
-
         if(network.first == Network){
             return true;
         }
@@ -132,6 +222,10 @@ bool SaveLatestIndexedBl(std::string Network, std::string Data){
     std::vector<unsigned char> byteArray;
     addHexStringInVector(byteArray, Data);
 
+    cout<<endl<<" SaveLatestIndexedBl at "<<Network<< endl;
+
+    mkDir("DB/"+Network+"/");
+
     std::ofstream filedata("DB/"+Network+"/"+"latestEthBlockNumber", ios::binary | ios::out);
     if (!filedata) {return false;}
     for (unsigned int i = 0; i < byteArray.size(); i++){
@@ -141,7 +235,43 @@ bool SaveLatestIndexedBl(std::string Network, std::string Data){
     filedata.close();
 
     if(readlatestBlockNumberIndexed(Network) != Data ){
-        cout<<endl<<"error = SaveLatestIndexedEthBlIndex() readlatestEthBlockNumber() != Data "<<endl;
+        cout<<endl<<"SaveLatestIndexedBl error = SaveLatestIndexedEthBlIndex() readlatestEthBlockNumber() != Data "<<endl;
+        return false;
+    }
+    return true;
+}
+
+uint64_t readLatestBlDbIndexed(std::string Network){
+
+    json latestEvent = ReadEvent("DB/"+Network+"/LatestDbElement");
+
+    if(latestEvent["value"]=="emty"){
+        return 0;
+    }
+
+    if (latestEvent.contains("blockNumber")) {
+        return latestEvent["blockNumber"];
+    }
+
+    return 0;
+
+}
+
+bool SaveLatestBlDbIndexed(std::string Network, json event){
+
+    uint64_t LatestBlDbIndexed = readLatestBlDbIndexed( Network);
+
+    if(LatestBlDbIndexed < event["blockNumber"]){
+
+        std::ofstream archivo("DB/"+Network+"/LatestDbElement");
+        if (archivo.is_open()){
+            archivo << event.dump(4); 
+            archivo.close();
+            std::cout << "LatestDbElement saved succesfully." << std::endl;
+            return true;
+        } else {
+            std::cerr << "SaveLatestBlDbIndexed Error storing LatestDbElement." << std::endl;
+        }
         return false;
     }
     return true;
@@ -199,32 +329,32 @@ std::string pathOfAddressEvent(std::string &Network, json &ethEvent, std::string
     if ( access(Path.c_str() , 0) != 0) {
         if (mkdir(Path.c_str(), 0777) == 0) {
         } else {
-            std::cerr << "error mkdir " + Path  << std::endl;
-            return "/error/"; 
+            std::cerr << "pathOfAddressEvent error mkdir " + Path  << std::endl;
+            return "pathOfAddressEvent /error/"; 
         }
     }
     Path += "/"+Network;
     if ( access(Path.c_str() , 0) != 0) {
         if (mkdir(Path.c_str(), 0777) == 0) {
         } else {
-            std::cerr << "error mkdir " + Path  << std::endl;
-            return "/error/"; 
+            std::cerr << "pathOfAddressEvent error mkdir " + Path  << std::endl;
+            return "pathOfAddressEvent /error/"; 
         }
     }
     Path += "/AccountIndex/";
     if ( access(Path.c_str() , 0) != 0) {
         if (mkdir(Path.c_str(), 0777) == 0) {
         } else {
-            std::cerr << "error mkdir " + Path  << std::endl;
-            return "/error/"; 
+            std::cerr << "pathOfAddressEvent error mkdir " + Path  << std::endl;
+            return "pathOfAddressEvent /error/"; 
         }
     }
     Path += Address;
     if ( access(Path.c_str() , 0) != 0) {
         if (mkdir(Path.c_str(), 0777) == 0) {
         } else {
-            std::cerr << "error mkdir " + Path  << std::endl;
-            return "/error/";
+            std::cerr << "pathOfAddressEvent error mkdir " + Path  << std::endl;
+            return "pathOfAddressEvent /error/"; 
         }
     }
     Path += "/"+bldir;
@@ -232,24 +362,24 @@ std::string pathOfAddressEvent(std::string &Network, json &ethEvent, std::string
         if (mkdir(Path.c_str(), 0777) == 0) {
         } else {
 
-            std::cerr << "error mkdir " + Path  << std::endl;
-            return "/error/";
+            std::cerr << "pathOfAddressEvent error mkdir " + Path  << std::endl;
+            return "pathOfAddressEvent /error/"; 
         }
     }
     Path += "/"+transactiondir;
     if ( access(Path.c_str() , 0) != 0) {
         if (mkdir(Path.c_str(), 0777) == 0) {
         } else {
-            std::cerr << "error mkdir" + Path  << std::endl;
-            return "/error/";
+            std::cerr << "pathOfAddressEvent error mkdir " + Path  << std::endl;
+            return "pathOfAddressEvent /error/"; 
         }
     }
     Path += "/"+logIndexdir;
     if ( access(Path.c_str() , 0) != 0) {
         if (mkdir(Path.c_str(), 0777) == 0) {
         } else {
-            std::cerr << "error mkdir" + Path  << std::endl;
-            return "/error/";
+            std::cerr << "pathOfAddressEvent error mkdir " + Path  << std::endl;
+            return "pathOfAddressEvent /error/"; 
         }
     }
 
@@ -337,7 +467,7 @@ bool SaveTimeStampIndexEvent(std::string Network, json &ethEvent){
     if ( access(Path.c_str() , 0) != 0) {
         if (mkdir(Path.c_str(), 0777) == 0) {
         } else {
-            std::cerr << "error mkdir " + Path  << std::endl;
+            std::cerr << "SaveTimeStampIndexEvent error mkdir " + Path  << std::endl;
             return false; 
         }
     }
@@ -346,7 +476,7 @@ bool SaveTimeStampIndexEvent(std::string Network, json &ethEvent){
     if ( access(Path.c_str() , 0) != 0) {
         if (mkdir(Path.c_str(), 0777) == 0) {
         } else {
-            std::cerr << "error mkdir " + Path  << std::endl;
+            std::cerr << "SaveTimeStampIndexEvent error mkdir " + Path  << std::endl;
             return false; 
         }
     }
@@ -355,7 +485,7 @@ bool SaveTimeStampIndexEvent(std::string Network, json &ethEvent){
     if ( access(Path.c_str() , 0) != 0) {
         if (mkdir(Path.c_str(), 0777) == 0) {
         } else {
-            std::cerr << "error mkdir " + Path  << std::endl;
+            std::cerr << "SaveTimeStampIndexEvent error mkdir " + Path  << std::endl;
             return false; 
         }
     }
@@ -378,7 +508,7 @@ bool SaveTimeStampIndexEvent(std::string Network, json &ethEvent){
     std::cout << "EventStored." << std::endl;
 
     } else {
-        std::cerr << "Error storing event file." << std::endl;
+        std::cerr << "SaveTimeStampIndexEvent Error storing event file." << std::endl;
         return false; 
     }
 
@@ -397,7 +527,7 @@ bool saveEvent(std::string Network, json &ethEvent){
     if ( access(Path.c_str() , 0) != 0) {
         if (mkdir(Path.c_str(), 0777) == 0) {
         } else {
-            std::cerr << "error mkdir " + Path  << std::endl;
+            std::cerr << "saveEvent error mkdir " + Path  << std::endl;
             return false; 
         }
     }
@@ -406,7 +536,7 @@ bool saveEvent(std::string Network, json &ethEvent){
     if ( access(Path.c_str() , 0) != 0) {
         if (mkdir(Path.c_str(), 0777) == 0) {
         } else {
-            std::cerr << "error mkdir " + Path  << std::endl;
+            std::cerr << "saveEvent error mkdir " + Path  << std::endl;
             return false; 
         }
     }
@@ -415,7 +545,7 @@ bool saveEvent(std::string Network, json &ethEvent){
     if ( access(Path.c_str() , 0) != 0) {
         if (mkdir(Path.c_str(), 0777) == 0) {
         } else {
-            std::cerr << "error mkdir " + Path  << std::endl;
+            std::cerr << "saveEvent error mkdir " + Path  << std::endl;
             return false; 
         }
     }
@@ -424,7 +554,7 @@ bool saveEvent(std::string Network, json &ethEvent){
         if (mkdir(Path.c_str(), 0777) == 0) {
         } else {
 
-            std::cerr << "error mkdir " + Path  << std::endl;
+            std::cerr << "saveEvent error mkdir " + Path  << std::endl;
             return false; 
         }
     }
@@ -434,7 +564,7 @@ bool saveEvent(std::string Network, json &ethEvent){
     if ( access(Path.c_str() , 0) != 0) {
         if (mkdir(Path.c_str(), 0777) == 0) {
         } else {
-            std::cerr << "error mkdir " + Path  << std::endl;
+            std::cerr << "saveEvent error mkdir " + Path  << std::endl;
             return false; 
         }
     }
@@ -442,7 +572,7 @@ bool saveEvent(std::string Network, json &ethEvent){
     if ( access(Path.c_str() , 0) != 0) {
         if (mkdir(Path.c_str(), 0777) == 0) {
         } else {
-            std::cerr << "error mkdir " + Path  << std::endl;
+            std::cerr << "saveEvent error mkdir " + Path  << std::endl;
             return false; 
         }
     }
@@ -455,7 +585,7 @@ bool saveEvent(std::string Network, json &ethEvent){
     std::cout << "EventStored." << std::endl;
 
     } else {
-        std::cerr << "Error storing event file." << std::endl;
+        std::cerr << "saveEvent Error storing event file." << std::endl;
         return false; 
     }
 
@@ -474,7 +604,7 @@ bool updateAccBalances(std::string Network, json &ethEvent){
     if ( access(Path.c_str() , 0) != 0) {
         if (mkdir(Path.c_str(), 0777) == 0) {
         } else {
-            std::cerr << "error mkdir " + Path  << std::endl;
+            std::cerr << "updateAccBalances error mkdir " + Path  << std::endl;
             return false; // Salir con error
         }
     }
@@ -482,7 +612,7 @@ bool updateAccBalances(std::string Network, json &ethEvent){
     if ( access(Path.c_str() , 0) != 0) {
         if (mkdir(Path.c_str(), 0777) == 0) {
         } else {
-            std::cerr << "error mkdir " + Path  << std::endl;
+            std::cerr << "updateAccBalances error mkdir " + Path  << std::endl;
             return false; // Salir con error
         }
     }
@@ -490,7 +620,7 @@ bool updateAccBalances(std::string Network, json &ethEvent){
     if ( access(Path.c_str() , 0) != 0) {
         if (mkdir(Path.c_str(), 0777) == 0) {
         } else {
-            std::cerr << "error mkdir " + Path  << std::endl;
+            std::cerr << "updateAccBalances error mkdir " + Path  << std::endl;
             return false; // Salir con error
         }
     }
@@ -498,7 +628,7 @@ bool updateAccBalances(std::string Network, json &ethEvent){
     if ( access(Path.c_str() , 0) != 0) {
         if (mkdir(Path.c_str(), 0777) == 0) {
         } else {
-            std::cerr << "error mkdir " + Path  << std::endl;
+            std::cerr << "updateAccBalances error mkdir " + Path  << std::endl;
             return false; // Salir con error
         }
     }
@@ -507,7 +637,7 @@ bool updateAccBalances(std::string Network, json &ethEvent){
     if ( access(Path.c_str() , 0) != 0) {
         if (mkdir(Path.c_str(), 0777) == 0) {
         } else {
-            std::cerr << "error mkdir " + Path  << std::endl;
+            std::cerr << "updateAccBalances error mkdir " + Path  << std::endl;
             return false; // Salir con error
         }
     }
@@ -519,36 +649,20 @@ bool updateAccBalances(std::string Network, json &ethEvent){
 
 }
 
-json ReadEvent(string Path){
+vector<uint16_t> getDirOfTransactionsEvents(const std::string &Path, const std::string &BlNumber, const std::string &TrNumber ){
 
-    std::ifstream jsonFileEvent(Path);
-    if (jsonFileEvent.is_open()) {
-        json EventData;
-        jsonFileEvent >> EventData;
-        jsonFileEvent.close();
-        return EventData;
-    } else {
-        std::cerr << "Error opening event file  " << Path << std::endl;
-        return 1; 
-    }
-
-}
-
-vector<uint64_t> getDirOfTransactionsEvents(const std::string &Path, uint64_t &BlNumber, uint64_t &TrNumber ){
-
-    std::string EthEventsdir = Path+ullToHex(BlNumber)+"/"+ullToHex(TrNumber); 
-    std::vector<uint64_t> BlocksNumberIndex;
+    std::string EthEventsdir = Path+BlNumber+"/"+TrNumber; 
+    std::vector<uint16_t> BlocksNumberIndex;
 
     if (!fs::exists(EthEventsdir) || !fs::is_directory(EthEventsdir)) {
-        std::cerr << "Error, no such directory"+Path+ullToHex(BlNumber)+"/"+ullToHex(TrNumber) << std::endl;
+        std::cerr << "getDirOfTransactionsEvents Error, no such directory "+Path+BlNumber+"/"+TrNumber<< std::endl;
         return BlocksNumberIndex;
     }
 
     for (const auto& entry : fs::directory_iterator(EthEventsdir)) {
         if (fs::is_directory(entry.status())) {
             try {
-                uint64_t BlockNumberEvent = hexToULL(entry.path().filename().string());
-                BlocksNumberIndex.push_back(BlockNumberEvent);
+                BlocksNumberIndex.push_back(hexToULL(entry.path().filename().string()));
             } catch (const std::invalid_argument& e) {
 
             }
@@ -557,41 +671,31 @@ vector<uint64_t> getDirOfTransactionsEvents(const std::string &Path, uint64_t &B
 
     std::sort(BlocksNumberIndex.begin(), BlocksNumberIndex.end(), std::greater<uint64_t>());
 
-    /*(uint64_t dirNumber : BlocksNumberIndex) {
-        std::cout << dirNumber << std::endl;
-    }
-    */
     return BlocksNumberIndex;
 
 }
 
-vector<uint64_t> getDirOfBlTransactions(const std::string &Path, const uint64_t &BlNumber){
+vector<uint32_t> getDirOfBlTransactions(const std::string &Path, const std::string &BlNumber){
 
-    std::string EthEventsdir = Path+ullToHex(BlNumber); 
-    std::vector<uint64_t> BlocksNumberIndex;
+    std::string EthEventsdir = Path+BlNumber; 
+    std::vector<uint32_t> BlocksNumberIndex;
 
     if (!fs::exists(EthEventsdir) || !fs::is_directory(EthEventsdir)) {
-        std::cerr << "Error, no such directory "+ Path+"/"+ ullToHex(BlNumber) << std::endl;
+        std::cerr << "getDirOfBlTransactions Error, no such directory "+ Path+"/"+ BlNumber << std::endl;
         return BlocksNumberIndex;
     }
 
     for (const auto& entry : fs::directory_iterator(EthEventsdir)) {
         if (fs::is_directory(entry.status())) {
             try {
-                uint64_t BlockNumberEvent = hexToULL(entry.path().filename().string());
-                BlocksNumberIndex.push_back(BlockNumberEvent);
+                BlocksNumberIndex.push_back(hexToULL(entry.path().filename().string()));
             } catch (const std::invalid_argument& e) {
             }
         }
     }
 
-    std::sort(BlocksNumberIndex.begin(), BlocksNumberIndex.end(), std::greater<uint64_t>());
+    std::sort(BlocksNumberIndex.begin(), BlocksNumberIndex.end(), std::greater<uint32_t>());
 
-    /*std::cout << "Directories order:" << std::endl;
-    for (uint64_t dirNumber : BlocksNumberIndex) {
-        std::cout << dirNumber << std::endl;
-    }
-    */
     return BlocksNumberIndex;
   
 }
@@ -601,7 +705,7 @@ vector<uint64_t> getDirOfBlocksInRange(const std::string &Path, const uint64_t &
     std::vector<uint64_t> BlocksNumberIndex;
 
     if (!fs::exists(Path) || !fs::is_directory(Path)) {
-        std::cerr << "Error, no such directory DB/EthEvents/" << std::endl;
+        std::cerr << "getDirOfBlocksInRange Error, no such directory DB/EthEvents/" << std::endl;
         return BlocksNumberIndex;
     }
 
@@ -621,48 +725,37 @@ vector<uint64_t> getDirOfBlocksInRange(const std::string &Path, const uint64_t &
 
     std::sort(BlocksNumberIndex.begin(), BlocksNumberIndex.end(), std::greater<uint64_t>());
 
-    /*std::cout << "Directories order:" << std::endl;
-    for (uint64_t dirNumber : BlocksNumberIndex) {
-        std::cout << dirNumber << std::endl;
-    }
-    */
-
     return BlocksNumberIndex;
 
 }
 
-vector<json> indexEvents(const std::string Path, const uint64_t &from, const uint64_t &to, const bool &filterTransactions, const bool &filterBalances, const bool &filterApproval, const bool &filterSupply, const bool &filterFreezeAddress, const bool &filterPause){
+vector<json> indexEventsChart(const std::string Path,string block , const bool &filterTransactions, const bool &filterBalances, const bool &filterApproval, const bool &filterSupply, const bool &filterFreezeAddress, const bool &filterPause, const bool &filterBridgeTo ){
 
-
-    cout<<endl<<"call debug indexEvents Path "<<Path<<endl;
-
-    vector<uint64_t> BlocksNumberIndex = getDirOfBlocksInRange(Path, from, to);
     vector<json> EthEvents;
 
-    for (uint64_t Block : BlocksNumberIndex) {
+        vector<uint32_t> transactionNumberIndex = getDirOfBlTransactions(Path, block);
 
-        vector<uint64_t> transactionNumberIndex = getDirOfBlTransactions(Path, Block);
+        for (const auto &transaction : transactionNumberIndex) {
 
-        for (uint64_t transaction : transactionNumberIndex) {
+            vector<uint16_t> EventsTransactionNumberIndex = getDirOfTransactionsEvents(Path, block, ullToHex(transaction));
 
-            vector<uint64_t> EventsTransactionNumberIndex = getDirOfTransactionsEvents(Path, Block, transaction);
-
-            for (uint64_t Event : EventsTransactionNumberIndex) {
+            for (auto &Event : EventsTransactionNumberIndex) {
 
                 bool checkEntry=false;
 
-                for (const auto& File : fs::directory_iterator(Path+ullToHex(Block)+"/"+ullToHex(transaction)+"/"+ullToHex(Event))) {
-                    if(checkEntry){
-                        cout<<endl<<"error, there is more than one file in the directory"<<endl;
+                for (const auto& File : fs::directory_iterator(Path+block+"/"+ullToHex(transaction)+"/"+ullToHex(Event))) {
+                   if(checkEntry){
+                        cout<<endl<<"indexEvents error, there is more than one file in the directory"<<endl;
                         break;
                     }
-
-                    if( (File.path().filename().string() == "accountBalanceUpdate" && filterBalances) ||
+                    if( 
+                        (File.path().filename().string() == "accountBalanceUpdate" && filterBalances) ||
                         (File.path().filename().string() == "Transfer" && filterTransactions) || 
                         (File.path().filename().string() == "Approval" && filterApproval) || 
                         ((File.path().filename().string() == "SupplyDecreased" || File.path().filename().string() == "SupplyIncreased") && filterSupply) ||
                         ((File.path().filename().string() == "FrozenAddressWiped" || File.path().filename().string() == "FreezeAddress"|| File.path().filename().string() == "UnfreezeAddress") && filterFreezeAddress)||
-                        ((File.path().filename().string() == "Pause" || File.path().filename().string() == "Unpause") && filterPause)
+                        ((File.path().filename().string() == "Pause" || File.path().filename().string() == "Unpause") && filterPause) ||
+                        (File.path().filename().string() == "BridgeTo" && filterBridgeTo) 
                     ) {
 
                         EthEvents.push_back(ReadEvent(File.path().string()));
@@ -670,10 +763,55 @@ vector<json> indexEvents(const std::string Path, const uint64_t &from, const uin
 
                     checkEntry = true;
                 }
- 
+            }
+        }
+
+    return EthEvents;
+
+}
+
+vector<json> indexEvents(const std::string Path, const uint64_t &from, const uint64_t &to, const bool &filterTransactions, const bool &filterBalances, const bool &filterApproval, const bool &filterSupply, const bool &filterFreezeAddress, const bool &filterPause, const bool &filterBridgeTo ){
+
+    vector<uint64_t> BlocksNumberIndex = getDirOfBlocksInRange(Path, from, to);
+    vector<json> EthEvents;
+
+    for (const auto &Block : BlocksNumberIndex) {
+
+        vector<uint32_t> transactionNumberIndex = getDirOfBlTransactions(Path, ullToHex(Block));
+
+        for (const auto &transaction : transactionNumberIndex) {
+
+            vector<uint16_t> EventsTransactionNumberIndex = getDirOfTransactionsEvents(Path, ullToHex(Block), ullToHex(transaction));
+
+            for (auto &Event : EventsTransactionNumberIndex) {
+
+                bool checkEntry=false;
+
+                for (const auto& File : fs::directory_iterator(Path+ullToHex(Block)+"/"+ullToHex(transaction)+"/"+ullToHex(Event))) {
+                   if(checkEntry){
+                        cout<<endl<<"indexEvents error, there is more than one file in the directory"<<endl;
+                        break;
+                    }
+                    if( 
+                        (File.path().filename().string() == "accountBalanceUpdate" && filterBalances) ||
+                        (File.path().filename().string() == "Transfer" && filterTransactions) || 
+                        (File.path().filename().string() == "Approval" && filterApproval) || 
+                        ((File.path().filename().string() == "SupplyDecreased" || File.path().filename().string() == "SupplyIncreased") && filterSupply) ||
+                        ((File.path().filename().string() == "FrozenAddressWiped" || File.path().filename().string() == "FreezeAddress"|| File.path().filename().string() == "UnfreezeAddress") && filterFreezeAddress)||
+                        ((File.path().filename().string() == "Pause" || File.path().filename().string() == "Unpause") && filterPause) ||
+                        (File.path().filename().string() == "BridgeTo" && filterBridgeTo) 
+                    ) {
+
+                        EthEvents.push_back(ReadEvent(File.path().string()));
+                    }
+
+                    checkEntry = true;
+                }
             }
         }
     }
+
+    cout<<endl<<" etheventsSize() "<<EthEvents.size();
 
     return EthEvents;
 
@@ -690,20 +828,6 @@ uint64_t AddressBalance(std::string &Network, string address){
 
     std::string balanceRead =  byteVectorToHexStr(AddressFileBalance);
     return hexToULL(balanceRead);
-
-}
-
-bool mkDir(std::string Path){
-
-    if ( access(Path.c_str() , 0) != 0) {
-        if (mkdir(Path.c_str(), 0777) == 0) {
-        } else {
-            std::cerr << "error mkdir " + Path  << std::endl;
-            return false; 
-        }
-    }
-
-    return true;
 
 }
 
@@ -733,7 +857,7 @@ bool saveNetwork(json &networtSet){
         std::cout << "network saved succesfully." << std::endl;
 
     } else {
-        std::cerr << "Error storing network set." << std::endl;
+        std::cerr << "saveNetwork Error storing network set." << std::endl;
         return false; 
     }
 
@@ -746,10 +870,11 @@ vector<json> loadnetworksJson(){
     vector<json>networks;
 
     for ( const auto& File : fs::directory_iterator("sets/networks/") ) {
-
         json networkset = ReadNetworkFileSet(File.path().string());
+        
+        cout<<endl<<"loadnetworksJson()  " <<readlatestBlockNumberIndexed(File.path().filename().string())<<endl; 
+        networkset["startIndexingFrom"] = readlatestBlockNumberIndexed(File.path().filename().string());
         networks.push_back(networkset);
-
     }
 
     return networks;
@@ -771,12 +896,16 @@ vector<string> savedNetworks(){
 
 bool storeSmartContracInfoDB(std::string network, json tokenInfo){
 
+    cout<<endl<<"storeSmartContracInfoDB "<<endl;
+
+    mkDir("DB/"+network+"/");
+
     std::ofstream archivo("DB/"+network+"/tokenInfo");
     if (archivo.is_open()) {
         archivo << tokenInfo.dump(4); 
         archivo.close();
     } else {
-        std::cerr << "Error storing event file." << std::endl;
+        std::cerr << "storeSmartContracInfoDB Error storing event file." << std::endl;
         return false; 
     }
     return true;
@@ -792,9 +921,147 @@ json ReadSmartContracInfoDB(std::string network){
         jsonFileEvent.close();
         return EventData;
     } else {
-        std::cerr << "Error reading network setting file  " << "DB/"+network+"/tokenInfo" << std::endl;
+        std::cerr << "ReadSmartContracInfoDB Error reading network setting file  " << "DB/"+network+"/tokenInfo" << std::endl;
         return 1; 
     }
+
+}
+
+uint64_t countPackagesEventsIntervals(const std::string Path, const bool &filterTransactions, const bool &filterBalances, const bool &filterApproval, const bool &filterSupply, const bool &filterFreezeAddress, const bool &filterPause, const bool &filterBridgeTo){
+
+
+    std::vector<std::string> hexDirectories;
+    std::regex hexRegex("^[0-9a-fA-F]+$");
+    uint64_t EthEventsCounter=0;
+
+    for (const auto& entry : fs::directory_iterator(Path)) {
+        if (fs::is_directory(entry.status())) {
+            std::string filename = entry.path().filename().string();
+            if (std::regex_match(filename, hexRegex)) {
+                hexDirectories.push_back(filename);
+            }
+        }
+    }
+    std::sort(hexDirectories.begin(), hexDirectories.end(), [](const std::string& a, const std::string& b) {
+        long long intA = hexToULL(a);
+        long long intB = hexToULL(b);
+        return intA > intB;
+    });
+
+    for(const auto& dirName : hexDirectories){
+{
+            vector<uint32_t> transactionNumberIndex = getDirOfBlTransactions(Path, dirName);
+
+            for (auto &transaction : transactionNumberIndex) {
+
+                vector<uint16_t> EventsTransactionNumberIndex = getDirOfTransactionsEvents(Path, dirName, ullToHex(transaction));
+
+                for (auto & Event : EventsTransactionNumberIndex) {
+
+                    bool checkEntry=false;
+
+                    for (const auto& File : fs::directory_iterator(Path+dirName+"/"+ullToHex(transaction)+"/"+ullToHex(Event))) {
+
+                    if(checkEntry){
+                            cout<<endl<<"indexEvents error, there is more than one file in the directory"<<endl;
+                            break;
+                        }
+
+                        if( 
+                            (File.path().filename().string() == "accountBalanceUpdate" && filterBalances) ||
+                            (File.path().filename().string() == "Transfer" && filterTransactions) || 
+                            (File.path().filename().string() == "Approval" && filterApproval) || 
+                            ((File.path().filename().string() == "SupplyDecreased" || File.path().filename().string() == "SupplyIncreased") && filterSupply) ||
+                            ((File.path().filename().string() == "FrozenAddressWiped" || File.path().filename().string() == "FreezeAddress"|| File.path().filename().string() == "UnfreezeAddress") && filterFreezeAddress)||
+                            ((File.path().filename().string() == "Pause" || File.path().filename().string() == "Unpause") && filterPause) ||
+                            (File.path().filename().string() == "BridgeTo" && filterBridgeTo) || 
+                            ((File.path().filename().string() == "BridgeIn") || (File.path().filename().string() == "BridgeStored") || (File.path().filename().string() == "BridgeDeleted") && filterPause) 
+                        ) {
+
+                            EthEventsCounter++;
+                        }
+                        checkEntry = true;
+                    }
+                }
+            }
+        }
+    }
+    return EthEventsCounter;
+}
+
+vector<json> indexEventsByIntervals(const std::string Path, const uint64_t &startIndexFrom, const uint64_t &qttyElements, const bool &filterTransactions, const bool &filterBalances, const bool &filterApproval, const bool &filterSupply, const bool &filterFreezeAddress, const bool &filterPause, const bool &filterBridgeTo ){
+
+    uint64_t ElementCount=0;
+    uint16_t qttyElementsCount=0;
+
+    std::vector<std::string> hexDirectories;
+    std::regex hexRegex("^[0-9a-fA-F]+$");
+    vector<json> EthEvents;
+
+    for (const auto& entry : fs::directory_iterator(Path)) {
+        if (fs::is_directory(entry.status())) {
+            std::string filename = entry.path().filename().string();
+            if (std::regex_match(filename, hexRegex)) {
+                hexDirectories.push_back(filename);
+            }
+        }
+    }
+    std::sort(hexDirectories.begin(), hexDirectories.end(), [](const std::string& a, const std::string& b) {
+        long long intA = hexToULL(a);
+        long long intB = hexToULL(b);
+        return intA > intB;
+    });
+
+    for(const auto &dirName : hexDirectories){
+
+        vector<uint32_t> transactionNumberIndex = getDirOfBlTransactions(Path, dirName);
+
+        for (const auto &transaction : transactionNumberIndex) {
+
+            vector<uint16_t> EventsTransactionNumberIndex = getDirOfTransactionsEvents(Path, dirName, ullToHex(transaction));
+
+            for (const auto &Event : EventsTransactionNumberIndex) {
+
+                bool checkEntry=false;
+
+                for (const auto& File : fs::directory_iterator(Path+dirName+"/"+ullToHex(transaction)+"/"+ullToHex(Event))) {
+
+                    if(checkEntry){
+                        cout<<endl<<"indexEvents error, there is more than one file in the directory"<<endl;
+                        break;
+                    }
+
+                    if( 
+                        ( File.path().filename().string() == "accountBalanceUpdate" && filterBalances) ||
+                        ( File.path().filename().string() == "Transfer" && filterTransactions) || 
+                        ( File.path().filename().string() == "Approval" && filterApproval) || 
+                        ((File.path().filename().string() == "SupplyDecreased" || File.path().filename().string() == "SupplyIncreased") && filterSupply) ||
+                        ((File.path().filename().string() == "FrozenAddressWiped" || File.path().filename().string() == "FreezeAddress"|| File.path().filename().string() == "UnfreezeAddress") && filterFreezeAddress)||
+                        ((File.path().filename().string() == "Pause" || File.path().filename().string() == "Unpause") && filterPause) ||
+                        ( File.path().filename().string() == "BridgeTo" && filterBridgeTo) || 
+                        ((File.path().filename().string() == "BridgeIn") || (File.path().filename().string() == "BridgeStored") || (File.path().filename().string() == "BridgeDeleted") && filterPause) 
+                    ) {
+                        ElementCount++;
+                        if(ElementCount>=startIndexFrom ){
+                            EthEvents.push_back(ReadEvent(File.path().string()));
+                            qttyElementsCount++;
+                        }
+                        if(qttyElementsCount>=qttyElements){
+                            return EthEvents;
+                        }
+                    }
+                    checkEntry = true;
+                }
+            }
+        }
+    }
+    return EthEvents;
+}
+
+vector<json>retrieveTabQueryByNumber(const std::string Path, uint64_t Frame_tab, uint32_t selecctor, const bool &filterTransactions, const bool &filterBalances, const bool &filterApproval, const bool &filterSupply, const bool &filterFreezeAddress, const bool &filterPause, const bool &filterBridgeTo ){
+
+    const uint64_t selectTab = Frame_tab*selecctor;
+    return indexEventsByIntervals(Path, selectTab, Frame_tab, filterTransactions, filterBalances, filterApproval, filterSupply, filterFreezeAddress, filterPause, filterBridgeTo);
 
 }
 
@@ -816,41 +1083,26 @@ string elementForIndexSum(string TypeOfElement){
 
 }
 
-uint64_t readTimeStampOfBlock(string network, uint64_t blockNumber){
+uint64_t readTimeStampOfBlock(string network, string blockNumber){
 
-    json timestamp = ReadEvent("DB/"+network+"/EthEvents/"+ullToHex(blockNumber)+"/timestamp");
+    json timestamp = ReadEvent("DB/"+network+"/EthEvents/"+blockNumber+"/timestamp");
     return timestamp["timestamp"];
 
 }
 
-vector<uint64_t> SumEventsElementOnTime(vector<json> events, uint64_t lastDate, uint64_t PeriodTime, uint16_t splitIntervals, string TypeOfElement){
+bool storeDataChart(string network, uint64_t timeSums, string TypeOfElement, string intervaltime, time_t blockTimestamp){
 
-    vector<uint64_t>timeSums;
-    uint64_t splitedIntervals = PeriodTime / splitIntervals;
+    json DataChart = {{"TypeOfElement", TypeOfElement} , {"value", timeSums} , {"timestamp" , blockTimestamp} }; 
 
-    for(uint i = 0 ; i < splitIntervals ; i++){
+    mkDir("DB/"+network+"/Chart");
+    mkDir("DB/"+network+"/Chart/"+intervaltime);
+    mkDir("DB/"+network+"/Chart/"+intervaltime+"/"+to_string(blockTimestamp));
 
-        timeSums.push_back(0);
-        uint64_t intervaltime = lastDate-splitedIntervals;
-
-        for(uint e = 0 ; e < events.size(); e++){
-        
-            if(events[e]["timestamp"] > intervaltime && events[e]["timestamp"] <= intervaltime + splitedIntervals ){
-
-                timeSums[i]++;
-            }
-
-        }
-
-        lastDate = intervaltime;
-
-    }
-
-    return timeSums;
+    return SaveData("DB/"+network+"/Chart/"+intervaltime+"/"+to_string(blockTimestamp)+"/"+TypeOfElement, DataChart);
 
 }
 
-vector<uint64_t> EventsElementOnTime(vector<json> events, uint64_t lastDate, uint64_t PeriodTime, uint16_t splitIntervals, string TypeOfElement){
+vector<uint64_t> SumEventsElementOnTime(string network, vector<json> events, time_t lastDate, uint64_t PeriodTime, uint16_t splitIntervals, string TypeOfElement, string typeindexTime){
 
     vector<uint64_t>timeSums;
     uint64_t splitedIntervals = PeriodTime / splitIntervals;
@@ -858,16 +1110,69 @@ vector<uint64_t> EventsElementOnTime(vector<json> events, uint64_t lastDate, uin
     for(uint i = 0 ; i < splitIntervals ; i++){
 
         timeSums.push_back(0);
-        uint64_t intervaltime = lastDate-splitedIntervals;
 
+        std::time_t intervaltime;
+
+        intervaltime = lastDate-splitedIntervals;
+ 
         for(uint e = 0 ; e < events.size(); e++){
+            if(events[e]["timestamp"] >= intervaltime && events[e]["timestamp"] < intervaltime + splitedIntervals ){
+                if( events[e]["TypeOfElement"] ==  TypeOfElement ){
+                    timeSums[i] = events[e]["value"];
+                    break;
+                } else {
+                    timeSums[i]++;
+                }
+
+            }
+        }
+
+        json cacheChart = ReadDataChart(network , to_string(intervaltime+1), typeindexTime, TypeOfElement);
+
+        if(cacheChart["value"]=="emty"){
+			if(readTimeStampOfBlock(network , ullToHex(readLatestBlDbIndexed(network))) >  splitedIntervals + intervaltime){
+				storeDataChart(network, timeSums[i], TypeOfElement, typeindexTime, intervaltime+1);
+			}
+        }
         
-            if(events[e]["timestamp"] > intervaltime && events[e]["timestamp"] <= intervaltime + splitedIntervals ){
+        lastDate = intervaltime;
+    }
+    return timeSums;
+}
+
+vector<uint64_t> EventsElementOnTime(string network, vector<json> events, time_t lastDate, uint64_t PeriodTime, uint16_t splitIntervals, string TypeOfElement, string typeindexTime){
+
+    vector<uint64_t>timeSums;
+    uint64_t splitedIntervals = PeriodTime / splitIntervals;
+
+    for(uint i = 0 ; i < splitIntervals ; i++){
+
+        timeSums.push_back(0);
+
+        std::time_t intervaltime;
+
+        intervaltime = lastDate-splitedIntervals;
+        
+        for(uint e = 0 ; e < events.size(); e++){
+
+            if(events[e]["timestamp"] >= intervaltime && events[e]["timestamp"] < intervaltime + splitedIntervals ){
                 uint64_t sum =  events[e][elementForIndexSum(TypeOfElement)];
                 timeSums[i]+= sum;
             }
-
         }
+
+            json cacheChart = ReadDataChart(network , to_string(intervaltime+1), typeindexTime, TypeOfElement);
+
+            if(cacheChart["value"]=="emty"){
+				if(readTimeStampOfBlock(network , ullToHex(readLatestBlDbIndexed(network))) >  splitedIntervals + intervaltime){
+					
+					storeDataChart(network, timeSums[i], TypeOfElement, typeindexTime, intervaltime+1);
+					
+				}
+				
+				
+
+            }
 
         lastDate = intervaltime;
 
@@ -902,42 +1207,107 @@ void SetFilterElements(string TypeOfElement, string &filterElement,bool &filterT
 
 }
 
-vector<json> readEventsTimestampEvent(string network, uint64_t last, uint64_t old, string TypeOfElement){
+vector<json> readEventsTimestampEvent(string network, uint64_t last, uint64_t old, uint splitTime, string TypeOfElement, string typeindexTime){
 
     vector<json> eventsFiltered;
     vector<json> events;
-    uint64_t blockTimestamp;
+    time_t blockTimestamp;
+    uint64_t lastTimestamp = last;
 
-    bool filterTransactions;
+    bool filterTransfer;
     bool filterBalances;
     bool filterApproval;
     bool filterSupply;
     bool filterFreezeAddress;
     bool filterPause;
+    bool filterBridgeOut;
     string filterElement;
 
-    SetFilterElements(TypeOfElement, filterElement, filterTransactions, filterBalances, filterApproval, filterSupply, filterFreezeAddress, filterPause);
+    SetFilterElements(TypeOfElement, filterElement, filterTransfer, filterBalances, filterApproval, filterSupply, filterFreezeAddress, filterPause);
 
-    for(uint64_t blockNumber = hexToULL(readlatestBlockNumberIndexed(network)) ; blockNumber>0 ; blockNumber--){
+    std::vector<std::string> hexDirectories;
+    std::regex hexRegex("^[0-9a-fA-F]+$");
 
-        if( !checkFileExist("DB/"+network+"/EthEvents/"+ullToHex(blockNumber)+"/timestamp") ){
+    for (const auto& entry : fs::directory_iterator("DB/"+network+"/EthEvents/")) {
+        if (fs::is_directory(entry.status())) {
+            std::string filename = entry.path().filename().string();
+            if (std::regex_match(filename, hexRegex)) {
+                hexDirectories.push_back(filename);
+            }
+        }
+    }
+    std::sort(hexDirectories.begin(), hexDirectories.end(), [](const std::string& a, const std::string& b) {
+        long long intA = hexToULL(a);
+        long long intB = hexToULL(b);
+        return intA > intB;
+    });
+
+
+    time_t timeStampsDiscard = 99999999999999;
+
+    for(const auto& dirName : hexDirectories){
+
+        if( !checkFileExist("DB/"+network+"/EthEvents/"+dirName+"/timestamp") ){
             continue;
         }
 
-        blockTimestamp = readTimeStampOfBlock(network, blockNumber);
+        blockTimestamp = readTimeStampOfBlock(network, dirName);
 
         if( blockTimestamp >  last){
             continue;
         }
-
         if( old > blockTimestamp ){
             break;
         }
 
-        events.clear();
-        events = indexEvents("DB/"+network+"/EthEvents/", blockNumber, blockNumber, filterTransactions, filterBalances, filterApproval, filterSupply, filterFreezeAddress, filterPause);
 
-        cout<<endl<<" eventFilter "<< filterElement<<endl;
+        if(typeindexTime == "day"){
+
+            if(blockTimestamp < lastTimestamp && blockTimestamp < timeStampsDiscard){
+
+                json cacheChart = ReadDataChart(network , to_string(getHour0day(blockTimestamp)), typeindexTime, TypeOfElement);
+
+                if(cacheChart["value"]!="emty"){
+
+                    if(cacheChart["TypeOfElement"] == TypeOfElement){
+
+                        eventsFiltered.push_back(cacheChart); 
+                        last = getHour0day(blockTimestamp)-1;
+
+                        continue;
+
+                    }
+                } else {
+                    timeStampsDiscard = getHour0day(blockTimestamp);
+                }
+            }
+        }
+
+        if(typeindexTime == "hour"){
+
+            if(blockTimestamp < lastTimestamp && blockTimestamp < timeStampsDiscard){
+
+                json cacheChart = ReadDataChart(network , to_string(getStartOfCurrentHour(blockTimestamp)), typeindexTime, TypeOfElement);
+                if(cacheChart["value"]!="emty"){
+                    if(cacheChart["TypeOfElement"] == TypeOfElement){
+
+                        eventsFiltered.push_back(cacheChart); 
+                        last = getStartOfCurrentHour(blockTimestamp)-1;
+
+                        continue;
+
+                    }
+                } else {
+                    timeStampsDiscard = getStartOfCurrentHour(blockTimestamp);
+                }
+            }
+        }
+
+        uint64_t blockNumber = hexToULL(dirName);
+
+        events.clear();
+
+        events = indexEventsChart("DB/"+network+"/EthEvents/", dirName, filterTransfer, filterBalances, filterApproval, filterSupply, filterFreezeAddress, filterPause, filterBridgeOut);
 
         for(auto& event: events){
 
@@ -959,17 +1329,46 @@ vector<uint64_t> eventsPointInTimeLine(string network, uint64_t last, uint64_t o
 
     if(typeindexTime == "week"){
 
+        typeindexTime = "day";
+
         uint PeriodTime = 604800;
         uint16_t splitIntervals = 7;
-        vector<json> events = readEventsTimestampEvent( network, last, last-PeriodTime, TypeOfElement);
+        uint splitTime = 604800/7;
+
+        vector<json> events = readEventsTimestampEvent( network, last, last-PeriodTime, splitTime,TypeOfElement, typeindexTime);
 
         if(TypeOfElement == "amountTransfers"){
 
-            xyElements = SumEventsElementOnTime(events, last, PeriodTime, splitIntervals, TypeOfElement);
+            xyElements = SumEventsElementOnTime(network, events, last, PeriodTime, splitIntervals, TypeOfElement, typeindexTime);
 
         }  else {
 
-            xyElements = EventsElementOnTime(events, last, PeriodTime, splitIntervals, TypeOfElement);
+            xyElements = EventsElementOnTime(network, events, last, PeriodTime, splitIntervals, TypeOfElement, typeindexTime);
+
+        }
+
+        return xyElements ;
+
+    }
+
+    if(typeindexTime == "day"){
+
+
+        typeindexTime = "hour";
+
+        uint PeriodTime = 86400;
+        uint16_t splitIntervals = 24;
+        uint splitTime = PeriodTime/splitIntervals;
+
+        vector<json> events = readEventsTimestampEvent( network, last, last-PeriodTime, splitTime,TypeOfElement, typeindexTime);
+
+        if(TypeOfElement == "amountTransfers"){
+
+            xyElements = SumEventsElementOnTime(network, events, last, PeriodTime, splitIntervals, TypeOfElement, typeindexTime);
+
+        }  else {
+
+            xyElements = EventsElementOnTime(network, events, last, PeriodTime, splitIntervals, TypeOfElement, typeindexTime);
 
         }
 
@@ -977,6 +1376,52 @@ vector<uint64_t> eventsPointInTimeLine(string network, uint64_t last, uint64_t o
 
     return xyElements;
     
+}
+
+vector<json> walletsStored(){
+
+    vector<json>Wallets;
+    std::string Path = "wallets/keys/"; 
+
+    if (!fs::exists(Path) || !fs::is_directory(Path)) {
+        std::cerr << "no such directory "+ Path << std::endl;
+        return Wallets;
+    }
+
+    for (const auto& entry : fs::directory_iterator(Path)) {
+
+            try {
+                Wallets.push_back(ReadEvent(Path+entry.path().filename().string()));
+            } catch (const std::invalid_argument& e) {
+				
+            }
+    }
+
+    return Wallets;
+
+}
+
+vector<json> AddressesStored(){
+
+    vector<json>Addresses;
+    std::string Path = "wallets/addresses/"; 
+
+    if (!fs::exists(Path) || !fs::is_directory(Path)) {
+        std::cerr << " no such directory "+ Path << std::endl;
+        return Addresses;
+    }
+
+    for (const auto& entry : fs::directory_iterator(Path)) {
+
+		try {
+			Addresses.push_back(ReadEvent(Path+entry.path().filename().string()));
+		} catch (const std::invalid_argument& e) {
+		}
+
+    }
+
+    return Addresses;
+
 }
 
 

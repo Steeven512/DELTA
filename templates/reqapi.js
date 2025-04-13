@@ -1,6 +1,7 @@
 var serverurl = window.location.origin;
-
-let daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+var tabIndex = 0;
+var tabSizeElements=30
+var lastTab = 0
 
 function sixdecimals(value) {
   if (typeof value !== 'string') {
@@ -24,13 +25,14 @@ function sixdecimals(value) {
   return integerPart + '.' + decimalPart;
 }
 
-function ullToHex(ullValue) {
+function ullToHex(number) {
 
-    let hex = ullValue.toString(16);
-    while (hex.length < 16) {
-      hex = "0" + hex;
-    }
-    return hex;
+  if (typeof number !== 'number' || number < 0 || number > 18446744073709551615) {
+    return "Invalid input"; // Or throw an error, depending on your needs
+  }
+  const hexString = number.toString(16).toUpperCase();
+  return hexString.padStart(16, '0');
+  
 }
 
 function clearTable(){
@@ -117,7 +119,7 @@ function createTableRow(logElements, number, trcontrast) {
   tableBody.appendChild(tr);
 }
 
-function apprendTh(){
+function apprendTh(elementsInDb){
 
   logElements = ['{"blockNumber" : "blockNumber", "transactionIndex" : "transactionIndex" , "logIndex" : "logIndex", "event" : "event"}'];
 
@@ -148,19 +150,52 @@ function apprendTh(){
   tr.appendChild(th3);
   tr.appendChild(th4);
 
+
+
+  const thControls = document.createElement('th');
+  thControls.classList.add('controls-right'); 
+  
+  const botonPrev = document.createElement('button');
+  botonPrev.classList.add('buttonsearch');
+  botonPrev.textContent = 'Prev';
+  thControls.appendChild(botonPrev);
+  botonPrev.addEventListener('click', function() {
+    prevTab();
+  });
+  
+  const spanTexto = document.createElement('span');
+  spanTexto.textContent = document.createTextNode(tabIndex+1+"-"+parseInt(elementsInDb+1)).textContent;
+  spanTexto.id = 'tabNumber';
+
+  thControls.appendChild(spanTexto );
+  
+  const botonNext = document.createElement('button');
+  botonNext.classList.add('buttonsearch');
+  botonNext.textContent = 'Next';
+  thControls.appendChild(botonNext);
+  botonNext.addEventListener('click', function() {
+    nextTab();
+  });
+
+  tr.appendChild(thControls);
+
+
+
+
   const tableBody = document.getElementById('table-body');
   tableBody.appendChild(tr);
 
 }
 
 async function loadtable(araytable){
-  clearTable()
 
-  apprendTh()
+  clearTable()
+  apprendTh( araytable[0])
+  lastTab= parseInt(araytable[0])/tabSizeElements
 
   trcontrast = false;
 
-  for (let i = 0; i < araytable.length; i++) {
+  for (let i = 1; i < araytable.length; i++) {
     createTableRow(araytable[i],i,trcontrast);
     if(trcontrast){
       trcontrast = false
@@ -171,56 +206,15 @@ async function loadtable(araytable){
 
 }
 
-async function IndexEvents(f, t) {
-
-    from = ullToHex(f).toUpperCase();
-    to = ullToHex(t).toUpperCase();
-
-    autoIndex=false
-
-    try {
-      const response = await fetch(serverurl+"/IndexEvents", {
-      method: 'POST',
-      headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({  "from": from, 
-                              "to": to,
-                              "network": document.getElementById("Networks").value,
-                              "indexType": "general",
-                              "filterTransactions": document.getElementById("filterTransactions").checked,
-                              "filterBalances": document.getElementById("filterBalances").checked,
-                              "filterApproval": document.getElementById("filterApproval").checked,
-                              "filterSupply": document.getElementById("filterSupply").checked,
-                              "filterFreezeAddress": document.getElementById("filterFreezeAddress").checked,
-                              "filterPause": document.getElementById("filterPause").checked
-                             })
-    })
-  
-    var data = await response.json()
-
-    console.log("debug", data)
-  
-    await loadtable(data)
-  
-  } catch (error) {
-      console.log("error ",error);
-  }
-}
-
 function ClearIntervals() {
 
-  document.getElementById('fromBl').textContent = ""
   document.getElementById('toBl').textContent = ""
-
-  let fromBl = document.getElementById('fromBl');
-  fromBl.value = "";
 
   let toBl = document.getElementById('toBl');
   toBl.value = "";
 
   switchButtomintervals()
+  tabIndex = 0
 
   autoIndex = true
 
@@ -261,21 +255,18 @@ function switchButtomintervals() {
 
 async function performIndexEventsInIntervals(){
 
-  let maxinterval = 50
-  let fromBl = document.getElementById('fromBl').value
-  let toBl = document.getElementById('toBl').value
+  let toBl = parseInt(document.getElementById('toBl').value)
 
-  if(toBl <fromBl ){
-    alert("input error: toBl < fromBl")
+  if(toBl <1 ){
+    alert("error: query < 1")
+    return
   }
-  if(toBl-fromBl>maxinterval){
-    alert("max interval exceeded",maxinterval )
+  if(toBl>lastTab+1){
+    alert("error: query >",lastTab )
+    return
   }
 
-  IndexEvents(fromBl, toBl)
-
-  await switchButtomClear()
-
+  IndexEventsMain2(tabSizeElements, toBl-1)
 
 
 }
@@ -284,13 +275,11 @@ autoIndex = true;
 
 async function IndexEventsMain() {
 
-  if(autoIndex){
 
-    await updateNetworkIndexSelect() 
-    await retrieveinfo()
+  if(tabIndex == 0){
 
-    from = ullToHex(0).toUpperCase();
-    to = "last"
+    from = tabSizeElements
+    to = 0
     try {
       const response = await fetch(serverurl+"/IndexEvents", {
       method: 'POST',
@@ -298,12 +287,11 @@ async function IndexEventsMain() {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
       },
-      body: JSON.stringify({  "from": from, 
-                              "to": to,
+      body: JSON.stringify({  "from": ullToHex(from), 
+                              "to": ullToHex(to),
                               "network": document.getElementById("Networks").value,
-                              "indexType": "general",
+                              "indexType": "new",
                               "filterTransactions": document.getElementById("filterTransactions").checked,
-                              "filterBalances": document.getElementById("filterBalances").checked,
                               "filterApproval": document.getElementById("filterApproval").checked,
                               "filterSupply": document.getElementById("filterSupply").checked,
                               "filterFreezeAddress": document.getElementById("filterFreezeAddress").checked,
@@ -315,11 +303,54 @@ async function IndexEventsMain() {
 
     await loadtable(data)
 
-  } catch (error) {
+    lastTab= parseInt(data[0], 16)/tabSizeElements
+
+    document.getElementById("tabNumber").textContent = parseInt(tabIndex)+1+"-"+parseInt(lastTab+1)
+
+    }  catch (error) {
       console.log("error ",error);
+    }
+
   }
 
 }
+
+async function IndexEventsMain2(frame_size, mul_selector) {
+
+
+
+  try {
+    const response = await fetch(serverurl+"/IndexEvents", {
+    method: 'POST',
+    headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({  "from": ullToHex(frame_size), 
+                            "to": ullToHex(parseInt(mul_selector)),
+                            "network": document.getElementById("Networks").value,
+                            "indexType": "new",
+                            "filterTransactions": document.getElementById("filterTransactions").checked,
+                            "filterApproval": document.getElementById("filterApproval").checked,
+                            "filterSupply": document.getElementById("filterSupply").checked,
+                            "filterFreezeAddress": document.getElementById("filterFreezeAddress").checked,
+                            "filterPause": document.getElementById("filterPause").checked
+                          })
+  })
+
+  var data = await response.json()
+
+  await loadtable(data)
+
+  tabIndex = mul_selector
+
+  lastTab= parseInt(data[0], 16)/tabSizeElements
+
+  document.getElementById("tabNumber").textContent = parseInt(tabIndex)+1+"-"+parseInt(lastTab+1)
+
+  }  catch (error) {
+    console.log("error ",error);
+  }
 
 }
 
@@ -351,53 +382,13 @@ async function updateBalance(){
 
 }
 
-async function IndexEventsAddressMain() {
-
-  await updateNetworkIndexSelect() 
-  await retrieveinfoIndexingSection()
-  GetBalanceAddress()
-
-  from = ullToHex(0).toUpperCase();
-  to = "last"
-
-  var indexAddress = document.getElementById("Address").textContent
-
-  try {
-    const response = await fetch(serverurl+"/IndexEvents", {
-    method: 'POST',
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({  "from": from, 
-      "to": to,
-      "network": document.getElementById("Networks").value,
-      "indexType": indexAddress,
-      "filterTransactions": document.getElementById("filterTransactions").checked,
-      "filterBalances": document.getElementById("filterBalances").checked,
-      "filterApproval": document.getElementById("filterApproval").checked,
-      "filterSupply": document.getElementById("filterSupply").checked,
-      "filterFreezeAddress": document.getElementById("filterFreezeAddress").checked,
-      "filterPause": document.getElementById("filterPause").checked
-     })
-  })
-
-  var data = await response.json()
-
-  await loadtable(data)
-
-} catch (error) {
-    console.log("error ",error);
-  }
-
-}
-
 networkSelectUpdated = false;
-
 
 async function updateNetworkIndexSelect() {
 
   if(!networkSelectUpdated){
+
+
     try {
       const response = await fetch(serverurl+"/api", {
       method: 'POST',
@@ -410,8 +401,6 @@ async function updateNetworkIndexSelect() {
     })
 
     var responsedata = await response.json()
-
-    console.log("debug update networks", responsedata)
 
     var selectElement = document.getElementById('Networks');
 
@@ -429,9 +418,15 @@ async function updateNetworkIndexSelect() {
 
     });
 
-    RetrieveVolumeTransactionsValueChart()
-    RetrieveMintedBurnedChart()
-    RetrieveAmountTransfersChart()
+    document.getElementById('Networks').value = (document.cookie.match('(^|;)\\s*' + "networkSet" + '\\s*=\\s*([^;]+)') || [])[2] || null
+
+
+    retrieveinfo()
+
+    IndexEventsMain()
+
+    loadCharts()
+
 
     networkSelectUpdated = true;
 
@@ -447,43 +442,6 @@ function IndexAddress() {
   window.open(serverurl+"/AddressIndexing/"+Address, '_blank');
 }
 
-async function retrieveinfoIndexingSection(){
-
-  try {
-    const response = await fetch(serverurl+"/api", {
-    method: 'POST',
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({"request": "CryptoInfo",
-                          "network": document.getElementById("Networks").value,
-                           })
-    })
-
-
-  var data = await response.json()
-
-  let networkName = document.getElementById('networkName');
-  networkName.textContent = data["networkName"];
-
-  let networkid = document.getElementById('networkid');
-  networkid.textContent = data["networkid"];
-
-  let name = document.getElementById('name');
-  name.textContent = data["name"];
-
-  let symbol = document.getElementById('symbol');
-  symbol.textContent = data["symbol"];
-
-  console.log(data)
-
-
-} catch (error) {
-    console.log("error ",error);
-  }
-
-}
 
 async function retrieveinfo(){
 
@@ -498,9 +456,11 @@ async function retrieveinfo(){
                           "network": document.getElementById("Networks").value,
                            })
     })
-
+    console.log("eth data ", response)
 
   var data = await response.json()
+
+
 
   let totalSupply = document.getElementById('totalSupply');
   totalSupply.textContent = sixdecimals(data["totalSupply"]);
@@ -526,8 +486,10 @@ async function retrieveinfo(){
   let name = document.getElementById('name');
   name.textContent = data["name"];
 
-  let symbol = document.getElementById('symbol');
-  symbol.textContent = data["symbol"];
+  document.getElementById('symbol').textContent = data["symbol"]+""
+  document.getElementById('symbol2').textContent = data["symbol"]+"\u2006"
+  document.getElementById('symbol3').textContent = data["symbol"]+"\u2006"
+  document.getElementById('symbol4').textContent = data["symbol"]+"\u2006"
 
 } catch (error) {
     console.log("error ",error);
@@ -535,54 +497,71 @@ async function retrieveinfo(){
 
 }
 
-async function GetBalanceAddress(){
 
-  try {
+window.addEventListener('load', function() {
 
-      jsonValues = JSON.stringify({ 
-      "network": document.getElementById("Networks").value,
-      "option": "balanceOf",
-      "Address": document.getElementById('Address').textContent,
-      })
-  
+  updateNetworkIndexSelect() 
+  IndexEventsAddressMain()
 
-      const response = await fetch(serverurl+"/api", {
-      method: 'POST',
-      headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({  "request": "getBalanceW3", 
-                              "values": jsonValues,
-                              })
-      })
 
-      var data = await response.text()
-      console.log(data)
-      document.getElementById('balance').textContent = sixdecimals(data)
-      
-  } catch (error) {
-      console.log("error ",error);
+});
+
+async function changeViewChart(){
+
+  if(chartDisplayMode == "day"){
+    chartDisplayMode = "week"
+    document.getElementById("chartViewMode").textContent = "week"
+    loadCharts()
+    return 
+  }
+
+  if(chartDisplayMode == "week"){
+    chartDisplayMode = "day"
+    document.getElementById("chartViewMode").textContent = "day"
+    loadCharts()
+    return 
   }
 
 }
 
-window.addEventListener('load', function() {
 
-  IndexEventsMain()
-  IndexEventsAddressMain()
-
-});
 
 //charts
-async function RetrieveVolumeTransactionsValueChart(){
+
+
+var daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+var chartDisplayMode = "day"
+
+
+function getStartOfDayTimestamp(timestampInSeconds) {
+  const date = new Date(timestampInSeconds * 1000);
+
+  date.setUTCHours(0);
+  date.setUTCMinutes(0);
+  date.setUTCSeconds(0);
+  date.setUTCMilliseconds(0);
+
+  return Math.floor(date.getTime() / 1000); 
+}
+
+function getStartOfhourTimestamp(timestampInSeconds) {
+  const date = new Date(timestampInSeconds * 1000);
+
+  date.setUTCMinutes(0);
+  date.setUTCSeconds(0);
+  date.setUTCMilliseconds(0);
+
+  return Math.floor(date.getTime() / 1000); 
+
+}
+
+
+
+async function RetrieveChartWeek(TypeOfElement){
 
   let timestamp = Math.floor(Date.now() / 1000);
-  let date = new Date(timestamp * 1000);
-
-
-  console.log("actual timestamp ", date.getDay());
-
+  timestamp = getStartOfDayTimestamp(timestamp)-1
   week = 604800
 
   try {
@@ -596,7 +575,7 @@ async function RetrieveVolumeTransactionsValueChart(){
     body: JSON.stringify({"request": "ChartInfo",
                           "network": document.getElementById("Networks").value,
                           "typeindexTime": "week",
-                          "TypeOfElement": "TransfersValueVolume", 
+                          "TypeOfElement": TypeOfElement, 
                           "Fromdate": ullToHex(timestamp), 
                           "to": ullToHex(timestamp-week)
                            })
@@ -606,20 +585,52 @@ async function RetrieveVolumeTransactionsValueChart(){
 
     data = [...data].reverse();
 
-    chartUpdateVolumeTransactionsValue(data)
+    return data
+    
 
 } catch (error) {
     console.log("error ",error);    
   }
 }
 
-async function RetrieveMintedBurnedChart(){
+async function RetrieveChartDay(TypeOfElement){
 
   let timestamp = Math.floor(Date.now() / 1000);
-  let date = new Date(timestamp * 1000);
+  timestampMinute0 = getStartOfhourTimestamp(timestamp)-1
+  day = 86400
 
-  console.log("actual timestamp ", date.getDay());
+  try {
 
+    const response = await fetch(serverurl+"/api", {
+    method: 'POST',
+    headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({"request": "ChartInfo",
+                          "network": document.getElementById("Networks").value,
+                          "typeindexTime": "day",
+                          "TypeOfElement": TypeOfElement, 
+                          "Fromdate": ullToHex(timestampMinute0), 
+                          "to": ullToHex(getStartOfDayTimestamp(timestampMinute0))
+                           })
+    })
+
+    var data = await response.json()
+
+    data = [...data].reverse();
+
+    return data;
+
+} catch (error) {
+    console.log("error ",error);    
+  }
+}
+
+async function RetrieveMintedBurnedChartWeek(){
+
+  let timestamp = Math.floor(Date.now() / 1000);
+  timestamp = getStartOfDayTimestamp(timestamp)-1
   week = 604800
 
   try {
@@ -642,15 +653,9 @@ async function RetrieveMintedBurnedChart(){
    
     var data = await response.json()
 
-    console.log(data)
+    return data;
 
-    minted = data[0]
-    burned = data[1]
 
-    minted = [...minted].reverse();
-    burned = [...burned].reverse();
-
-    chartUpdateMintedBurned(minted, burned)
 
 
 
@@ -659,14 +664,11 @@ async function RetrieveMintedBurnedChart(){
   }
 }
 
-async function RetrieveAmountTransfersChart(){
+async function RetrieveMintedBurnedChartDay(){
 
   let timestamp = Math.floor(Date.now() / 1000);
-  let date = new Date(timestamp * 1000);
-
-  console.log("actual timestamp ", date.getDay());
-
-  week = 604800
+  timestampMinute0 = getStartOfhourTimestamp(timestamp)-1
+  day = 86400
 
   try {
 
@@ -678,28 +680,143 @@ async function RetrieveAmountTransfersChart(){
     },
     body: JSON.stringify({"request": "ChartInfo",
                           "network": document.getElementById("Networks").value,
-                          "typeindexTime": "week",
-                          "TypeOfElement": "amountTransfers", 
-                          "Fromdate": ullToHex(timestamp), 
-                          "to": ullToHex(timestamp-week)
+                          "typeindexTime": "day",
+                          "TypeOfElement": "MintedBurned", 
+                          "Fromdate": ullToHex(timestampMinute0), 
+                          "to": ullToHex(getStartOfDayTimestamp(timestampMinute0))
                            })
     })
 
-   
     var data = await response.json()
 
-    console.log("amount transfers data ", data)
-
-    data = [...data].reverse();
-
-    chartUpdateAmountTransfers(data)
-
+    return data;
 
 
 } catch (error) {
     console.log("error ",error);    
   }
 }
+
+
+async function loadVolumeTransactionsValueChart(){
+
+  if(chartDisplayMode === "week"){
+
+    dataVolumeTransactionsValuechartweek = await RetrieveChartWeek("TransfersValueVolume")
+    dataVolumeTransactionsValuechartday = await RetrieveChartDay("TransfersValueVolume")
+
+    const sum = dataVolumeTransactionsValuechartday.reduce((accumulator, currentValue) => {
+      return accumulator + currentValue;
+    }, 0); 
+
+    dataVolumeTransactionsValuechartweek.shift()
+    dataVolumeTransactionsValuechartweek.push(sum)
+    chartUpdateVolumeTransactionsValueWeek(dataVolumeTransactionsValuechartweek)
+
+
+  }
+
+  if(chartDisplayMode === "day"){
+
+    datachartday = await RetrieveChartDay("TransfersValueVolume")
+    chartUpdateVolumeTransactionsValueDay(datachartday)
+
+  }
+
+  document.getElementById("loadingIndicator").style.display = "none";
+  document.getElementById("VolumeTransactionsValueChart").style.visibility = "visible";
+
+}
+
+async function loadAmountTransfersChart(){
+
+  if(chartDisplayMode === "week"){
+
+    datachartweek = await RetrieveChartWeek("amountTransfers")
+    datachartday = await RetrieveChartDay("amountTransfers")
+
+    const sum = datachartday.reduce((accumulator, currentValue) => {
+      return accumulator + currentValue;
+    }, 0); 
+
+    datachartweek.shift()
+    datachartweek.push(sum)
+    chartUpdateAmountTransfersWeek(datachartweek)
+
+
+  }
+
+  if(chartDisplayMode === "day"){
+
+    datachartday = await RetrieveChartDay("amountTransfers")
+    chartUpdateAmountTransfersDay(datachartday)
+
+
+  }
+
+  document.getElementById("loadingIndicator2").style.display = "none";
+  document.getElementById("amountTransfersChart").style.visibility = "visible";
+
+}
+
+async function loadAmountMintedBurnedChart(){
+
+  if(chartDisplayMode === "week"){
+
+    var datachartAmountMintedBurnedweek = await RetrieveMintedBurnedChartWeek()
+
+    mintedWeek = datachartAmountMintedBurnedweek[0]
+    burnedWeek = datachartAmountMintedBurnedweek[1]
+    mintedWeek = [...mintedWeek].reverse();
+    burnedWeek = [...burnedWeek].reverse();
+
+    datachartDay = await RetrieveMintedBurnedChartDay()
+
+    mintedDay = datachartDay[0]
+    burnedDay = datachartDay[1]
+    mintedDay = [...mintedDay].reverse();
+    burnedDay = [...burnedDay].reverse();
+
+    const mintedDaySum = mintedDay.reduce((accumulator, currentValue) => {
+      return accumulator + currentValue;
+    }, 0); 
+
+    const burnedDaySum = burnedDay.reduce((accumulator, currentValue) => {
+      return accumulator + currentValue;
+    }, 0); 
+
+    mintedWeek.shift()
+    mintedWeek.push(mintedDaySum)
+
+    burnedWeek.shift()
+    burnedWeek.push(burnedDaySum)
+
+    chartUpdateMintedBurnedWeek(mintedWeek, burnedWeek)
+
+  
+  }
+
+  if(chartDisplayMode === "day"){
+
+    var datachartAmountMintedBurnedweek = await RetrieveMintedBurnedChartDay()
+
+    mintedDay = [...datachartAmountMintedBurnedweek[0]].reverse();
+    burnedDay = [...datachartAmountMintedBurnedweek[1]].reverse();
+
+    chartUpdateMintedBurnedDay(mintedDay, burnedDay)
+
+
+  }
+
+
+  document.getElementById("loadingIndicator3").style.display = "none";
+  document.getElementById("MintedBurnedChart").style.visibility = "visible";
+
+
+
+}
+
+
 
 function arrangeDays(timestamptiming, splitTime){
 
@@ -718,12 +835,178 @@ function arrangeDays(timestamptiming, splitTime){
 
   daysarrange = [...daysarrange].reverse();
 
-
   return daysarrange
 
 }
 
-async function chartUpdateAmountTransfers(dataChar){
+function arrangeHours(numberOfHours) {
+  let timestamp = Math.floor(Date.now() / 1000);
+  let hoursArrange = [];
+
+  for (let i = 0; i < numberOfHours; i++) {
+    let date = new Date(timestamp * 1000);
+    let hour = date.getHours();
+    const formattedHour = hour < 10 ? `0${hour}:00` : `${hour}:00`;
+    hoursArrange[i] = formattedHour;
+
+    timestamp -= 3600;
+    date = new Date(timestamp * 1000);
+  }
+
+  hoursArrange = [...hoursArrange].reverse();
+
+  return hoursArrange;
+}
+
+
+
+async function chartUpdateVolumeTransactionsValueWeek(dataChar){
+
+  if (window.VolumeTransactionsValueChart) {
+    window.VolumeTransactionsValueChart.destroy();
+  }
+
+  if (typeof VolumeTransactionsValueChart !== 'undefined' && VolumeTransactionsValueChart !== null) {
+    VolumeTransactionsValueChart.destroy();
+  }
+
+  const ctx = document.getElementById('VolumeTransactionsValueChart').getContext('2d');
+
+  window.VolumeTransactionsValueChart = new Chart(ctx, {
+      type: "line",
+      data: {
+          labels: arrangeDays(86400, 7),
+          datasets: [{ 
+              data: dataChar,
+              backgroundColor: "rgba(186, 214, 255, 0.21)", 
+              borderColor: "#b0cfff",
+              fill: true,
+              borderWidth: 1, 
+              tension: 0.1,
+              pointRadius: 0,          
+              pointHoverRadius: 5,     
+              pointHitRadius: 10 
+          }]
+      },
+      options: {
+          plugins: {
+              legend: { display: false },
+              tooltip: { 
+                  backgroundColor: 'rgba(0,0,0,0.8)',
+                  titleFont: { size: 14 },
+                  bodyColor: '#b0cfff',
+                  bodyFont: { size: 12 },
+                  displayColors: true,
+                  callbacks: {
+                      label: function(context) {
+                          return document.getElementById('symbol').textContent+"\u2006" + sixdecimals(context.parsed.y);
+                      }
+                  }
+              }
+          },
+          scales: {
+              x: { 
+                  grid: { display: false },
+                  ticks: {
+                      color: "rgba(230, 230, 230, 0.95)",
+                      font: { size: 12 }
+                  }
+              },
+              y: {
+                  grid: { display: true },
+                  ticks: {
+                      color: "rgb(219, 219, 219)",
+                      font: { size: 12 },
+                      callback: function(value) {
+                          return document.getElementById('symbol').textContent+"\u2006" + sixdecimals(value);
+                      }
+                  },
+                  beginAtZero: true
+              }
+          },
+          animation: {
+              duration: 2000,
+              easing: 'easeOutQuart'
+          }
+      }
+  });
+
+}
+
+async function chartUpdateVolumeTransactionsValueDay(dataChar){
+
+  if (window.VolumeTransactionsValueChart) {
+    window.VolumeTransactionsValueChart.destroy();
+  }
+
+  if (typeof VolumeTransactionsValueChart !== 'undefined' && VolumeTransactionsValueChart !== null) {
+    VolumeTransactionsValueChart.destroy();
+  }
+
+  const ctx = document.getElementById('VolumeTransactionsValueChart').getContext('2d');
+
+  window.VolumeTransactionsValueChart = new Chart(ctx, {
+      type: "line",
+      data: {
+          labels: arrangeHours(24),
+          datasets: [{ 
+              data: dataChar,
+              backgroundColor: "rgba(186, 214, 255, 0.21)", 
+              borderColor: "#b0cfff",
+              fill: true,
+              borderWidth: 1, 
+              tension: 0.1,
+              pointRadius: 0,          
+              pointHoverRadius: 5,     
+              pointHitRadius: 10 
+          }]
+      },
+      options: {
+          plugins: {
+              legend: { display: false },
+              tooltip: { 
+                  backgroundColor: 'rgba(0,0,0,0.8)',
+                  titleFont: { size: 14 },
+                  bodyColor: '#b0cfff',
+                  bodyFont: { size: 12 },
+                  displayColors: true,
+                  callbacks: {
+                      label: function(context) {
+                          return document.getElementById('symbol').textContent+"\u2006" + sixdecimals(context.parsed.y);
+                      }
+                  }
+              }
+          },
+          scales: {
+              x: { 
+                  grid: { display: false },
+                  ticks: {
+                      color: "rgba(230, 230, 230, 0.95)",
+                      font: { size: 12 }
+                  }
+              },
+              y: {
+                  grid: { display: true },
+                  ticks: {
+                      color: "rgb(219, 219, 219)",
+                      font: { size: 12 },
+                      callback: function(value) {
+                          return document.getElementById('symbol').textContent+"\u2006" + sixdecimals(value);
+                      }
+                  },
+                  beginAtZero: true
+              }
+          },
+          animation: {
+              duration: 2000,
+              easing: 'easeOutQuart'
+          }
+      }
+  });
+
+}
+
+async function chartUpdateAmountTransfersWeek(dataChar){
 
   if (window.amountTransfersChart) {
     window.amountTransfersChart.destroy();
@@ -789,80 +1072,75 @@ window.amountTransfersChart = new Chart(ctx, {
 
 }
 
-async function chartUpdateVolumeTransactionsValue(dataChar){
+async function chartUpdateAmountTransfersDay(dataChar){
 
-  if (window.VolumeTransactionsValueChart) {
-    window.VolumeTransactionsValueChart.destroy();
+  if (window.amountTransfersChart) {
+    window.amountTransfersChart.destroy();
   }
 
-  if (typeof VolumeTransactionsValueChart !== 'undefined' && VolumeTransactionsValueChart !== null) {
-    VolumeTransactionsValueChart.destroy();
+  if (typeof amountTransfersChart !== 'undefined' && amountTransfersChart !== null) {
+    amountTransfersChart.destroy();
   }
 
-const ctx = document.getElementById('VolumeTransactionsValueChart').getContext('2d');
+  const ctx = document.getElementById('amountTransfersChart').getContext('2d');
 
-window.VolumeTransactionsValueChart = new Chart(ctx, {
-    type: "line",
-    data: {
-        labels: arrangeDays(86400, 7),
-        datasets: [{ 
-            data: dataChar,
-            backgroundColor: "rgba(186, 214, 255, 0.21)", 
-            borderColor: "#b0cfff",
-            fill: true,
-            borderWidth: 1, 
-            tension: 0.1,
-            pointRadius: 0,          
-            pointHoverRadius: 5,     
-            pointHitRadius: 10 
-        }]
-    },
-    options: {
-        plugins: {
-            legend: { display: false },
-            tooltip: { 
-                backgroundColor: 'rgba(0,0,0,0.8)',
-                titleFont: { size: 14 },
-                bodyColor: '#b0cfff',
-                bodyFont: { size: 12 },
-                displayColors: true,
-                callbacks: {
-                    label: function(context) {
-                        return '$' + context.parsed.y;
-                    }
-                }
-            }
-        },
-        scales: {
-            x: { 
-                grid: { display: false },
-                ticks: {
-                    color: "rgba(230, 230, 230, 0.95)",
-                    font: { size: 12 }
-                }
-            },
-            y: {
-                grid: { display: true },
-                ticks: {
-                    color: "rgb(219, 219, 219)",
-                    font: { size: 12 },
-                    callback: function(value) {
-                        return "$" + value;
-                    }
-                },
-                beginAtZero: true
-            }
-        },
-        animation: {
-            duration: 2000,
-            easing: 'easeOutQuart'
-        }
-    }
-});
+  window.amountTransfersChart = new Chart(ctx, {
+      type: "line",
+      data: {
+          labels: arrangeHours(24),
+          datasets: [{ 
+              data: dataChar,
+              backgroundColor: "rgba(186, 214, 255, 0.21)", 
+              borderColor: "#b0cfff",
+              fill: true,
+              borderWidth: 1, 
+              tension: 0.1,
+              pointRadius: 0,          
+              pointHoverRadius: 5,     
+              pointHitRadius: 10 
+          }]
+      },
+      options: {
+          plugins: {
+              legend: { display: false },
+              tooltip: { 
+                  backgroundColor: 'rgba(0,0,0,0.8)',
+                  titleFont: { size: 14 },
+                  bodyColor: '#b0cfff',
+                  bodyFont: { size: 12 },
+                  displayColors: true,
+                  callbacks: {
+  
+                  }
+              }
+          },
+          scales: {
+              x: { 
+                  grid: { display: false },
+                  ticks: {
+                      color: "rgba(230, 230, 230, 0.95)",
+                      font: { size: 12 }
+                  }
+              },
+              y: {
+                  grid: { display: true },
+                  ticks: {
+                      color: "rgb(219, 219, 219)",
+                      font: { size: 12 }
+                  },
+                  beginAtZero: true
+              }
+          },
+          animation: {
+              duration: 2000,
+              easing: 'easeOutQuart'
+          }
+      }
+  });
 
 }
 
-async function chartUpdateMintedBurned(dataChartMinted, dataChartburned){
+async function chartUpdateMintedBurnedWeek(dataChartMinted, dataChartburned){
 
   if (window.MintedBurnedChart) {
     window.MintedBurnedChart.destroy();
@@ -880,7 +1158,7 @@ async function chartUpdateMintedBurned(dataChartMinted, dataChartburned){
           labels: arrangeDays(86400, 7),
           datasets: [{ 
               data: dataChartburned,
-              backgroundColor: "rgba(255, 149, 0, 0.46)", 
+              backgroundColor: "rgba(255, 195, 111, 0.48)", 
               borderColor: "rgba(255, 184, 19, 0.72)",
               fill: true,
               borderWidth: 1, 
@@ -891,7 +1169,8 @@ async function chartUpdateMintedBurned(dataChartMinted, dataChartburned){
               pointHitRadius: 10 
           }, { 
             data: dataChartMinted,
-            backgroundColor: "rgba(73, 191, 110, 0.51)",
+            backgroundColor:"rgba(113, 244, 235, 0.26)",
+            borderColor: "rgba(113, 244, 235, 0.59)",
             fill: true,
             borderWidth: 1, 
             tension: 0.1,
@@ -911,7 +1190,7 @@ async function chartUpdateMintedBurned(dataChartMinted, dataChartburned){
                   displayColors: true,
                   callbacks: {
                       label: function(context) {
-                          return '$' + context.parsed.y;
+                          return document.getElementById('symbol').textContent+"\u2006" + sixdecimals(context.parsed.y);
                       }
                   }
               }
@@ -930,7 +1209,7 @@ async function chartUpdateMintedBurned(dataChartMinted, dataChartburned){
                       color: "rgb(219, 219, 219)",
                       font: { size: 12 },
                       callback: function(value) {
-                          return "$" + value;
+                          return document.getElementById('symbol').textContent+"\u2006" + sixdecimals(value);
                       }
                   },
                   beginAtZero: true
@@ -945,45 +1224,104 @@ async function chartUpdateMintedBurned(dataChartMinted, dataChartburned){
 
 }
 
-var amountTransfersChart = new Chart("amountTransfersChart", {
-  
-  type: "line",
-  data: {
-    labels: arrangeDays(86400, 7),
-    datasets: [{ 
-      data: [300,700,aa,5000,6000,4000,2000,1000,200,100],
-      borderColor: "blue",
-      backgroundColor: "#b0cfffc2",
-      fill: true,
-      borderColor: "#b0cfff", 
-      borderWidth: 1, 
-    }]
-  },
-options: {
-    legend: {display: false},
-    scales: {
-      xAxes: [{
-        gridLines: {
-          display: false 
-        }, 
-        ticks: {
-        fontColor: "rgba(129, 129, 129, 0.81)",
-        fontSize: 12,
+async function chartUpdateMintedBurnedDay(dataChartMinted, dataChartburned){
 
-      }
-      }],
-      yAxes: [{
-        gridLines: {
-          display: false // 
-        } , 
-        ticks: {
-        fontColor: "rgba(129, 129, 129, 0.81)", 
-        fontSize: 12,
-      }
-      }]
-    }
+  if (window.MintedBurnedChart) {
+    window.MintedBurnedChart.destroy();
   }
-});
+
+  if (typeof MintedBurnedChart !== 'undefined' && MintedBurnedChart !== null) {
+    MintedBurnedChart.destroy();
+  }
+
+  const ctx = document.getElementById('MintedBurnedChart').getContext('2d');
+
+  window.MintedBurnedChart = new Chart(ctx, {
+      type: "line",
+      data: {
+          labels: arrangeHours(24),
+          datasets: [{ 
+            data: dataChartburned,
+            backgroundColor: "rgba(255, 195, 111, 0.48)", 
+            borderColor: "rgba(255, 184, 19, 0.72)",
+            fill: true,
+            borderWidth: 1, 
+            tension: 0.1,
+            borderWidth: 1,
+            pointRadius: 0,          
+            pointHoverRadius: 5,     
+            pointHitRadius: 10 
+        }, { 
+          data: dataChartMinted,
+          backgroundColor:"rgba(113, 244, 235, 0.26)",
+          borderColor: "rgba(113, 244, 235, 0.59)",
+          fill: true,
+          borderWidth: 1, 
+          tension: 0.1,
+          pointRadius: 0,          
+          pointHoverRadius: 5,     
+          pointHitRadius: 10 
+        }]
+      },
+      options: {
+          plugins: {
+              legend: { display: false },
+              tooltip: { 
+                  backgroundColor: 'rgba(0,0,0,0.8)',
+                  titleFont: { size: 14 },
+                  bodyColor: '#b0cfff',
+                  bodyFont: { size: 12 },
+                  displayColors: true,
+                  callbacks: {
+                      label: function(context) {
+                          return document.getElementById('symbol').textContent+"\u2006" + sixdecimals(context.parsed.y);
+                      }
+                  }
+              }
+          },
+          scales: {
+              x: { 
+                  grid: { display: false },
+                  ticks: {
+                      color: "rgba(230, 230, 230, 0.95)",
+                      font: { size: 12 }
+                  }
+              },
+              y: {
+                  grid: { display: true },
+                  ticks: {
+                      color: "rgb(219, 219, 219)",
+                      font: { size: 12 },
+                      callback: function(value) {
+                          return document.getElementById('symbol').textContent+"\u2006" + sixdecimals(value);
+                      }
+                  },
+                  beginAtZero: true
+              }
+          },
+          animation: {
+              duration: 2000,
+              easing: 'easeOutQuart'
+          }
+      }
+  });
+
+}
+
+
+
+
+
+async function loadCharts(){
+
+  loadVolumeTransactionsValueChart()
+  loadAmountTransfersChart()
+  loadAmountMintedBurnedChart()
+
+}
+
+
+
 
 var VolumeTransactionsValueChart = new Chart("VolumeTransactionsValueChart", {
   
@@ -991,12 +1329,12 @@ var VolumeTransactionsValueChart = new Chart("VolumeTransactionsValueChart", {
   data: {
     labels: arrangeDays(86400, 7),
     datasets: [{ 
-      data: [300,700,aa,5000,6000,4000,2000,1000,200,100],
+      data: [0,0,0,0,0,0,0,0,0,0],
       borderColor: "blue",
       backgroundColor: "#b0cfffc2",
       fill: true,
       borderColor: "#b0cfff", 
-      borderWidth: 1, 
+      borderWidth: 0, 
     }]
   },
 options: {
@@ -1022,6 +1360,46 @@ options: {
         callback: function(value) {
           return "$" + value;  
         }
+      }
+      }]
+    }
+  }
+});
+
+var amountTransfersChart = new Chart("amountTransfersChart", {
+  
+  type: "line",
+  data: {
+    labels: arrangeDays(86400, 7),
+    datasets: [{ 
+      data: [0,0,0,0,0,0,0],
+      borderColor: "blue",
+      backgroundColor: "#b0cfffc2",
+      fill: true,
+      borderColor: "#b0cfff", 
+      borderWidth: 0, 
+    }]
+  },
+options: {
+    legend: {display: false},
+    scales: {
+      xAxes: [{
+        gridLines: {
+          display: false 
+        }, 
+        ticks: {
+        fontColor: "rgba(129, 129, 129, 0.81)",
+        fontSize: 12,
+
+      }
+      }],
+      yAxes: [{
+        gridLines: {
+          display: false // 
+        } , 
+        ticks: {
+        fontColor: "rgba(129, 129, 129, 0.81)", 
+        fontSize: 12,
       }
       }]
     }
@@ -1079,6 +1457,34 @@ options: {
     }
   }
 });
+
+
+
+
+
+//controol tabs
+
+function nextTab(){
+
+  if(tabIndex<lastTab){
+
+    IndexEventsMain2(tabSizeElements ,tabIndex+1)
+  }
+
+  if(tabIndex<1){
+    autoIndex = true
+  }
+
+}
+function prevTab(){
+
+  if(tabIndex>0){
+    autoIndex = false
+    IndexEventsMain2(tabSizeElements ,tabIndex-1)
+  }
+
+}
+
 
 
 

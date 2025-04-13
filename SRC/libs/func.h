@@ -89,9 +89,9 @@ void storeSmartContracInfo(std::string network){
 
     try {
 
-        cout<<endl<<" storeSmartContracInfo "<<endl;
-
         string tokenInfo =  SmOperation(rpc_address, sm_address, jsonSrt);
+
+        cout<<endl<<" storeSmartContracInfo  smOperation result : "<<tokenInfo<<endl;
 
         if(tokenInfo == "py error catched" || !checkJson(tokenInfo)){
             return;
@@ -110,6 +110,40 @@ string DerivePublicKey(string PK){
     string address =  DerivePublicKeyWeb3(PK);
 
     return address;
+
+}
+
+bool storageKey(string  _Key ){
+
+    json key =json::parse(_Key);
+
+    mkDir("wallets/");
+    mkDir("wallets/keys/");
+    string addressStr = key["address"];
+    string Path = "wallets/keys/"+addressStr ;
+    return SaveData(Path, key);
+
+}
+
+bool storageAddress(string _Address ){
+
+    json Address= json::parse(_Address);
+
+    mkDir("wallets/");
+    mkDir("wallets/addresses/");
+    string addressStr = Address["address"];
+    string Path = "wallets/addresses/"+addressStr ;
+    return SaveData(Path , Address);
+
+}
+
+bool eraseKey(string _key ){
+    return eraseFile("wallets/keys/"+_key);
+}
+
+bool eraseAddress(string _Address ){
+
+    return eraseFile("wallets/addresses/"+_Address);
 
 }
 

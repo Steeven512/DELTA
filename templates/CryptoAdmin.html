@@ -3,12 +3,12 @@
 <html>
 
   <head>
-    <title>SS: DELTA</title>
+    <title>S.S: &#916; DELTA</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="css/css.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <script  src="js/reqapi.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
   </head>
 
@@ -16,7 +16,7 @@
 
     <div class = "container">
         <nav class="navbar navbar-expand-lg navbar-dark bg-light fixed-top">
-          <a class="navbar-brand" href="#">S.S: Front Rest API Web</a>
+          <a class="navbar-brand" href="#">S.S: &#916; DELTA</a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -32,9 +32,9 @@
                 <a class="nav-link" href="/setting">Settings</a>
               </li>
             </ul>
-            <span class="navbar-text">
+            <a navbar-brand class="navbar-text navbar-brand" href="https://steevjadev.blogspot.com/2025/01/hello.html">
               Developed by Steeven J Salazar
-            </span>
+            </a>
           </div>
         </nav>
     </div>
@@ -95,21 +95,21 @@
                 <span id="AccAdmin" class="AccAdmin">Total Supply </span> 
               </div>
               <div class="row">
-                <span class="deltaformat">&#916;</span><span class="amountsCoin" id="totalSupply"> {{TotalSupply}} </span>
+                <span class="deltaformat" id="symbol2">&#916;</span><span class="amountsCoin" id="totalSupply"> {{TotalSupply}} </span>
               </div>
 
               <div class="row">
                 <span id="AccAdmin" class="AccAdmin">in reserve </span> 
               </div>
               <div class="row">
-                <span class="deltaformat">&#916;</span><span class="amountsCoin" id="inReserve"> {{TotalSupply}} </span>
+                <span class="deltaformat" id="symbol3">&#916;</span><span class="amountsCoin" id="inReserve"> {{TotalSupply}} </span>
               </div>
 
               <div class="row">
                 <span id="AccAdmin" class="AccAdmin">in circulation </span> 
               </div>
               <div class="row">
-                <span class="deltaformat">&#916;</span><span class="amountsCoin" id="inCirculation"> {{TotalSupply}} </span>
+                <span class="deltaformat" id="symbol4">&#916;</span><span class="amountsCoin" id="inCirculation"> {{TotalSupply}} </span>
               </div>
 
 
@@ -124,24 +124,56 @@
 
       <div class="CryptoInfo">
         <div class="row chartsdiv">
-          <h4>Charts</h4><br>
+
+          <div>
+
+          </div>
+
+          <div class="chartheaderTittle">
+            <h4>Stats</h4><br> 
+          </div>
+
+          <div class="buttonChartsContainer">
+
+            <span>View</span> 
+            <button class="buttonCharts" onclick="changeViewChart(this)">&#11164;</button>
+            <span id="chartViewMode">day</span> 
+            <button class="buttonCharts" onclick="changeViewChart(this)">&#11166;</button>
+
+          </div>
+
+
         </div>
         <div class="row ">
 
           <div class="col chartIndividualCont">
             <span>Volume</span>
-            <canvas id="VolumeTransactionsValueChart" style="width:100%;max-width:600px"></canvas>
+            <canvas id="VolumeTransactionsValueChart" style="width:100%;max-width:600px;visibility:hidden;"></canvas>
+            
+				<div id="loadingIndicator" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.2em; color: #888;">
+					Loading data...
+					<span class="loader" ></span>
+				</div>
+            
           </div>
 
           <div class="col chartIndividualCont">
             <span>transactions</span>
-            <canvas id="amountTransfersChart" style="width:100%;max-width:600px"></canvas>
+            <canvas id="amountTransfersChart" style="width:100%;max-width:600px;visibility:hidden;"></canvas>
+				<div id="loadingIndicator2" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.2em; color: #888;">
+					Loading data...
+					<span class="loader" ></span>
+				</div>
           </div>
 
 
           <div class="col chartIndividualCont">
             <span>Minted / Burned</span>
-            <canvas id="MintedBurnedChart" style="width:100%;max-width:600px"></canvas>
+            <canvas id="MintedBurnedChart" style="width:100%;max-width:600px;visibility:hidden;"></canvas>
+				<div id="loadingIndicator3" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.2em; color: #888;">
+					Loading data...
+					<span class="loader" ></span>
+				</div>
           </div>
 
         </div>
@@ -150,65 +182,59 @@
 
     <div class = "tablecontainer">
 
-        <div class="row w-100" style="align-items: center;justify-content: center;" >
+        <div class="row w-100" style="align-items: center;justify-content: space-between;" >
 
-          <div class="col filterselection tableheadCoinSymbol">
-            <p>{{symbol}} Events</p>
-          </div>
+          <div class="colfilters">
 
-          <div class="col RowCheckBox">
-            <div class="row filterselection ">
-              <div class="col">
-                <label class="CheckboxContainer">Transactions
-                  <input type="checkbox" checked="checked" id="filterTransactions">
-                  <span class="checkmark"></span>
-                </label>
-              </div>
-              <div class="col">
-                <label class="CheckboxContainer">Balances
-                  <input type="checkbox" checked="checked" id="filterBalances">
-                  <span class="checkmark"></span>
-                </label>
-              </div>
-              <div class="col">
-                <label class="CheckboxContainer">Approval
-                  <input type="checkbox" checked="checked" id="filterApproval">
-                <span class="checkmark"></span>
-              </div>
-              <div class="col">
-                <label class="CheckboxContainer">Supply
-                  <input type="checkbox" checked="checked" id="filterSupply">
-                  <span class="checkmark"></span>
-              </div>
-              <div class="col">
-                <label class="CheckboxContainer">FreezeAddress
-                  <input type="checkbox" checked="checked" id="filterFreezeAddress">
-                  <span class="checkmark"></span> 
-              </div>
-              <div class="col">
-                <label class="CheckboxContainer">Pause
-                  <input type="checkbox" checked="checked" id="filterPause">
-                  <span class="checkmark"></span> 
-              </div>
-
+            <div class="col filterselection tableheadCoinSymbol">
+              <p id="eventsSimbol">{{symbol}} Events</p>
             </div>
+
+            <div class="col RowCheckBox">
+              <div class="row filterselection ">
+                <div class="col">
+                  <label class="CheckboxContainer">Transactions
+                    <input type="checkbox" checked="checked" id="filterTransactions">
+                    <span class="checkmark"></span>
+                  </label>
+                </div>
+
+                <div class="col">
+                  <label class="CheckboxContainer">Approval
+                    <input type="checkbox" checked="checked" id="filterApproval">
+                  <span class="checkmark"></span>
+                </div>
+                <div class="col">
+                  <label class="CheckboxContainer">Supply
+                    <input type="checkbox" checked="checked" id="filterSupply">
+                    <span class="checkmark"></span>
+                </div>
+                <div class="col">
+                  <label class="CheckboxContainer">FreezeAddress
+                    <input type="checkbox" checked="checked" id="filterFreezeAddress">
+                    <span class="checkmark"></span> 
+                </div>
+                <div class="col">
+                  <label class="CheckboxContainer">Pause
+                    <input type="checkbox" checked="checked" id="filterPause">
+                    <span class="checkmark"></span> 
+                </div>
+
+              </div>
+            </div>
+
           </div>
 
           <div class="col filterselection  intervalsetMaxWidth">
 
             <div class="row ">
-              <div class="col FromMargin searchFrom">
-                <p>index From Block N</p>
-              </div>
-              <div class="col intervalsetsearhbarDiv">
-                <input type="text" class="intervalsetsearchbar" id="fromBl">
-              </div>
+
               <div class="col ToMargin">
 
                 <div class="row displayRowSearchInterval">
 
                   <div class="col searchTo">
-                    <p>To</p>
+                    <p>Tab </p>
                   </div>
                   <div class="col intervalsetsearhbarDiv">
                     <input type="text" class="intervalsetsearchbar" id="toBl">
@@ -239,8 +265,35 @@
 
   </body>
 
-  <script>
-    const intervalId = setInterval(IndexEventsMain, 5000)
+
+  <script  src="js/reqapi.js">
+    
   </script>
+
+  <script>
+
+
+
+    const intervalId = setInterval(IndexEventsMain, 20000);
+
+    const selectElement = document.getElementById('Networks');
+      if (selectElement) {
+        selectElement.addEventListener('change',async function(event) {
+
+          IndexEventsMain()
+          retrieveinfo()
+          loadCharts()
+
+          let date = new Date();
+          date.setTime(date.getTime() + (9999 * 24 * 60 * 60 * 1000));
+          const expires = "expires=" + date.toUTCString();
+          document.cookie = "networkSet" + "=" + document.getElementById("Networks").value + ";" + expires + ";path=/";
+
+        });
+      } 
+
+
+  </script>
+
 
 </html>

@@ -72,7 +72,7 @@ def inCirculation(RPC_Networkd_Address, sm_address):
     W3 = RPC(RPC_Networkd_Address)
     Contract = contract(sm_address, W3)
 
-    inReserve = Contract.functions.balanceOf(Contract.functions.getOwner().call()).call()
+    inReserve = Contract.functions.balanceOf(Contract.functions.owner().call()).call()
     totalSupply = Contract.functions.totalSupply().call()
 
     if inReserve>totalSupply:
@@ -85,7 +85,7 @@ def inReserve(RPC_Networkd_Address, sm_address):
     W3 = RPC(RPC_Networkd_Address)
     Contract = contract(sm_address, W3)
 
-    return Contract.functions.balanceOf(Contract.functions.getOwner().call()).call()
+    return Contract.functions.balanceOf(Contract.functions.owner().call()).call()
 
 def totalSupply(RPC_Networkd_Address, sm_address):
 
@@ -98,7 +98,7 @@ def getOwner(RPC_Networkd_Address, sm_address):
 
     W3 = RPC(RPC_Networkd_Address)
     Contract = contract(sm_address, W3)
-    return Contract.functions.getOwner().call()
+    return Contract.functions.owner().call()
 
 def name(RPC_Networkd_Address, sm_address):
 
@@ -114,10 +114,15 @@ def symbol(RPC_Networkd_Address, sm_address):
 
 def SmartContracInfo(RPC_Networkd_Address, sm_address):
 
+
     admin = getOwner(RPC_Networkd_Address, sm_address)
     _totalsupply = totalSupply(RPC_Networkd_Address, sm_address)
     _inReserve = inReserve(RPC_Networkd_Address, sm_address)
+
+    print("SmartContracInfo debug element ")
     _inCirculation = inCirculation(RPC_Networkd_Address, sm_address)
+    print("SmartContracInfo inReserve", _inReserve)
+
     _name = name(RPC_Networkd_Address, sm_address)
     _symbol = symbol(RPC_Networkd_Address, sm_address)
 
@@ -310,10 +315,29 @@ def transfer(RPC_Networkd_Address, sm_address, address, amount, private_key):
 
     signed_txn = W3.eth.account.sign_transaction(transaction, private_key)
 
-    print("transfer signed_txn : ", signed_txn)
     print("transfer signed_txn.rawTransaction : ", signed_txn.rawTransaction)
 
     return W3.eth.send_raw_transaction(signed_txn.rawTransaction) #return hash transaction
+
+def SignTransfer(RPC_Networkd_Address, sm_address, address, amount, private_key):
+
+    W3 = RPC(RPC_Networkd_Address)
+    Contract = contract(sm_address, W3)
+    account = W3.eth.account.from_key(private_key)
+    nonce = W3.eth.get_transaction_count(account.address)
+    gas_estimate = Contract.functions.transfer(address, amount).estimate_gas({'from': account.address})
+
+    transaction = Contract.functions.transfer(address, amount).build_transaction({
+        'from': account.address,
+        'gas': gas_estimate,
+        'nonce': nonce,
+    })
+
+    signed_txn = W3.eth.account.sign_transaction(transaction, private_key)
+
+    print("transfer signed_txn : ", signed_txn)
+
+    return signed_txn 
 
 def GetDataTransfer(RPC_Networkd_Address, sm_address, address, amount, private_key):
 
@@ -350,8 +374,31 @@ def SendSidnedTransfer(RPC_Networkd_Address, sm_address, signed_txn):
     except Exception as e:
         print(f"Error sending raw transaction: {e}")
 
-    return tx_hash
+    return tx_hash.hex()
 
+def VerifyTransferStatus(RPC_Networkd_Address, sm_address, tx_hash):
+
+    W3 = RPC(RPC_Networkd_Address)
+
+    if not isinstance(tx_hash, str) or len(tx_hash) != 66 or not tx_hash.startswith('0x'):
+        return "Invalid Hash Length"
+
+    try:
+        tx_receipt = W3.eth.get_transaction_receipt(tx_hash)
+
+        if tx_receipt is None:
+            return "Pending"  # Transaction not yet mined
+
+        if tx_receipt['status'] == 1:
+            return "Success"  # Transaction was successful (validated)
+        elif tx_receipt['status'] == 0:
+            return "Failed"   # Transaction failed (rejected by the EVM)
+        else:
+            return f"Unknown Status: {tx_receipt['status']}"
+
+    except Exception as e:
+        print(f"Error fetching transaction receipt: {e}")
+        return None
 
 
 def estimateGas(RPC_Networkd_Address, sm_address, From, to, amount):
@@ -381,9 +428,11 @@ def performTransactionSM(RPC_Networkd_Address, sm_address, options_sm):
 
         if(transactionValues["option"] == "balanceOf"):
 
-            result = balanceOf(RPC_Networkd_Address, sm_address, transactionValues["Address"])
-
-            return str(result)
+            try:
+                result = balanceOf(RPC_Networkd_Address, sm_address, transactionValues["Address"])
+                return str(result)
+            except:
+                return str(0)
 
         if(transactionValues["option"] == "increaseSupply"):
 
@@ -466,6 +515,10 @@ def performTransactionSM(RPC_Networkd_Address, sm_address, options_sm):
             print("SendSidnedTransfer" , transactionValues["signedTransfer"])
 
             return SendSidnedTransfer(RPC_Networkd_Address, sm_address, transactionValues["signedTransfer"]) 
+
+        if(transactionValues["option"] == "VerifyTransferStatus"):
+
+            return VerifyTransferStatus(RPC_Networkd_Address, sm_address, transactionValues["hash"])
     
     except :
         return "unexpected py error"

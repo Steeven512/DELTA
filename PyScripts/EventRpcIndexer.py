@@ -19,6 +19,10 @@ def eventsIndexer(RPC_Networkd_Address, SM_address, fromBlock, toBlock):
     unfreezeAddress_topic = W3.keccak(text="UnfreezeAddress(address)").hex()
     supplyDecreased_topic = W3.keccak(text="SupplyDecreased(address,uint256)").hex()
     supplyIncreased_topic = W3.keccak(text="SupplyIncreased(address,uint256)").hex()
+    BridgeTo_topic = W3.keccak(text="BridgeTo(bytes32,address,uint256)").hex()
+    BridgeIn_topic = W3.keccak(text="BridgeIn(bytes32,address,uint256)").hex()
+    BridgeStored_topic = W3.keccak(text="BridgeStored(bytes32)").hex()
+    BridgeDeleted_topic = W3.keccak(text="BridgeDeleted(bytes32)").hex()
     
     logs = W3.eth.get_logs({
         'address': SM_address,
@@ -237,6 +241,93 @@ def eventsIndexer(RPC_Networkd_Address, SM_address, fromBlock, toBlock):
 
             result.append(json.dumps(data))
 
+        elif event_signature == BridgeTo_topic:
+
+            event = Contract.events.BridgeTo().process_log(log)
+
+            blockNumber = event['blockNumber']
+            transactionIndex = event['transactionIndex']
+            logIndex = event['logIndex']
+
+            bridgeTo = event['bridgeTo']
+            receiver = event['args']['receiver']
+            value = event['args']['value']
+
+            data = {"event": "BridgeTo", 
+                    "timestamp": W3.eth.get_block(event['blockNumber'])['timestamp'],
+                    "blockNumber" : blockNumber,
+                    "transactionIndex" : transactionIndex,
+                    "logIndex" : logIndex,
+                    "bridgeTo" : bridgeTo,
+                    "receiver" : receiver,
+                    "value" : value
+                    }
+
+            result.append(json.dumps(data))
+
+        elif event_signature == BridgeIn_topic:
+
+            event = Contract.events.BridgeIn().process_log(log)
+
+            blockNumber = event['blockNumber']
+            transactionIndex = event['transactionIndex']
+            logIndex = event['logIndex']
+
+            bridgeFrom = event['bridgeFrom']
+            receiver = event['args']['receiver']
+            value = event['args']['value']
+
+            data = {"event": "BridgeTo", 
+                    "timestamp": W3.eth.get_block(event['blockNumber'])['timestamp'],
+                    "blockNumber" : blockNumber,
+                    "transactionIndex" : transactionIndex,
+                    "logIndex" : logIndex,
+                    "bridgeFrom" : bridgeFrom,
+                    "receiver" : receiver,
+                    "value" : value
+                    }
+
+            result.append(json.dumps(data))
+
+        elif event_signature == BridgeStored_topic:
+
+            event = Contract.events.BridgeStored().process_log(log)
+
+            blockNumber = event['blockNumber']
+            transactionIndex = event['transactionIndex']
+            logIndex = event['logIndex']
+
+            bridgeName = event['bridgeName']
+
+            data = {"event": "BridgeTo", 
+                    "timestamp": W3.eth.get_block(event['blockNumber'])['timestamp'],
+                    "blockNumber" : blockNumber,
+                    "transactionIndex" : transactionIndex,
+                    "logIndex" : logIndex,
+                    "bridgeName" : bridgeName,
+                    }
+
+            result.append(json.dumps(data))
+
+        elif event_signature == BridgeDeleted_topic:
+
+            event = Contract.events.BridgeDeleted().process_log(log)
+
+            blockNumber = event['blockNumber']
+            transactionIndex = event['transactionIndex']
+            logIndex = event['logIndex']
+            bridgeName = event['bridgeName']
+
+
+            data = {"event": "BridgeTo", 
+                    "timestamp": W3.eth.get_block(event['blockNumber'])['timestamp'],
+                    "blockNumber" : blockNumber,
+                    "transactionIndex" : transactionIndex,
+                    "logIndex" : logIndex,
+                    "bridgeName" : bridgeName,
+                    }
+
+            result.append(json.dumps(data))
 
     return result
 

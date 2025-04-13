@@ -1,6 +1,7 @@
 #include <iostream>
 #include <boost/python.hpp>
 #include <vector>
+#include <mutex>
 
 #ifndef PYTHONW3_H
 #define PYTHONW3_H

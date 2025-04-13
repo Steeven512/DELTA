@@ -10,7 +10,7 @@ body {
     border: 1px solid #13131326;
     margin-top: 5vh;
     position: relative;
-    background-color: #859099;
+    background-color: #85909973;
     border-radius: 9px;
 }
 
@@ -21,7 +21,8 @@ body {
     margin-top: 3vh;
     padding: 51px;
     border: 1px solid #0000000f;
-    background-color: rgba(17, 18, 18, 0.15);
+    background: rgb(86,93,110);
+    background: radial-gradient(circle, rgba(86,93,110,1) 0%, rgba(80,89,102,1) 33%, rgba(74,85,94,1) 71%, rgba(74,84,93,1) 100%); 
     position: relative;
     border-radius: 4px;
     max-width: 1200px; 
@@ -72,6 +73,15 @@ font-size: 24px;
 .tableEventsLeft {
     text-align: left;
 }
+
+th.controls-right {
+  text-align: right; /* Alinea el contenido del th a la derecha */
+}
+
+th.controls-right > span {
+  margin-left: 20px; /* Ajusta este valor según el espacio que necesites */
+}
+
 
 .trContrast{
   background-color: #c0e0ff12;
@@ -129,6 +139,9 @@ font-size: 24px;
     max-width: 89px;
 }
 
+.settingDivElement{
+	padding: 8px;
+}
 
 
 .amountsCoindiv{
@@ -137,9 +150,16 @@ font-size: 24px;
 
 }
 
-.amountsCoin{
-  font-size: 20px;
+.amountsCoinTransfer{
+  font-size: 17px;
   color: #aac2d7;
+}
+
+.amountsCoin{
+  font-size: 17px;
+  color: #aac2d7;
+  top: 2px;
+  position: relative;
 }
 
 .deltaformat{
@@ -157,6 +177,7 @@ font-size: 24px;
     max-width: 629px;
     justify-content: center;
     display: flex;
+    margin-top: 11px;
 }
 
 .searchbarspan{
@@ -169,18 +190,38 @@ font-size: 24px;
 
 .buttonsearch{
   background-color: #6e7e8a;
-  color: aliceblue;
+  color: #f1eae3;
   border: turquoise;
   margin-left: 15px;
   border-radius: 4px;
 }
 
+.buttonCharts{
+  background-color: #6e7e8a00;
+  color: rgb(183, 187, 191);
+  border: rgba(64, 224, 208, 0);
+  border-radius: 4px;
+}
+
+button:focus {
+  outline: none; 
+}
+
+.buttonChartsContainer{
+  margin-top: 4px;
+  margin-right: 20px;
+}
+
 .buttontransfer{
-  background-color: #0e151b5c;
+background-color: #0e151b5c;
   color: aliceblue;
-  border: turquoise;
-  padding: 10px;
-  border-radius: 35px;
+  border:rgb(0, 0, 0);
+  padding:7px;
+  border-radius: 8px;
+  right: 0px;
+  position: relative;
+  top: 9px;
+  width: 100%;
 }
 
 .buttonIndexIntervals{
@@ -192,7 +233,7 @@ font-size: 24px;
 }
 
 .displayRowSearchInterval{
-    display: block ruby;
+   
 }
 
 .ToMargin{
@@ -213,6 +254,7 @@ font-size: 24px;
 
 .filterselection{
     margin-top: 10px;
+    margin-left: 20px;
     
 }
 
@@ -223,6 +265,22 @@ font-size: 24px;
   background-color: #08080826;
   top: -22px;
   position: relative;
+  justify-content: space-between;
+  height: 30px;
+}
+
+.transferdivTittle{
+
+  justify-content: center;
+  border-radius: 6px;
+  background-color: #08080826;
+  top: -22px;
+  position: relative;
+  height: 30px;
+}
+
+.chartheaderTittle{
+  padding-left: 130px;
 }
 
 .chartIndividualCont{
@@ -333,7 +391,6 @@ font-size: 24px;
   div.content {
     margin-left: 200px;
     padding: 1px 16px;
-    height: 1000px;
   }
   
   /* On screens that are less than 700px wide, make the sidebar into a topbar */
@@ -360,6 +417,11 @@ font-size: 24px;
     padding-top: 15px;
   }
 
+  .infoAccount{
+    padding: 30px;
+  }
+  
+
   .AddNetwork{
     padding-bottom: 42px;
     justify-content: center;
@@ -367,8 +429,8 @@ font-size: 24px;
   }
 
   .buttonSetSetting{
-    background-color: #739fa63b;
-    max-width: 28px;
+    background-color: #2b33399c;
+    max-width: 100px;
     color: aliceblue;
     border: turquoise;
     margin-left: 15px;
@@ -417,6 +479,23 @@ font-size: 24px;
 
 }
 
+
+
+
+ .settingInputMid{
+
+    width: 203px;
+    outline: none;
+    background-color: #929eac57;
+    border: aqua;
+    border-radius: 4px;
+    color: azure;
+
+}
+.inputdivMidRow{
+display: inline-flex;
+}
+
 .transferInput{
 
   width: 440px;
@@ -451,7 +530,9 @@ font-size: 24px;
 
 
   .bg-light {
-    background-color: #657985 !important;
+    background-color: #657985db !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px); 
   }
 
 
@@ -487,6 +568,148 @@ font-size: 24px;
     text-shadow: 1px 0px 4px black;
   }
 
+  .chart-frame{
+    width:100%;
+    max-width:600px;
+  }
+
+  .filterselection.intervalsetMaxWidth {
+    text-align: right;
+    width: 100%;
+    max-width: 235px;
+  }
+  
+  .colfilters{
+    display: flex; /* Make each col a flex container */
+    justify-content: flex-start;
+  }
+
+  .displayBalance{
+    display: flex;
+  }
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+  .sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #3e464db2;;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+  }
+  
+  .sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 26px;
+    color: #d0d0d0;
+    display: block;
+    transition: 0.3s;
+  }
+  
+  .sidenav a:hover {
+    color: #f1f1f1;
+  }
+  
+  .sidenav .closebtn {
+    position: absolute;
+    top: 52px;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+  }
+  
+  #main {
+    transition: margin-left .5s;
+    padding: 16px;
+  }
+  
+  @media screen and (max-height: 450px) {
+    .sidenav {padding-top: 15px;}
+    .sidenav a {font-size: 18px;}
+  }
+
+ .sideButtonWallter{
+font-size: 26px;
+  cursor: pointer;
+  position: relative;
+  left: 24.5px;
+  top: -42px;
+  }
+
+
+  .Transfers{
+      display: none;
+  }
+
+  .buttonDivWallet{
+    justify-content: right;
+    display: flex;
+  }
+  
+  .labelselectAddress{
+  display: flex;
+  justify-content: space-between;
+ }
+ 
+ .walletManagementDelete{
+  padding:22px;
+  background-color: #221d1d36;
+  margin-top: 15px;
+  border-radius:2px;
+  max-width: 484px;
+  display: flex;
+  font-size: 16px;
+ }
+ 
+ .buttonDelete{
+ background-color: #0e151b5c;
+  color: aliceblue;
+  border:rgb(0, 0, 0);
+  padding:7px;
+  border-radius:8px;
+  right: 0px;
+  position: relative;
+  top: -1px;
+  width: 100%;
+  }
+  
+.loader {
+width: 100%;
+height: 3px;
+  display: inline-block;
+  background-color: #DBEEFF33;
+  background-image: linear-gradient(45deg, rgba(0, 0, 0, 0.25) 25%, transparent 25%, transparent 50%, rgba(0, 0, 0, 0.25) 50%, rgba(0, 0, 0, 0.25) 75%, transparent 75%, transparent);
+  font-size: 19px;
+  background-size: 1em 1em;
+  box-sizing: border-box;
+  animation:
+barStripe 2s linear infinite;
+}
+
+@keyframes barStripe {
+  0% {
+    background-position: 1em 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
