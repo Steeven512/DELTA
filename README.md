@@ -1,4 +1,4 @@
-# ▲ DELTA: Intuitive Stablecoin Management & Tracing Platform
+# ▲ DELTA: Easy Management & Tracing Platform for Stablecoins
 
 **DELTA**  Streamlined and efficient interface for managing and tracing regulated stablecoin operations. Seamlessly interact with your digital assets and gain deep insights into their lifecycle across multiple blockchain networks.
 
