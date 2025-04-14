@@ -464,7 +464,7 @@ int http_server(){
     });
 
 
-    
+    server.loglevel(crow::LogLevel::Warning);
     auto _a = server.port(port)/*.ssl_file("ssl/domain.crt", "ssl/domain.key").*/.concurrency(128).run_async();
 
     return 0;
