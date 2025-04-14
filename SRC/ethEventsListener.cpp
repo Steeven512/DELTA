@@ -7,7 +7,7 @@
 #include <csignal>
 #include "libs/func.h"
 
-//  g++ SRC/ethEventsListener.cpp -o eventslistener -I/usr/include/python3.11 -lboost_python311 -lpython3.11  -lssl -lcrypto -lcryptopp -std=c++17
+//  g++ SRC/ethEventsListener.cpp -o eventslistener -I/usr/include/python3.11 -lboost_python311 -lpython3.11 -std=c++17
 
 using namespace std;
 using json = nlohmann::json;
@@ -111,6 +111,7 @@ void  main_thread(){
         }
 
         for(uint i =0 ; i<SyncedToLastCheck.size(); i++){
+			std::this_thread::sleep_for(std::chrono::milliseconds(200));
             if(!SyncedToLastCheck[i]){
                 break;
             }

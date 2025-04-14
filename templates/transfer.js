@@ -711,11 +711,11 @@ async function loadWalletsTransferSelector(){
         
         if(accountSelected != 0){
 			
-			pass = prompt("Password decrypt:")
+			
 			
 			try{
 				
-				pk =  await DecryptWallet( pass , accountSelected )
+				pk =  await DecryptWallet( prompt("Password decrypt:") , accountSelected )
 				if(checkPrivate(pk)) {
 					document.getElementById('privKeyValue').value = pk
           deriveEthAddressFromKey()
