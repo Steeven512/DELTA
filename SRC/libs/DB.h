@@ -838,22 +838,34 @@ bool loadPathNetworkSets(){
         return false;
     }
     std::string Path = "sets";
-    if(!mkDir("sets")){ 
-        cout<<endl<<"fl1";
+    if(!mkDir(Path)){
         return false;
     }
     Path += "/networks";
     if(!mkDir(Path)){
-                cout<<endl<<"fl2";
         return false;
     }
     return true;
-
 }
 
 bool saveNetwork(json &networtSet){
 
     loadPathNetworkSets();
+
+
+    std::filesystem::path gitignore_path("sets/networks/.gitkeep");
+
+    if (std::filesystem::exists(gitignore_path)) {
+        try {
+            std::filesystem::remove(gitignore_path);
+            std::cout << ".gitignore file removed successfully." << std::endl;
+        } catch (const std::filesystem::filesystem_error& e) {
+            std::cerr << "Error removing .gitignore: " << e.what() << std::endl;
+
+        }
+    } else {
+        std::cout << "" << std::endl;
+    }
 
     std::string networkname = networtSet["networkName"];
     std::ofstream archivo("sets/networks/"+networkname);
@@ -876,6 +888,22 @@ bool saveNetwork(json &networtSet){
 vector<json> loadnetworksJson(){
 
     vector<json>networks;
+
+    std::filesystem::path gitignore_path("sets/networks/.gitkeep");
+
+    if (std::filesystem::exists(gitignore_path)) {
+        try {
+            std::filesystem::remove(gitignore_path);
+            std::cout << ".gitignore file removed successfully." << std::endl;
+        } catch (const std::filesystem::filesystem_error& e) {
+            std::cerr << "Error removing .gitignore: " << e.what() << std::endl;
+            return networks;
+        }
+    } else {
+        std::cout << "" << std::endl;
+    }
+
+
 
     for ( const auto& File : fs::directory_iterator("sets/networks/") ) {
         json networkset = ReadNetworkFileSet(File.path().string());
