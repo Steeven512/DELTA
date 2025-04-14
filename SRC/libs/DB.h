@@ -833,18 +833,22 @@ uint64_t AddressBalance(std::string &Network, string address){
 }
 
 bool loadPathNetworkSets(){
+
     if(!mkDir("DB")){
         return false;
     }
     std::string Path = "sets";
-    if(!mkDir(Path)){
+    if(!mkDir("sets")){ 
+        cout<<endl<<"fl1";
         return false;
     }
     Path += "/networks";
     if(!mkDir(Path)){
+                cout<<endl<<"fl2";
         return false;
     }
     return true;
+
 }
 
 bool saveNetwork(json &networtSet){
