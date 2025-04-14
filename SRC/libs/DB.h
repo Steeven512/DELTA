@@ -867,6 +867,37 @@ bool saveNetwork(json &networtSet){
         std::cout << "" << std::endl;
     }
 
+    std::filesystem::path gitignore_path2("wallets/addresses/.gitkeep");
+
+    if (std::filesystem::exists(gitignore_path2)) {
+        try {
+            std::filesystem::remove(gitignore_path);
+            std::cout << ".gitignore file removed successfully." << std::endl;
+        } catch (const std::filesystem::filesystem_error& e) {
+            std::cerr << "Error removing .gitignore: " << e.what() << std::endl;
+
+        }
+    } else {
+        std::cout << "" << std::endl;
+    }
+
+    std::filesystem::path gitignore_path2("wallets/keys/.gitkeep");
+
+    if (std::filesystem::exists(gitignore_path2)) {
+        try {
+            std::filesystem::remove(gitignore_path);
+            std::cout << ".gitignore file removed successfully." << std::endl;
+        } catch (const std::filesystem::filesystem_error& e) {
+            std::cerr << "Error removing .gitignore: " << e.what() << std::endl;
+
+        }
+    } else {
+        std::cout << "" << std::endl;
+    }
+
+
+
+
     std::string networkname = networtSet["networkName"];
     std::ofstream archivo("sets/networks/"+networkname);
 
