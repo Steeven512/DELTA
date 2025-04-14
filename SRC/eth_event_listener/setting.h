@@ -1,6 +1,5 @@
 #include "../libs/io.h"
 #include "../libs/DB.h"
-#include "../libs/hasher.h"
 #include <termios.h>
 
 

@@ -1,7 +1,10 @@
 var serverurl = window.location.origin;
 var tabIndex = 0;
 var tabSizeElements=30
-var lastTab = 0
+var lastTab = 1
+var elementsInDb = 0;
+
+numberOfElementsIndexed = true;
 
 function sixdecimals(value) {
   if (typeof value !== 'string') {
@@ -119,7 +122,70 @@ function createTableRow(logElements, number, trcontrast) {
   tableBody.appendChild(tr);
 }
 
-function apprendTh(elementsInDb){
+
+
+async function GetelementsInDb(){
+
+  try {
+    const response = await fetch(serverurl+"/IndexEvents", {
+    method: 'POST',
+    headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({  "from": ullToHex(0), 
+                            "to": ullToHex(0),
+                            "network": document.getElementById("Networks").value,
+                            "indexType": "NumberElementsIndex",
+                            "filterTransactions": document.getElementById("filterTransactions").checked,
+                            "filterApproval": document.getElementById("filterApproval").checked,
+                            "filterSupply": document.getElementById("filterSupply").checked,
+                            "filterFreezeAddress": document.getElementById("filterFreezeAddress").checked,
+                            "filterPause": document.getElementById("filterPause").checked
+                          })
+  })
+
+  var data = await response.text()
+
+  elementsInDb = parseInt(data,16)
+
+  lastTab= elementsInDb/tabSizeElements
+
+  document.getElementById("tabNumber").textContent = parseInt(tabIndex)+1+"-"+parseInt(lastTab+1)
+
+  const networksValue = document.getElementById("Networks").value;
+  const indexValue = "IndexMain";
+
+  let date = new Date();
+  date.setTime(date.getTime() + (9999 * 24 * 60 * 60 * 1000));
+  const expires = "expires=" + date.toUTCString();
+
+  document.cookie = networksValue +indexValue+ "=" + elementsInDb + ";" + expires + ";path=/";
+
+  }  catch (error) {
+    console.log("error ",error);
+  }
+
+}
+
+async function getCookieIndexNumber(){
+
+  const networksValue = document.getElementById("Networks").value;
+  const indexValue = "IndexMain";
+  const dbElementsCookie = (document.cookie.match('(^|;)\\s*' + networksValue+indexValue + '\\s*=\\s*([^;]+)') || [])[2] || null
+
+  if(dbElementsCookie){
+    elementsInDb = dbElementsCookie
+    lastTab= elementsInDb/tabSizeElements
+    document.getElementById("tabNumber").textContent = parseInt(tabIndex)+1+"-"+parseInt(lastTab+1)
+  } else {
+    document.getElementById("tabNumber").textContent = parseInt(tabIndex)+1+" -"+" ...indexing "
+    GetelementsInDb()
+  }
+
+}
+
+function apprendTh(){
 
   logElements = ['{"blockNumber" : "blockNumber", "transactionIndex" : "transactionIndex" , "logIndex" : "logIndex", "event" : "event"}'];
 
@@ -150,8 +216,6 @@ function apprendTh(elementsInDb){
   tr.appendChild(th3);
   tr.appendChild(th4);
 
-
-
   const thControls = document.createElement('th');
   thControls.classList.add('controls-right'); 
   
@@ -164,8 +228,11 @@ function apprendTh(elementsInDb){
   });
   
   const spanTexto = document.createElement('span');
-  spanTexto.textContent = document.createTextNode(tabIndex+1+"-"+parseInt(elementsInDb+1)).textContent;
+  spanTexto.textContent = document.createTextNode(parseInt(tabIndex)+1+"-"+parseInt(lastTab+1)).textContent;
+  
   spanTexto.id = 'tabNumber';
+
+
 
   thControls.appendChild(spanTexto );
   
@@ -190,12 +257,13 @@ function apprendTh(elementsInDb){
 async function loadtable(araytable){
 
   clearTable()
-  apprendTh( araytable[0])
-  lastTab= parseInt(araytable[0])/tabSizeElements
+  apprendTh()
+
+  lastTab= elementsInDb/tabSizeElements
 
   trcontrast = false;
 
-  for (let i = 1; i < araytable.length; i++) {
+  for (let i = 0; i < araytable.length; i++) {
     createTableRow(araytable[i],i,trcontrast);
     if(trcontrast){
       trcontrast = false
@@ -203,6 +271,11 @@ async function loadtable(araytable){
       trcontrast = true
     }
   }
+
+
+  document.getElementById("tabNumber").textContent = parseInt(tabIndex)+1+"-"+parseInt(lastTab+1)
+
+
 
 }
 
@@ -273,10 +346,11 @@ async function performIndexEventsInIntervals(){
 
 autoIndex = true;
 
+
 async function IndexEventsMain() {
 
-
   if(tabIndex == 0){
+
 
     from = tabSizeElements
     to = 0
@@ -303,10 +377,6 @@ async function IndexEventsMain() {
 
     await loadtable(data)
 
-    lastTab= parseInt(data[0], 16)/tabSizeElements
-
-    document.getElementById("tabNumber").textContent = parseInt(tabIndex)+1+"-"+parseInt(lastTab+1)
-
     }  catch (error) {
       console.log("error ",error);
     }
@@ -316,7 +386,6 @@ async function IndexEventsMain() {
 }
 
 async function IndexEventsMain2(frame_size, mul_selector) {
-
 
 
   try {
@@ -342,11 +411,7 @@ async function IndexEventsMain2(frame_size, mul_selector) {
 
   await loadtable(data)
 
-  tabIndex = mul_selector
 
-  lastTab= parseInt(data[0], 16)/tabSizeElements
-
-  document.getElementById("tabNumber").textContent = parseInt(tabIndex)+1+"-"+parseInt(lastTab+1)
 
   }  catch (error) {
     console.log("error ",error);
@@ -422,10 +487,12 @@ async function updateNetworkIndexSelect() {
 
 
     retrieveinfo()
-
-    IndexEventsMain()
-
     loadCharts()
+    await IndexEventsMain()
+    getCookieIndexNumber()
+    
+
+
 
 
     networkSelectUpdated = true;
@@ -434,6 +501,7 @@ async function updateNetworkIndexSelect() {
 
     }
   }
+
 }
 
 function IndexAddress() {
@@ -500,8 +568,10 @@ async function retrieveinfo(){
 
 window.addEventListener('load', function() {
 
+ 
   updateNetworkIndexSelect() 
   IndexEventsAddressMain()
+
 
 
 });
@@ -1469,11 +1539,13 @@ function nextTab(){
   if(tabIndex<lastTab){
 
     IndexEventsMain2(tabSizeElements ,tabIndex+1)
+    document.getElementById("tabNumber").textContent = parseInt(++tabIndex)+1+"-"+parseInt(lastTab+1)
   }
 
   if(tabIndex<1){
     autoIndex = true
   }
+
 
 }
 function prevTab(){
@@ -1481,6 +1553,7 @@ function prevTab(){
   if(tabIndex>0){
     autoIndex = false
     IndexEventsMain2(tabSizeElements ,tabIndex-1)
+    document.getElementById("tabNumber").textContent = parseInt(--tabIndex)+1+"-"+parseInt(lastTab+1)
   }
 
 }

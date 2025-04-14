@@ -175,7 +175,26 @@
 </div>
 
   <script>
-    const intervalId = setInterval(IndexEventsAddressMain, 25000)
+
+    const intervalId = setInterval(IndexEventsAddressMain, 40000)
+    const intervalId2 = setInterval(GetelementsInDb, 500000)
+
+    const selectElement = document.getElementById('Networks');
+      if (selectElement) {
+        selectElement.addEventListener('change',async function(event) {
+
+          GetBalanceAddress()
+          retrieveinfo()
+          await getCookieIndexNumber()
+          IndexEventsAddressMain()
+
+          let date = new Date();
+          date.setTime(date.getTime() + (9999 * 24 * 60 * 60 * 1000));
+          const expires = "expires=" + date.toUTCString();
+          document.cookie = "networkSet" + "=" + document.getElementById("Networks").value + ";" + expires + ";path=/";
+
+        });
+      } 
   </script>
 
 </body>

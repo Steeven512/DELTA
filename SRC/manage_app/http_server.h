@@ -132,7 +132,6 @@ int http_server(){
 
             vector<json> wallets= walletsStored();
             
-            cout<<endl<<"wallets.size "<<wallets.size(); 
             vector<string>jsonString;
             for (nlohmann::json wallet : wallets) { 
 
@@ -179,7 +178,6 @@ int http_server(){
     CROW_ROUTE(server, "/css/<string>")([](const crow::request& req, crow::response& res, string Path) {
 
         if(!noConsecutivePeriods(Path)){
-            cout<<endl<<"secucheck .. "<<endl;
             res.code = 404;
             res.end();
         }
@@ -231,7 +229,6 @@ int http_server(){
 
         cout<<"IndexEvents debug req.body "<<req.body<<endl;
 
-
         const string from = x["from"].s();
         const string to = x["to"].s();
         const string network = x["network"].s();
@@ -268,13 +265,30 @@ int http_server(){
 
         cout<<endl<<"indexType "<<indexType<<endl;
 
+        if(indexType == "NumberElementsIndex"){
+
+            const string Path = "DB/"+network+"/EthEvents/";
+            string response = ullToHex(countPackagesEventsIntervals(network, Path, filterTransactions, filterBalances, filterApproval, filterSupply, filterFreezeAddress, filterPause, filterBridgeDebug));
+            return crow::response(response); 
+            
+        }
+
+        if(indexType == "NumberElementsAccount"){
+
+            const string Address = x["Address"].s();
+            const string Path = "DB/"+network+"/AccountIndex/"+Address+"/";
+            string response = ullToHex(countPackagesEventsIntervalsAddress(Path, filterTransactions, filterBalances, filterApproval, filterSupply, filterFreezeAddress, filterPause, filterBridgeDebug));
+            return crow::response(response); 
+            
+        }
+
+
         if(indexType == "new"){
 
             const string Path = "DB/"+network+"/EthEvents/";
 
-            fl = retrieveTabQueryByNumber(Path, From , To, filterTransactions, filterBalances, filterApproval, filterSupply, filterFreezeAddress, filterPause, filterBridgeDebug);
+            fl = retrieveTabQueryByNumber(network , Path, From , To, filterTransactions, filterBalances, filterApproval, filterSupply, filterFreezeAddress, filterPause, filterBridgeDebug);
             vector<string>jsonString;
-            jsonString.push_back(ullToHex(countPackagesEventsIntervals(Path, filterTransactions, filterBalances, filterApproval, filterSupply, filterFreezeAddress, filterPause, filterBridgeDebug)));
             for (nlohmann::json transaction : fl) { 
 
                 jsonString.push_back(transaction.dump());
@@ -297,8 +311,8 @@ int http_server(){
 
         } else {
             const string Path = "DB/"+network+"/AccountIndex/"+indexType+"/";
-            jsonString.push_back(ullToHex(countPackagesEventsIntervals(Path, filterTransactions, filterBalances, filterApproval, filterSupply, filterFreezeAddress, filterPause, filterBridgeDebug)));
-            fl = retrieveTabQueryByNumber(Path, From , To, filterTransactions, filterBalances, filterApproval, filterSupply, filterFreezeAddress, filterPause,filterBridgeDebug);
+            uint64_t selectTab = From*To;
+            fl = indexEventsByIntervalsAddress( Path, selectTab , To, filterTransactions, filterBalances, filterApproval, filterSupply, filterFreezeAddress, filterPause,filterBridgeDebug);
         }
 
 

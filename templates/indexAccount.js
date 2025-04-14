@@ -3,6 +3,9 @@ var tabIndex = 0;
 var tabSizeElements=30
 var lastTab = 0
 var autoIndex = true
+var elementsInDb = 0;
+
+numberOfElementsIndexed = false;
 
 function sixdecimals(value) {
     if (typeof value !== 'string') {
@@ -116,7 +119,70 @@ function sixdecimals(value) {
     tableBody.appendChild(tr);
   }
   
-  function apprendTh(elementsInDb){
+  async function GetelementsInDb(){
+
+    try {
+      const response = await fetch(serverurl+"/IndexEvents", {
+      method: 'POST',
+      headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({  "from": ullToHex(0), 
+                              "to": ullToHex(0),
+                              "network": document.getElementById("Networks").value,
+                              "indexType": "NumberElementsAccount",
+                              "Address": document.getElementById("Address").textContent,
+                              "filterTransactions": document.getElementById("filterTransactions").checked,
+                              "filterApproval": document.getElementById("filterApproval").checked,
+                              "filterSupply": document.getElementById("filterSupply").checked,
+                              "filterFreezeAddress": document.getElementById("filterFreezeAddress").checked,
+                              "filterPause": document.getElementById("filterPause").checked
+                            })
+    })
+  
+    var data = await response.text()
+  
+    elementsInDb = parseInt(data,16)
+  
+    lastTab= elementsInDb/tabSizeElements
+
+    document.getElementById("tabNumber").textContent = parseInt(tabIndex)+1+"-"+parseInt(lastTab+1)
+
+    const networksValue = document.getElementById("Networks").value;
+    const indexValue = document.getElementById("Address").textContent;
+  
+    let date = new Date();
+    date.setTime(date.getTime() + (9999 * 24 * 60 * 60 * 1000));
+    const expires = "expires=" + date.toUTCString();
+
+    document.cookie = networksValue +indexValue+ "=" + elementsInDb + ";" + expires + ";path=/";
+
+
+  
+    }  catch (error) {
+      console.log("error ",error);
+    }
+  
+  }
+
+  function getCookieIndexNumber(){
+
+    const networksValue = document.getElementById("Networks").value;
+    const indexValue = document.getElementById("Address").textContent;
+    const dbElementsCookie = (document.cookie.match('(^|;)\\s*' + networksValue+indexValue + '\\s*=\\s*([^;]+)') || [])[2] || null
+
+    if(dbElementsCookie){
+      elementsInDb = dbElementsCookie
+      lastTab= elementsInDb/tabSizeElements
+      document.getElementById("tabNumber").textContent = parseInt(tabIndex)+1+"-"+parseInt(lastTab+1)
+    } else {
+      document.getElementById("tabNumber").textContent = parseInt(tabIndex)+1+"-"+" ...indexing "
+    }
+
+  }
+  
+  function apprendTh(){
   
     logElements = ['{"blockNumber" : "blockNumber", "transactionIndex" : "transactionIndex" , "logIndex" : "logIndex", "event" : "event"}'];
   
@@ -147,8 +213,6 @@ function sixdecimals(value) {
     tr.appendChild(th3);
     tr.appendChild(th4);
   
-  
-  
     const thControls = document.createElement('th');
     thControls.classList.add('controls-right'); 
     
@@ -161,8 +225,11 @@ function sixdecimals(value) {
     });
     
     const spanTexto = document.createElement('span');
-    spanTexto.textContent = document.createTextNode(tabIndex+1+"-"+parseInt(elementsInDb)).textContent;
+    spanTexto.textContent = document.createTextNode(parseInt(tabIndex)+1+"-"+parseInt(lastTab+1)).textContent;
+    
     spanTexto.id = 'tabNumber';
+  
+  
   
     thControls.appendChild(spanTexto );
     
@@ -185,14 +252,15 @@ function sixdecimals(value) {
   }
   
   async function loadtable(araytable){
-  
+
     clearTable()
-    apprendTh( araytable[0])
-    lastTab= parseInt(araytable[0])/tabSizeElements
+    apprendTh()
+  
+    lastTab= elementsInDb/tabSizeElements
   
     trcontrast = false;
   
-    for (let i = 1; i < araytable.length; i++) {
+    for (let i = 0; i < araytable.length; i++) {
       createTableRow(araytable[i],i,trcontrast);
       if(trcontrast){
         trcontrast = false
@@ -200,6 +268,10 @@ function sixdecimals(value) {
         trcontrast = true
       }
     }
+  
+    document.getElementById("tabNumber").textContent = parseInt(tabIndex)+1+"-"+parseInt(lastTab+1)
+
+  
   
   }
   
@@ -219,7 +291,7 @@ function sixdecimals(value) {
   }
   
   async function switchButtomClear() {
-  
+
     let buttonToRemplace = document.getElementById('indexIntervalsButton')
     let divPadre = buttonToRemplace.parentNode
     divPadre.removeChild(buttonToRemplace)
@@ -263,18 +335,23 @@ function sixdecimals(value) {
       return
     }
   
-    IndexEvents2(tabSizeElements, toBl-1)
+    IndexEventsMain2(tabSizeElements, toBl-1)
   
   
   }
+  
+  autoIndex = true;
+
+
+
 
   async function IndexEventsAddressMain() {
 
 
     if(tabIndex == 0){
 
-        from = tabSizeElements
-        to = 0
+        from = tabIndex
+        to = tabSizeElements
 
         try {
         const response = await fetch(serverurl+"/IndexEvents", {
@@ -297,15 +374,8 @@ function sixdecimals(value) {
     
         var data = await response.json()
 
-
         await loadtable(data)
 
-        lastTab= parseInt(data[0], 16)/tabSizeElements
-
-        document.getElementById("tabNumber").textContent = parseInt(tabIndex)+1+"-"+parseInt(lastTab+1)
-
-
-    
         } catch (error) {
             console.log("error ",error);
         }
@@ -353,9 +423,15 @@ async function updateNetworkIndexSelect() {
 
     document.getElementById('Networks').value = (document.cookie.match('(^|;)\\s*' + "networkSet" + '\\s*=\\s*([^;]+)') || [])[2] || null
 
+
     GetBalanceAddress()
-    retrieveinfo()
-    IndexEventsAddressMain()
+    retrieveinfo() 
+
+    await IndexEventsAddressMain()
+
+    getCookieIndexNumber()
+    await GetelementsInDb()
+
 
     networkSelectUpdated = true;
 
@@ -433,12 +509,7 @@ async function IndexEvents2(frame_size, mul_selector) {
     var data = await response.json()
   
     await loadtable(data)
-  
-    tabIndex = mul_selector
-  
-    lastTab= parseInt(data[0], 16)/tabSizeElements
-  
-    document.getElementById("tabNumber").textContent = parseInt(tabIndex)+1+"-"+parseInt(lastTab+1)
+
   
     }  catch (error) {
       console.log("error ",error);
@@ -519,6 +590,8 @@ window.addEventListener('load', function() {
 
     updateNetworkIndexSelect() 
 
+
+
   });
 
   
@@ -527,19 +600,22 @@ function nextTab(){
 
     if(tabIndex<lastTab){
   
-        IndexEvents2(tabSizeElements ,tabIndex+1)
+      IndexEventsMain2(tabSizeElements ,tabIndex+1)
+      document.getElementById("tabNumber").textContent = parseInt(++tabIndex)+1+"-"+parseInt(lastTab+1)
     }
   
     if(tabIndex<1){
       autoIndex = true
     }
   
+  
   }
-  function prevTab(){
+function prevTab(){
   
     if(tabIndex>0){
       autoIndex = false
-      IndexEvents2(tabSizeElements ,tabIndex-1)
+      IndexEventsMain2(tabSizeElements ,tabIndex-1)
+      document.getElementById("tabNumber").textContent = parseInt(--tabIndex)+1+"-"+parseInt(lastTab+1)
     }
   
   }

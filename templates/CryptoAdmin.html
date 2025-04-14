@@ -274,13 +274,15 @@
 
 
 
-    const intervalId = setInterval(IndexEventsMain, 20000);
+    const intervalId = setInterval(IndexEventsMain, 25000);
+    const intervalId2 = setInterval(GetelementsInDb, 300000);
 
     const selectElement = document.getElementById('Networks');
       if (selectElement) {
         selectElement.addEventListener('change',async function(event) {
 
           IndexEventsMain()
+          getCookieIndexNumber()
           retrieveinfo()
           loadCharts()
 
@@ -291,7 +293,6 @@
 
         });
       } 
-
 
   </script>
 
